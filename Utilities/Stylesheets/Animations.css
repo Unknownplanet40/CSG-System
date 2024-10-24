@@ -1,0 +1,92 @@
+/* NavbarStyle.css */
+@keyframes nav-zoom {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* HomeStyle.css */
+
+@keyframes move {
+  100% {
+      transform: translate3d(0, 0, 1px) rotate(360deg);
+  }
+}
+
+/* BS_DBStyle.css */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes RightFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes linegrow {
+  0% {
+    width: 0;
+  }
+
+  100% {
+    width: 50px;
+  }
+}
+
+@keyframes linegrow-end {
+  0% {
+    width: 0;
+  }
+
+  100% {
+    width: 125px;
+  }
+}
+
+@keyframes imageFadeIn {
+  0% {
+    opacity: 0;
+    background-position: right bottom;
+  }
+
+  100% {
+    opacity: 1;
+    background-position: right;
+  }
+}
+
+/* ProfileStyle.css */
+
+@keyframes cover-ani {
+  from {
+      opacity: 0;
+      transform: translateY(20px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}

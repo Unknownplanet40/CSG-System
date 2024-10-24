@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="../../Utilities/Third-party/Bootstrap/css/bootstrap.css"
+    />
+    <link rel="stylesheet" href="../../Utilities/Stylesheets/Fonts.css" />
+    <link
+      rel="shortcut icon"
+      href="../../Assets/Icons/PWA-Icon/MainIcon.png"
+      type="image/x-icon"
+    />
+    <title>Error Page</title>
+    <style>
+      body {
+        font-family: "Poppins";
+        font-size: 1.2rem;
+      }
+    </style>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        let errors_title = {
+          0: "Unknown Error",
+          1001: "User Error",
+          1049: "Invalid Database",
+          1045: "Invalid Username or Password",
+          2002: "Invalid Host",
+          1044: "Invalid Database",
+        };
+
+        let errors_message = {
+          0: "An unknown error occurred. Please try again later.",
+          1001: "An error occurred while processing your request. Please try again later.",
+          1049: "The specified database could not be found. Please check the database name and try again.",
+          1045: "Invalid username or password. Please verify your credentials and try again.",
+          2002: "Could not connect to the database host. Please check the host name and ensure the database server is running.",
+          1044: "Access denied for the specified database. Please verify the database name and permissions.",
+        };
+
+        if (localStorage.getItem("error_code") === null) {
+          localStorage.setItem("error_code", 0);
+          document.getElementById("error-title").innerHTML = errors_title[0];
+          document.getElementById("error-message").innerHTML = errors_message[0];
+        } else {
+          let error_code = localStorage.getItem("error_code");
+          document.getElementById("error-title").innerHTML = errors_title[error_code];
+          document.getElementById("error-message").innerHTML = errors_message[error_code];
+        }
+      });
+    </script>
+  </head>
+
+  <body class="bg-body">
+    <div class="container">
+      <div
+        class="row justify-content-center align-items-center"
+        style="height: 80vh"
+      >
+        <div class="col-md-12 text-center">
+          <img
+            src="../../Assets/Images/Loader-v1.gif"
+            alt="Error"
+            width="128"
+            height="128"
+            class="mb-4"
+          />
+          <h1 class="text-uppercase fw-bold text-danger mb-3"
+            id="error-title"></h1>
+          <p class="text-muted" id="error-message"></p>
+
+          <div class="hstack gap-3 d-flex justify-content-center mt-4">
+            <a class="btn btn-primary" id="backHome">Homepage</a>
+          </div>
+
+          <script>
+            document
+              .getElementById("backHome")
+              .addEventListener("click", () => {
+                localStorage.removeItem("error_code");
+                window.location.href = "./Homepage.php";
+              });
+          </script>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

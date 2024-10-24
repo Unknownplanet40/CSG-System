@@ -1,0 +1,79 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.selected {
+  color: var(--bs-success);
+  font-weight: 600;
+  transform: translateX(10px);
+}
+
+.selected svg {
+  height: 24px;
+  width: 24px;
+}
+
+.list-hover {
+  transition: 0.3s ease;
+  background-color: transparent;
+}
+
+.list-hover:not(.selected):hover {
+  /* background-color: var(--bs-warning-border-subtle);
+    color: var(--bs-warning-border-subtle-rgb); */
+  color: var(--bs-success);
+  transform: translateX(10px);
+}
+
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+.eyeforaneye {
+  position: relative;
+}
+
+.pass-eye {
+  position: absolute;
+  right: -8px;
+  top: 0;
+  cursor: pointer;
+}
+
+.pass-eye:hover {
+  color: var(--bs-link-hover-color);
+}
+
+.pass-eye:active {
+  color: var(--bs-link-color);
+}
+
+div:where(.alert-container).swal2-backdrop-show, div:where(.alert-container).swal2-noanimation {
+  backdrop-filter: blur(5px);
+}
+
+div:where(.alert-container) div:where(.alert-popup-inform) {
+  background: rgba(var(--bs-body-bg-rgb), 0.8) !important;
+  color: var(--bs-body-color);
+  backdrop-filter: blur(5px);
+  border-radius: 2px !important;
+}
+
+div:where(.alert-container) h2:where(.alert-title) {
+  color: var(--bs-body-color) !important;
+}
+
+div:where(.alert-container) div:where(.alert-html-container) {
+  color:  rgba(var(--bs-body-color-rgb), 0.8) !important;
+}
+
+div:where(.alert-container) button:where(.swal2-styled).alert-button-confirm{
+  background-color: var(--bs-primary) !important;
+  color: var(--bs-primary-rgb);
+  border-radius: 2px;
+
+}

@@ -1,0 +1,203 @@
+{
+  "protocol_handlers": [
+    {
+      "protocol": "web+tea",
+      "url": "/tea?type=%s"
+    },
+    {
+      "protocol": "web+coffee",
+      "url": "/coffee?type=%s"
+    }
+  ],
+  "name": "CSG: Central Student Government System",
+  "short_name": "CSG",
+  "background_color": "#fff",
+  "description": "Central Student Government System is a web application that allows students to access the services provided by the Central Student Government of the University Imus Campus.",
+  "dir": "ltr",
+  "display": "standalone",
+  "orientation": "natural",
+  "scope": "/",
+  "start_url": "/CSG-System/Src/Pages/Homepage.php",
+  "theme_color": "#ffffff",
+  "iarc_rating_id": "e58c174a-81d2-5c3c-32cc-34b8de4a52e9",
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": "narrow"
+  },
+  "related_applications": [
+    {
+      "platform": "play",
+      "id": "com.example.app1",
+      "url": "https://play.google.com/store/apps/details?id=com.example.app1"
+    },
+    {
+      "platform": "itunes",
+      "id": "com.example.app2",
+      "url": "https://itunes.apple.com/app/example-app2/id123456789"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Home Page",
+      "short_name": "Home",
+      "url": "/CSG-System/Src/Pages/Homepage.php",
+      "description": "Go to the homepage.",
+      "icons": [
+        {
+          "src": "../../Assets/Icons/PWA-Icon/Icon-x96.jpeg",
+          "sizes": "96x96",
+          "type": "image/jpeg",
+          "purpose": "any"
+        }
+      ]
+    },
+    {
+      "name": "Login / Register",
+      "short_name": "Sign In",
+      "url": "/CSG-System/Src/Pages/Accesspage.php",
+      "description": "Login to the system.",
+      "icons": [
+        {
+          "src": "../../Assets/Icons/PWA-Icon/Icon-x96.jpeg",
+          "sizes": "96x96",
+          "type": "image/jpeg",
+          "purpose": "any"
+        }
+      ]
+    },
+    {
+      "name": "View Announcements",
+      "short_name": "News Feed",
+      "url": "/CSG-System/Src/Pages/Feed.php",
+      "description": "View the latest announcements posted by the Central Student Government.",
+      "icons": [
+        {
+          "src": "../../Assets/Icons/PWA-Icon/Icon-x96.jpeg",
+          "sizes": "96x96",
+          "type": "image/jpeg",
+          "purpose": "any"
+        }
+      ]
+    },
+    {
+      "name": "View Profile",
+      "short_name": "Profile",
+      "url": "/CSG-System/Src/Pages/Profile.php",
+      "description": "View your profile.",
+      "icons": [
+        {
+          "src": "../../Assets/Icons/PWA-Icon/Icon-x96.jpeg",
+          "sizes": "96x96",
+          "type": "image/jpeg",
+          "purpose": "any"
+        }
+      ]
+    },
+    {
+      "name": "Borrow Equipment",
+      "short_name": "Borrow",
+      "url": "/CSG-System/Src/Pages/Apps/Borrowing_System/Dashboard.php",
+      "description": "Borrow equipment from the Central Student Government.",
+      "icons": [
+        {
+          "src": "../../Assets/Icons/PWA-Icon/Icon-x96.jpeg",
+          "sizes": "96x96",
+          "type": "image/jpeg",
+          "purpose": "any"
+        }
+      ]
+    }
+  ],
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  },
+  "web_apps": {
+    "navigation_scope": "/CSG-System/Src/Pages/Homepage.php",
+    "scope": "/CSG-System/Src/Pages/Homepage.php",
+    "open_as_window": true
+  },
+  "icons": [
+    {
+      "src": "../../Assets/Icons/PWA-Icon/Icon-x512.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "../../Assets/Icons/PWA-Icon/Icon-x192.jpeg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "../../Assets/Icons/PWA-Icon/Icon-x144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "../../Assets/Icons/PWA-Icon/Icon-x96.jpeg",
+      "sizes": "96x96",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "../../Assets/Icons/PWA-Icon/Icon-x72.jpeg",
+      "sizes": "72x72",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "../../Assets/Icons/PWA-Icon/Icon-x48.jpeg",
+      "sizes": "48x48",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "../../Assets/Icons/PWA-Icon/Icon-x36.jpeg",
+      "sizes": "36x36",
+      "type": "image/jpeg"
+    }
+  ],
+  "lang": "en",
+  "display_override": ["window-controls-overlay"],
+  "categories": [
+    "education",
+    "navigation",
+    "politics",
+    "productivity",
+    "utilities"
+  ],
+  "screenshots": [
+    {
+      "src": "../../Assets/Images/PWA ScreenShot/SSW.png",
+      "sizes": "1080x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "../../Assets/Images/PWA ScreenShot/SSM.png",
+      "sizes": "412x915",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "../../Assets/Images/PWA ScreenShot/SSM-2.png",
+      "sizes": "412x915",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "../../Assets/Images/PWA ScreenShot/SSM-3.png",
+      "sizes": "412x915",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "../../Assets/Images/PWA ScreenShot/SSW-2.png",
+      "sizes": "1080x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "../../Assets/Images/PWA ScreenShot/SSW-3.png",
+      "sizes": "1080x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
+}

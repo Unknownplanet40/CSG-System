@@ -1,0 +1,176 @@
+@import url(./Fonts.css);
+@import url(../Third-party/Bootstrap/css/color.css);
+@import url(./Animations.css);
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+}
+
+.RHBS {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+  width: 100%;
+  padding: 10px;
+  border-radius: 25rem 0 0 25rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  transition: 300ms ease all;
+}
+
+.RHBS:not(.selected) {
+  animation: fadeIn 300ms ease;
+}
+
+.RHBS:not(.selected):hover {
+  color: var(--bs-green);
+}
+
+.RHBS:not(.selected):active {
+  transform: translateX(20px);
+}
+
+.selected {
+  background-color: var(--bs-orange);
+  transform: translateX(50px);
+}
+
+.selected:hover {
+  transform: translateX(20px);
+}
+
+.BS-Side {
+  height: 100svh;
+  min-width: 250px;
+  max-width: 250px;
+  transition: 300ms ease all;
+  animation: RightFadeIn 800ms ease forwards;
+}
+
+.BS-Main {
+  width: 100%;
+}
+
+.lg {
+  margin: 5px 0;
+  padding: 0 10px;
+  background-color: transparent;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 300ms ease all;
+  width: 100%;
+}
+
+.lg-active {
+  transform: translateX(10px);
+  color: var(--bs-green);
+}
+
+.lg-label {
+  transition: 300ms ease all;
+  color: var(--bs-light);
+}
+
+.lg:not(.lg-active):hover {
+  color: var(--bs-green);
+  transform: translateX(15px);
+}
+
+.hr-divider-start {
+  position: relative;
+  text-align: center;
+  transition: 300ms ease all;
+}
+
+.hr-divider-start::before {
+  content: " ";
+  display: block;
+  height: 2px;
+  width: 50px;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  background: var(--bs-secondary);
+  animation: linegrow 300ms ease;
+}
+
+.hr-divider-start::after {
+  content: " ";
+  display: block;
+  height: 2px;
+  width: 50px;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  background: var(--bs-secondary);
+  animation: linegrow 300ms ease;
+}
+
+.hr-divider-end {
+  position: relative;
+  text-align: center;
+  transition: 300ms ease all;
+}
+
+.hr-divider-end::before {
+  content: " ";
+  display: block;
+  height: 2px;
+  width: 125px;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  background: var(--bs-secondary);
+  animation: linegrow-end 300ms ease;
+}
+
+.hr-divider-end::after {
+  content: " ";
+  display: block;
+  height: 2px;
+  width: 125px;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  background: var(--bs-secondary);
+  animation: linegrow-end 300ms ease;
+}
+
+.image1 {
+  background-image: url("https://i.imgur.com/Xd06F5f.jpeg");
+  background-size: 150px;
+  background-position: right;
+  background-repeat: no-repeat;
+  transition: all 300ms forwards;
+}
+
+.row > .col:nth-child(1) .image1 {
+  background-image: url("https://www.svgrepo.com/show/522794/clipboard-list.svg");
+  animation: imageFadeIn 300ms ease forwards;
+}
+
+.row > .col:nth-child(2) .image1 {
+  background-image: url("https://www.svgrepo.com/show/522742/archive-down-minimlistic.svg");
+  animation: imageFadeIn 300ms ease forwards;
+  animation-delay: 100ms;
+}
+
+.row > .col:nth-child(3) .image1 {
+  background-image: url("https://www.svgrepo.com/show/522749/augmented-reality.svg");
+  animation: imageFadeIn 300ms ease forwards;
+  animation-delay: 200ms;
+}
+
+.row > .col:nth-child(4) .image1 {
+  background-image: url("https://www.svgrepo.com/show/522740/align-top.svg");
+  animation: imageFadeIn 300ms ease forwards;
+  animation-delay: 300ms;
+}
