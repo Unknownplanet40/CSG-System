@@ -102,8 +102,7 @@
 .anal{
   animation: opascale linear both;
   animation-timeline: view(block);
-  animation-range: cover 5% contain 35%;
-  opacity: 0;
+  animation-range: entry 0% cover 60%;
 }
 
 .anals{
@@ -113,11 +112,9 @@
 
 @keyframes opascale {
   from {
-    opacity: 0;
     transform: scale(0.9);
   }
   to {
-    opacity: 1;
     transform: scale(1);
   }
 }
@@ -153,12 +150,12 @@
 
 .conusers-card{
   cursor: pointer;
-  transition: 500ms cubic-bezier(1, 0, 0, 1) all;
+  /* transition: 500ms cubic-bezier(1, 0, 0, 1) all; */
 }
 
 .conusers-card:not(.card-search):hover{
   background-color: var(--bs-list-group-bg);
-  transform: scale(1.05);
+  /* transform: scale(1.05); */
 }
 
 .swal2-actions{

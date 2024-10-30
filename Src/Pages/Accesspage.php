@@ -32,6 +32,7 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
     <link rel="stylesheet" href="../../Utilities/Stylesheets/CustomStyle.css">
     <link rel="stylesheet" href="../../Utilities/Stylesheets/MNavbarStyle.css">
     <link rel="stylesheet" href="../../Utilities/Stylesheets/Accessstyle.css">
+    <link rel="shortcut icon" href="../../Assets/Icons/PWA-Icon/MainIcon.png" type="image/x-icon">
     <script src="../../Utilities/Third-party/Bootstrap/js/bootstrap.bundle.js"></script>
     <script src="../../Utilities/Third-party/JQuery/js/jquery.min.js"></script>
     <script src="../../Utilities/Third-party/Sweetalert2/js/sweetalert2.all.min.js"></script>

@@ -38,6 +38,10 @@ try {
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
 
+            if (isset($_SESSION['UUID']) && $row['UUID'] == $_SESSION['UUID']) {
+                continue;
+            } 
+
             $stmt = $conn->prepare("SELECT * FROM userprofile WHERE UUID = ?");
             $stmt->bind_param("s", $row['UUID']);
             $stmt->execute();
@@ -50,6 +54,18 @@ try {
             } else {
                 $profile = "Default-Profile.gif";
             }
+
+            /* for ($i = 0; $i <= 5; $i++) {
+                $data[] = [
+                    'UUID' => $row['UUID'],
+                    'First_Name' => $row['First_Name'],
+                    'Last_Name' => $row['Last_Name'],
+                    'primary_email' => $row['primary_email'],
+                    'isLogin' => $row['isLogin'],
+                    'fullName' => $row['fullName'],
+                    'profile' => $profile
+                ];
+            } */
 
 
             $data[] = [

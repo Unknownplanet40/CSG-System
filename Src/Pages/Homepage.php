@@ -23,6 +23,7 @@ if (!isset($_SESSION['database_status'])) {
 	<meta name="keywords"
 		content="Central Student Government, CSG, Student Government, Central Student Government Portal">
 	<meta name="author" content="Unknownplanet40">
+	<link rel="shortcut icon" href="../../Assets/Icons/PWA-Icon/MainIcon.png" type="image/x-icon">
 	<link rel="manifest" href="manifest.json" crossorigin="use-credentials">
 	<link rel="stylesheet" href="../../Utilities/Third-party/Bootstrap/css/bootstrap.css">
 	<link rel="stylesheet" href="../../Utilities/Third-party/AOS/css/aos.css">

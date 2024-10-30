@@ -22,6 +22,8 @@ function response($data)
     exit;
 }
 
+$temp_UUID = "";
+
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         response(['error' => 'Invalid request method']);
@@ -41,6 +43,8 @@ try {
     } else {
         $autoLogin = false;
     }
+
+    $temp_UUID = $data['UUID'];
 
     $stmt = $conn->prepare("SELECT student_Number, password, LoginStat, BanExpired, UUID FROM accounts WHERE student_Number = ?");
     $stmt->bind_param("i", $studentNumber);
@@ -252,5 +256,6 @@ try {
         response(['status' => 'error', 'message' => 'No account found with the student number']);
     }
 } catch (Exception $e) {
+    writeLog($logPath, "ERROR", $temp_UUID, "Login", $ipAddress, "Failed");
     response(['status' => 'critical', 'message' => $e->getMessage()]);
 }

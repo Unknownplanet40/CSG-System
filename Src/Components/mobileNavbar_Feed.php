@@ -1,4 +1,5 @@
 
+<div class="b_navbar d-lg-none bg-body bg-blur-5 bg-opacity-25" id="b_Navbar">
 <div class="position-relative d-lg-none">
     <div class="position-fixed bottom-0 end-0 p-3 mb-5" style="z-index: 11;">
         <div type="button" class="btn btn-primary bg-transparent border-0 rounded-circle p-3 chat-aniSide" id="chatButton">
@@ -24,11 +25,7 @@
             $("#chatButton").removeClass("d-none");
         }
     }, 100);
-
-
 </script>
-
-<div class="b_navbar d-lg-none bg-body bg-blur-5 bg-opacity-25" id="b_Navbar">
         <div class="row h-100 item-parent">
             <div class="col-3">
                 <a class="col-Items nav-active" id="b_ItemNav_Log">

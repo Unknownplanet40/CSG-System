@@ -238,7 +238,7 @@ export function loadUsers() {
         usersCons.empty();
         usersCons.append(`
                     <div class="card rounded-1 mb-2 conusers-card card-search border-0 text-bg-secondary bg-opacity-25">
-                        <div class="card-body rounded-1">
+                        <div class="card-body">
                             <div class="hstack gap-1 d-flex justify-content-center">
                                 <svg width="48" height="48" class="text-body">
                                     <use xlink:href="#NoUsers"></use>
@@ -253,7 +253,7 @@ export function loadUsers() {
         usersCons.empty();
         usersCons.append(`
                     <div class="card rounded-1 mb-2 conusers-card card-search border-0">
-                        <div class="card-body rounded-1">
+                        <div class="card-body">
                             <div class="hstack gap-1 d-flex justify-content-center">
                                 <svg width="48" height="48">
                                     <use xlink:href="#NoUsers"></use>
@@ -268,7 +268,7 @@ export function loadUsers() {
           usersCons.empty();
           usersCons.append(`
                     <div class="card rounded-1 mb-2 conusers-card card-search border-0 text-bg-danger">
-                        <div class="card-body rounded-1">
+                        <div class="card-body">
                             <div class="hstack gap-1 d-flex justify-content-center">
                                 <svg width="48" height="48">
                                     <use xlink:href="#Close"></use>
@@ -286,7 +286,7 @@ export function loadUsers() {
         data.data.forEach((user) => {
           var randNum = Math.floor(Math.random() * 1000);
           usersCons.append(`
-                <div class="card rounded-1 mb-2 conusers-card" id="user-${randNum}">
+                <div class="card rounded-0 border-0 mb-2 conusers-card" id="user-${randNum}">
                     <div class="card-body">
                         <div class="hstack gap-1">
                             <div class="position-relative">
@@ -307,12 +307,12 @@ export function loadUsers() {
                                 } ${user.Last_Name}</p>
                                 ${
                                   user.Sentby === "You"
-                                    ? `<small class="fw-light d-inline-block text-truncate" style="max-width: 150px;">You: <span class="fw-light">${
+                                    ? `<small class="fw-light d-inline-block text-truncate" style="max-width: 115px;">You: <span class="fw-light">${
                                         user.currentMessageDeleted === true
                                           ? `This message was deleted`
                                           : user.latestMessage
                                       }</span></small>`
-                                    : `<small class="fw-light d-inline-block text-truncate" style="max-width: 150px;">${
+                                    : `<small class="fw-light d-inline-block text-truncate" style="max-width: 115px;">${
                                         user.currentMessageDeleted === true
                                           ? `This message was deleted`
                                           : user.latestMessage
@@ -346,7 +346,7 @@ export function loadUsers() {
       usersCons.empty();
       usersCons.append(`
                     <div class="card rounded-1 mb-2 conusers-card card-search border-0">
-                        <div class="card-body rounded-1">
+                        <div class="card-body">
                             <div class="hstack gap-1 d-flex justify-content-center">
                                 <svg width="48" height="48">
                                     <use xlink:href="#NoUsers"></use>
@@ -486,11 +486,24 @@ export function fetch_Announcements() {
     success: function (data) {
       if (data.status === "success") {
         annCon.empty();
+
+        // check data.data count
+        if (data.data.length > 2) {
+          $('#annsmain').addClass('ansscroll');
+        } else {
+          $('#annsmain').removeClass('ansscroll');
+        }
+
         data.data.forEach((announcement) => {
           // Format the likes and dislikes
           let postLikes = announcement.postLikes;
           let postDislikes = announcement.postDislikes;
           let largeNum = ["K", "M", "B", "T"];
+          let lastPost = "";
+
+          if (data.data[data.data.length - 1] !== announcement) {
+            lastPost = "anal";
+          }
 
           function formatNumber(num) {
             let formatted = num;
@@ -591,7 +604,7 @@ export function fetch_Announcements() {
             }
           }
 
-          annCon.append(`<div class="col-12 anal">
+          annCon.append(`<div class="col-12 ${lastPost}">
                             <div class="alert bg-body rounded-1 border shadow" role="alert">
                                 <div class="hstack gap-0">
                                     <div>

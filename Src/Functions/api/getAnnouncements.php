@@ -22,9 +22,9 @@ try {
     }
 
     if (!isset($_GET['UUID'])) {
-        $stmt = $conn->prepare("SELECT * FROM userannouncement ORDER BY priority DESC, postedDate DESC, RAND()");
+        $stmt = $conn->prepare("SELECT * FROM userannouncement ORDER BY priority DESC, postedDate DESC, RAND() LIMIT 10");
     } else {
-        $stmt = $conn->prepare("SELECT * FROM userannouncement WHERE postedBy = ? ORDER BY priority DESC, postedDate DESC, RAND()");
+        $stmt = $conn->prepare("SELECT * FROM userannouncement WHERE postedBy = ? ORDER BY priority DESC, postedDate DESC, RAND() LIMIT 10");
         $stmt->bind_param("s", $_GET['UUID']);
     }
     
@@ -120,6 +120,26 @@ try {
                 }
 
 
+                // for testing purposes loop data 5 times to see the effect of the infinite scroll
+
+                /* for ($i = 0; $i < 5; $i++) {
+                    $data[] = [
+                        'postID' => $row['postID'],
+                        'postedBy' => $fullName,
+                        'postStatus' => $row['postStatus'],
+                        'priority' => $row['priority'] == 1 ? 'LowPriority' : ($row['priority'] == 2 ? 'NormPriority' : 'HighPriority'),
+                        'postContent' => $row['postContent'],
+                        'postLikes' => $row['postLikes'],
+                        'postDislikes' => $row['postDislikes'],
+                        'likeBy' => $likeBy,
+                        'dislikeBy' => $dislikeBy,
+                        'likeBy_Name' => $likeBy_Name,
+                        'dislikeBy_Name' => $dislikeBy_Name,
+                        'isDeleted' => $row['isDeleted'],
+                        'postedDate' => date('F j, Y', strtotime($row['postedDate'])),
+                        'profileImage' => $image
+                    ];
+                } */
 
                 $data[] = [
                     'postID' => $row['postID'],

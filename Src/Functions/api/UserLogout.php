@@ -25,29 +25,30 @@ try {
     session_unset();
     session_destroy();
 
-    if ($_SERVER['REMOTE_ADDR'] == "::1") {
-        writeLog("../../Debug/Users/UUID.log", "Info", $currentSession, "logout", NULL, "Success");
-    } else {
-        writeLog("../../Debug/Users/UUID.log", "Info", $currentSession, "logout", $_SERVER['REMOTE_ADDR'], "Success");
-    }
-
     if (isset($_GET['error'])) {
-        $error = $_GET['error'];
-        if ($error == '003') {
-            header('Location: ../../Pages/Accesspage.php?error=003');
-        } elseif ($error == '002') {
-            header('Location: ../../Pages/Accesspage.php?error=002');
-        } elseif ($error == '001') {
-            header('Location: ../../Pages/Accesspage.php?error=001');
-        } else {
-            header('Location: ../../Pages/Accesspage.php');
+        switch ($_GET['error']) {
+            case '001':
+                header('Location: ../../Pages/Accesspage.php?error=001');
+                break;
+            case '002':
+                header('Location: ../../Pages/Accesspage.php?error=002');
+                break;
+            case '003':
+                header('Location: ../../Pages/Accesspage.php?error=003');
+                break;
+            default:
+                header('Location: ../../Pages/Accesspage.php');
+                break;
         }
     } else {
         if (isset($_GET['studentnum']) && isset($_GET['password'])) {
+            // this id for auto login (Note: since the user is already logged in it will redirect to the Feed page) this feature is rarely used
+            writeLog("../../Debug/Users/UUID.log", "INFO", $currentSession, "Auto-Login", $_SERVER['REMOTE_ADDR'], "Success");
             $studentnum = $_GET['studentnum'];
             $password = $_GET['password'];
             header('Location: ../../Pages/Accesspage.php?autoLogin=true&studentnum=' . $studentnum . '&password=' . $password);
         } else {
+            writeLog("../../Debug/Users/UUID.log", "Info", $currentSession, "logout", $_SERVER['REMOTE_ADDR'], "Success");
             header('Location: ../../Pages/Accesspage.php');
         }
     }

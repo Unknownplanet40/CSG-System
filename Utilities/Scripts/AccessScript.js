@@ -22,6 +22,8 @@ if (navigator.onLine) {
   $.getJSON("https://api.ipify.org?format=json", function (data) {
     $ipAddress = data.ip;
   });
+} else {
+  $ipAddress = "000.000.000.000";
 }
 
 $(document).ready(function () {

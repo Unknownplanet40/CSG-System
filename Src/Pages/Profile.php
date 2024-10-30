@@ -4,7 +4,7 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 if (!isset($_SESSION['UUID'])) {
-    header('Location: ../../Pages/Accesspage.php?error=001');
+    header('Location: ../Pages/Accesspage.php?error=001');
 }
 
 $inactive = 1800; // 30 minutes inactivity
@@ -30,6 +30,7 @@ $_SESSION['last_activity'] = time();
     <link rel="stylesheet" href="../../Utilities/Stylesheets/CustomStyle.css">
     <link rel="stylesheet" href="../../Utilities/Stylesheets/NavbarStyle.css">
     <link rel="stylesheet" href="../../Utilities/Stylesheets/ProfileStyle.css">
+    <link rel="shortcut icon" href="../../Assets/Icons/PWA-Icon/MainIcon.png" type="image/x-icon">
     <script defer src="../../Utilities/Third-party/Bootstrap/js/bootstrap.bundle.js"></script>
     <script src="../../Utilities/Third-party/Sweetalert2/js/sweetalert2.all.min.js"></script>
     <script src="../../Utilities/Third-party/JQuery/js/jquery.min.js"></script>
@@ -132,16 +133,14 @@ $_SESSION['last_activity'] = time();
                                             <div class="form-floating">
                                                 <textarea class="form-control border-0" placeholder="Create a Post"
                                                     style="white-space: pre-wrap;" id="post-details"
-                                                    style="height: 100px" maxlength="500" required rows="10"
-                                                    ></textarea>
+                                                    style="height: 100px" maxlength="500" required rows="10"></textarea>
                                                 <label for="post-details">What's on your mind?</label>
                                             </div>
 
                                             <hr>
                                             <div class="hstack gap-1">
                                                 <div>
-                                                    <button
-                                                        class="btn btn-sm btn-primary rounded-1 border-0 my-1 px-5"
+                                                    <button class="btn btn-sm btn-primary rounded-1 border-0 my-1 px-5"
                                                         id="SubmitPost">
                                                         <svg width="24" height="24">
                                                             <use xlink:href="#CreatePost" />
@@ -157,8 +156,7 @@ $_SESSION['last_activity'] = time();
                                                                 value="<?php echo $_SESSION['UUID']; ?>">
                                                         </cite>
                                                     </small>
-                                                    <button
-                                                        class="btn btn-sm btn-outline-secondary rounded-1 my-1 ms-4"
+                                                    <button class="btn btn-sm btn-outline-secondary rounded-1 my-1 ms-4"
                                                         data-bs-dismiss="modal" id="closePostModal">
                                                         <svg width="24" height="24">
                                                             <use xlink:href="#Close" />
@@ -178,7 +176,6 @@ $_SESSION['last_activity'] = time();
         </div>
     </div>
     </div>
-    <?php include_once '../Components/NavbarV3.php'; ?>
     <div class="container-fluid">
         <div class="row g-0 row-cols-1 row-cols-md-2">
             <div class="col-md-3 text-center order-2 order-md-1 profcover">
@@ -190,32 +187,22 @@ $_SESSION['last_activity'] = time();
                     </h5>
                     <p class="text-secondary">Placeholder</p>
                     <div class="d-flex justify-content-center">
-                        <div class="hstack gap-1">
-                            <button class="btn btn-sm btn-outline-primary rounded-1">
-                                <svg width="24" height="24">
-                                    <use xlink:href="#ManageAct" />
-                                </svg>
-                                <span class="d-sm-none">Manage Account</span>
-                            </button>
-                            <button class="btn btn-sm btn-outline-primary rounded-1">
-                                <svg width="24" height="24">
-                                    <use xlink:href="#MoreInfo" />
-                                </svg>
-                                <span class="d-sm-none">View More</span>
-                            </button>
-                            <button class="btn btn-sm btn-outline-primary rounded-1" data-bs-toggle="modal"
-                                data-bs-target="#NewPostModal">
-                                <svg width="24" height="24">
-                                    <use xlink:href="#MoreInfo" />
-                                </svg>
-                                <span class="d-sm-none">New Post</span>
-                            </button>
-                            <button class="btn btn-sm btn-outline-secondary rounded-1"
+                        <div class="hstack gap-2">
+                            <button class="btn btn-sm btn-outline-secondary rounded-1 border-0 me-auto
+                            " data-bs-toggle="tooltip"
+                                data-bs-placement="bottom" title="Back to Feed"
                                 onclick="window.location.href='./Feed.php'">
-                                <svg width="24" height="24">
+                                <svg width="28" height="28">
                                     <use xlink:href="#Back" />
                                 </svg>
                                 <span class="d-sm-none">Back</span>
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary rounded-1 border-0" data-bs-toggle="tooltip"
+                                data-bs-placement="bottom" title="Edit Profile">
+                                <svg width="28" height="28">
+                                    <use xlink:href="#ManageAct" />
+                                </svg>
+                                <span class="d-sm-none">Edit Profile</span>
                             </button>
                         </div>
                     </div>
@@ -229,7 +216,88 @@ $_SESSION['last_activity'] = time();
             </div>
         </div>
     </div>
-    <div class="container mt-3 border-top border-3">
+    <div class="container my-5">
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            <div class="col-md-6">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card border-0 shadow h-100">
+                                <div class="card-body">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            A list item
+                                            <span>asdsdsd</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            A list item
+                                            <span>asdsdsd</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            A list item
+                                            <span>asdsdsd</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card border-0 shadow h-100">
+                                <div class="card-body">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            A list item
+                                            <span>asdsdsd</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            A list item
+                                            <span>asdsdsd</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            A list item
+                                            <span>asdsdsd</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="card border-0 bg-transparent">
+                    <div class="card-body">
+                        <div class="hstack gap-3 justify-content-center">
+                            <span data-bs-toggle="tooltip" data-bs-placement="bottom" title="Create New Post" class="me-md-auto">
+                                <button class="btn btn-sm btn-outline-primary rounded-1 border-0" data-bs-toggle="modal" data-bs-target="#NewPostModal">
+                                    <svg width="30" height="30">
+                                        <use xlink:href="#CreatePost" />
+                                    </svg>
+                                    <span class="d-sm-none">New Post</span>
+                                </button>
+                            </span>
+                            <button class="btn btn-sm btn-outline-primary rounded-1">Button 1</button>
+                            <button class="btn btn-sm btn-outline-secondary rounded-1 border-0" onclick="window.location.href='../Functions/api/UserLogout.php'">
+                                <!-- logout -->
+                                <svg width="30" height="30">
+                                    <use xlink:href="#Logout" />
+                                </svg>
+                                <span class="d-sm-none">Logout</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="container">
         <div class="text-center mt-3">
             <h1>Your Posts</h1>
         </div>

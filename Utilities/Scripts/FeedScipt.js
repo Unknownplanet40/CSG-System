@@ -127,7 +127,7 @@ $(document).ready(function () {
                                                 <img src="../../Assets/Images/UserProfiles/${
                                                   user.profile
                                                 }" alt="" width="48" height="48" class="rounded-circle">
-                                                <span class="position-absolute top-100 start-100 translate-middle p-1 border border-light rounded-circle">
+                                                <span class="position-absolute top-100 start-100 translate-middle p-1 border border-light rounded-circle ${user.isLogin === 1 ? 'bg-success' : 'bg-danger' }">
                                                   <span class="visually-hidden">New alerts</span>
                                                 </span>
                                               </div>
@@ -182,6 +182,7 @@ $(document).ready(function () {
             );
           }
         },
+
         error: function () {
           result.append(
             '<div class="alert alert-secondary text-center fw-bold"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...</div>'
@@ -193,6 +194,19 @@ $(document).ready(function () {
             );
           }, 3000);
         },
+
+        complete: function () {
+          if (displaycount === 0) {
+            result.empty();
+            result.append(
+              '<div class="alert alert-danger fw-bold text-center">No results found</div>'
+            );
+          } else {
+            result.append(
+              `<small class="text-center fw-bold text-muted">Displaying ${displaycount} results</small>`
+            );
+          }
+        }
       });
     } else {
       result.addClass("d-none");

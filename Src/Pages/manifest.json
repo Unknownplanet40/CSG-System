@@ -118,14 +118,14 @@
   },
   "icons": [
     {
-      "src": "../../Assets/Icons/PWA-Icon/Icon-x512.jpeg",
+      "src": "../../Assets/Icons/PWA-Icon/Icon-x512.png",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/png"
     },
     {
-      "src": "../../Assets/Icons/PWA-Icon/Icon-x192.jpeg",
+      "src": "../../Assets/Icons/PWA-Icon/Icon-x192.png",
       "sizes": "192x192",
-      "type": "image/jpeg"
+      "type": "image/png"
     },
     {
       "src": "../../Assets/Icons/PWA-Icon/Icon-x144.png",

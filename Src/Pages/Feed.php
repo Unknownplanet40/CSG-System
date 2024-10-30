@@ -2,12 +2,14 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
     require_once '../Database/Config.php';
+    require_once '../Debug/GenLog.php';
 }
 
 if (!isset($_SESSION['UUID'])) {
-    header('Location: ../../Pages/Accesspage.php?error=001');
+    header('Location: ../Pages/Accesspage.php?error=001');
 } else {
     echo '<script>var UUID = "' . $_SESSION['UUID'] . '";</script>';
+    $logPath = "../Debug/Users/UUID.log";
 }
 
 $inactive = 1800; // 30 minutes inactivity
@@ -15,8 +17,11 @@ if (isset($_SESSION['last_activity'])) {
     $session_life = time() - $_SESSION['last_activity'];
 
     if ($session_life > $inactive) {
+        writeLog($logPath, "WARN", $_SESSION['UUID'], "Session Timeout", $_SERVER['REMOTE_ADDR'], "Session Timeout");
         header('Location: ../Functions/api/UserLogout.php?error=002');
     }
+
+
 }
 
 $_SESSION['last_activity'] = time();
@@ -25,7 +30,7 @@ $logout = '../Functions/api/UserLogout.php';
 
 
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="auto">
+<html lang="en" data-bs-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -35,6 +40,7 @@ $logout = '../Functions/api/UserLogout.php';
     <link rel="stylesheet" href="../../Utilities/Stylesheets/CustomStyle.css">
     <link rel="stylesheet" href="../../Utilities/Stylesheets/MNavbarStyle.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="shortcut icon" href="../../Assets/Icons/PWA-Icon/MainIcon.png" type="image/x-icon">
     <link rel="stylesheet" href="../../Utilities/Stylesheets/FeedStyle.css">
     <script defer src="../../Utilities/Third-party/Bootstrap/js/bootstrap.bundle.js"></script>
     <script defer src="../../Utilities/Third-party/Sweetalert2/js/sweetalert2.all.min.js"></script>
@@ -43,11 +49,42 @@ $logout = '../Functions/api/UserLogout.php';
     <script src="../../Utilities/Scripts/animate-browser-title.js"></script>
     <script type="module" src="../../Utilities/Scripts/FeedScipt.js"></script>
     <title>Anouncements Feed</title>
+    <style>
+        .away{
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(69, 69, 69, 0.5);
+            backdrop-filter: blur(3px);
+            z-index: 1020;
+        }
+
+        .away::after{
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            background-image: url("../../Assets/Images/Loader-v1.gif");
+            background-size: cover;
+        }
+
+        .ansscroll {
+            max-height: 90svh;
+            overflow-y: auto;
+        }
+
+    </style>
 </head>
 
 <?php include_once '../../Assets/Icons/Icon_Assets.php'; ?>
 
 <body>
+    <div class="" id="blurifAway">
     <!-- Chat Room Modal -->
     <div class="modal fade" id="chatRoom" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -139,7 +176,7 @@ $logout = '../Functions/api/UserLogout.php';
     <div class="container-fluid mt-3 con-H">
         <div class="row row-cols-1 row-cols-xl-3 row-cols-lg-3 row-cols-md-2 g-0">
             <div class="order-md-2 col-xl-7 col-lg-7 col-md-7">
-                <div class="container">
+                <div class="container-fluid" id="annsmain">
                     <div class="emptyfeed" id="EmptyFeed">
                         <div class="card border-0 bg-transparent">
                             <div class="card-body text-center">
@@ -147,8 +184,8 @@ $logout = '../Functions/api/UserLogout.php';
                             </div>
                         </div>
                     </div>
-                    <div class="row anncon g-2 my-2 d-none" id="Announcements">
-
+                    <div class="row anncon g-1 d-none" id="Announcements">
+                        <!-- This is where the mother fucking announcements will be displayed -->
                     </div>
                 </div>
             </div>
@@ -213,7 +250,7 @@ $logout = '../Functions/api/UserLogout.php';
                         </div>
                     </div>
                     <div class="my-3 d-flex justify-content-center searchbox">
-                        <input type="search" class="form-control" placeholder="Find People" id="SearchUser">
+                        <input type="search" class="form-control rounded-0" placeholder="Find People" id="SearchUser">
                         <div class="vstack gap-2 mt-5 p-2 floatingResult rounded rounded-top-0 shadow d-none"
                             id="searchResult">
                             <div class="text-center">
@@ -230,7 +267,7 @@ $logout = '../Functions/api/UserLogout.php';
                             </div>
                         </div>
                     </div>
-                    <div class="container conusers border py-3 rounded-1 d-none" id="userContainers"></div>
+                    <div class="container-fluid conusers py-3 rounded-1 d-none" id="userContainers"></div>
                 </div>
             </div>
         </div>
