@@ -73,6 +73,9 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
         } else if ($_GET['error'] == '003') {
             echo "<script>localStorage.setItem('error', 'Please insure that your the only one logged in on this account');</script>";
             unset($_GET['error']);
+        } else if ($_GET['error'] == '004') {
+            echo "<script>localStorage.setItem('error', 'You have Encountered an E-K404 Error Code. Please Contact the Administrator');</script>";
+            unset($_GET['error']);
         } else {
             echo "<script>localStorage.removeItem('error');</script>";
         }

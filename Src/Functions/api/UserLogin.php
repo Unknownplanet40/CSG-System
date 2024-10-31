@@ -2,8 +2,25 @@
 
 session_start();
 
+function response($data)
+{
+    echo json_encode($data);
+    exit;
+}
+
 require_once  "../../Database/Config.php";
 require_once './FetchuserCredentials.php';
+if (!file_exists('../env/HiddenKeys.php')) {
+    // generate the file
+    mkdir('../env', 0777, true);
+    $file = fopen('../env/HiddenKeys.php', 'w');
+    fclose($file);
+    response(['status' => 'fatal', 'message' => 'You have Encountered an E-K404 Error Code. Please Contact the Administrator']);
+} else {
+    require_once '../env/HiddenKeys.php';
+}
+
+
 require_once '../env/HiddenKeys.php';
 require_once '../../Debug/GenLog.php';
 $logPath = "../../Debug/Users/UUID.log";
@@ -16,11 +33,6 @@ use PHPMailer\PHPMailer\Exception;
 header('Content-Type: application/json');
 date_default_timezone_set('Asia/Manila');
 
-function response($data)
-{
-    echo json_encode($data);
-    exit;
-}
 
 $temp_UUID = "";
 

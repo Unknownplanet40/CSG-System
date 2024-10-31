@@ -94,6 +94,15 @@ export async function LoginProcess(data) {
       return;
     }
 
+    if (resData.status == "fatal") {
+      QueueNotification(["error", resData.message, 10000, "top"]);
+
+      setTimeout(function () {
+        window.location.reload();
+      }, 15000);
+      return
+    }
+
     if (resData.status == "success") {
       $("#Login-stdnum").val("");
       $("#Login-password").val("");

@@ -24,6 +24,10 @@
       document.addEventListener("DOMContentLoaded", function() {
         let errors_title = {
           0: "Unknown Error",
+          404: "Page Not Found",
+          403: "Forbidden Access",
+          500: "Internal Server Error",
+          503: "Service Unavailable",
           1001: "User Error",
           1049: "Invalid Database",
           1045: "Invalid Username or Password",
@@ -33,6 +37,10 @@
 
         let errors_message = {
           0: "An unknown error occurred. Please try again later.",
+          404: "The page you are looking for could not be found. Please check the URL and try again.",
+          403: "You do not have permission to access this page. Please contact the administrator for more information.",
+          503: "The service is currently unavailable. Please try again later.",
+          500: "An internal server error occurred. Please try again later.",
           1001: "An error occurred while processing your request. Please try again later.",
           1049: "The specified database could not be found. Please check the database name and try again.",
           1045: "Invalid username or password. Please verify your credentials and try again.",
@@ -40,15 +48,55 @@
           1044: "Access denied for the specified database. Please verify the database name and permissions.",
         };
 
-        if (localStorage.getItem("error_code") === null) {
-          localStorage.setItem("error_code", 0);
-          document.getElementById("error-title").innerHTML = errors_title[0];
-          document.getElementById("error-message").innerHTML = errors_message[0];
+        // get code from URL
+
+        var URLparams = new URLSearchParams(window.location.search);
+        var error_code = URLparams.get("Error");
+
+        if (error_code == null) {
+          document.getElementById("error-title").innerText = errors_title[0];
+          document.getElementById("error-message").innerText = errors_message[0];
         } else {
-          let error_code = localStorage.getItem("error_code");
-          document.getElementById("error-title").innerHTML = errors_title[error_code];
-          document.getElementById("error-message").innerHTML = errors_message[error_code];
+          switch (error_code) {
+            case "404":
+              document.getElementById("error-title").innerText = errors_title[404];
+              document.getElementById("error-message").innerText = errors_message[404];
+              break;
+            case "403":
+              document.getElementById("error-title").innerText = errors_title[403];
+              document.getElementById("error-message").innerText = errors_message[403];
+              break;
+            case "1001":
+              document.getElementById("error-title").innerText = errors_title[1001];
+              document.getElementById("error-message").innerText = errors_message[1001];
+              break;
+            case "1049":
+              document.getElementById("error-title").innerText = errors_title[1049];
+              document.getElementById("error-message").innerText = errors_message[1049];
+              break;
+            case "1045":
+              document.getElementById("error-title").innerText = errors_title[1045];
+              document.getElementById("error-message").innerText = errors_message[1045];
+              break;
+            case "2002":
+              document.getElementById("error-title").innerText = errors_title[2002];
+              document.getElementById("error-message").innerText = errors_message[2002];
+              break;
+            case "1044":
+              document.getElementById("error-title").innerText = errors_title[1044];
+              document.getElementById("error-message").innerText = errors_message[1044];
+              break;
+            case "nokeys":
+              document.getElementById("error-title").innerText = "No API Keys";
+              document.getElementById("error-message").innerText = "No API keys were found. Please contact the administrator for more information.";
+              break;
+            default:
+              document.getElementById("error-title").innerText = errors_title[0];
+              document.getElementById("error-message").innerText = errors_message[0];
+              break;
+          }
         }
+
       });
     </script>
   </head>

@@ -32,3 +32,8 @@
 10/31/2024 12:03:47 PM - [ERROR] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: Account Locked - IP: 127.0.0.1 - Status: Failed
 10/31/2024 12:11:53 PM - [INFO] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: Login - IP: 49.144.133.111 - Status: Success
 10/31/2024 05:12:21 AM - [INFO] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: logout - IP: 49.144.133.111 - Status: Success
+10/31/2024 07:58:27 PM - [INFO] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: Login - IP: 49.144.133.111 - Status: Success
+10/31/2024 12:58:34 PM - [INFO] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: logout - IP: 127.0.0.1 - Status: Success
+10/31/2024 08:01:50 PM - [ERROR] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: Account Locked - IP: 127.0.0.1 - Status: Failed
+10/31/2024 08:06:05 PM - [ERROR] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: Account Locked - IP: 127.0.0.1 - Status: Failed
+10/31/2024 08:14:08 PM - [ERROR] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: Account Locked - IP: 127.0.0.1 - Status: Failed

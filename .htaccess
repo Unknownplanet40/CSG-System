@@ -1,0 +1,4 @@
+errorDOCUMENT 404 http://csg.org/Src/Pages/Error.html?Error=404
+errorDOCUMENT 403 http://csg.org/Src/Pages/Error.html?Error=403
+errorDOCUMENT 500 http://csg.org/Src/Pages/Error.html?Error=500
+errorDOCUMENT 503 http://csg.org/Src/Pages/Error.html?Error=503
