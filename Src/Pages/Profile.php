@@ -189,8 +189,7 @@ $_SESSION['last_activity'] = time();
                     <div class="d-flex justify-content-center">
                         <div class="hstack gap-2">
                             <button class="btn btn-sm btn-outline-secondary rounded-1 border-0 me-auto
-                            " data-bs-toggle="tooltip"
-                                data-bs-placement="bottom" title="Back to Feed"
+                            " data-bs-toggle="tooltip" data-bs-placement="bottom" title="Back to Feed"
                                 onclick="window.location.href='./Feed.php'">
                                 <svg width="28" height="28">
                                     <use xlink:href="#Back" />
@@ -274,8 +273,10 @@ $_SESSION['last_activity'] = time();
                 <div class="card border-0 bg-transparent">
                     <div class="card-body">
                         <div class="hstack gap-3 justify-content-center">
-                            <span data-bs-toggle="tooltip" data-bs-placement="bottom" title="Create New Post" class="me-md-auto">
-                                <button class="btn btn-sm btn-outline-primary rounded-1 border-0" data-bs-toggle="modal" data-bs-target="#NewPostModal">
+                            <span data-bs-toggle="tooltip" data-bs-placement="bottom" title="Create New Post"
+                                class="me-md-auto">
+                                <button class="btn btn-sm btn-outline-primary rounded-1 border-0" data-bs-toggle="modal"
+                                    data-bs-target="#NewPostModal">
                                     <svg width="30" height="30">
                                         <use xlink:href="#CreatePost" />
                                     </svg>
@@ -283,7 +284,8 @@ $_SESSION['last_activity'] = time();
                                 </button>
                             </span>
                             <button class="btn btn-sm btn-outline-primary rounded-1">Button 1</button>
-                            <button class="btn btn-sm btn-outline-secondary rounded-1 border-0" onclick="window.location.href='../Functions/api/UserLogout.php'">
+                            <button class="btn btn-sm btn-outline-secondary rounded-1 border-0"
+                                onclick="window.location.href='../Functions/api/UserLogout.php'">
                                 <!-- logout -->
                                 <svg width="30" height="30">
                                     <use xlink:href="#Logout" />
@@ -300,8 +302,45 @@ $_SESSION['last_activity'] = time();
     <div class="container">
         <div class="text-center mt-3">
             <h1>Your Posts</h1>
+            <div class="hstack gap-3">
+                <button class="btn btn-sm btn-outline-secondary bg-transparent text-body fw-bold rounded-1 border-0 pbtn"
+                    id="defPri">All</button>
+                <button class="btn btn-sm btn-outline-secondary bg-transparent text-body fw-bold rounded-1 border-0 pbtn"
+                    id="LowPri">
+                    <span class="hstack gap-2 text-success">
+                        <svg width="24" height="24">
+                            <use xlink:href="#LowPriority" />
+                        </svg>
+                        <span class="d-none d-sm-block">Low Priority</span>
+                    </span>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary bg-transparent text-body fw-bold rounded-1 border-0 pbtn" id="NormPri">
+                    <span class="hstack gap-2 text-warning">
+                        <svg width="24" height="24">
+                            <use xlink:href="#NormPriority" />
+                        </svg>
+                        <span class="d-none d-sm-block">Normal Priority</span>
+                    </span>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary bg-transparent text-body fw-bold rounded-1 border-0 pbtn" id="HighPri">
+                    <span class="hstack gap-2 text-danger">
+                        <svg width="24" height="24">
+                            <use xlink:href="#HighPriority" />
+                        </svg>
+                        <span class="d-none d-sm-block">High Priority</span>
+                    </span>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary bg-transparent text-body fw-bold rounded-1 border-0 ms-auto pbtn" id="delPost">
+                    <span class="hstack gap-2 text-info">
+                        <svg width="24" height="24">
+                            <use xlink:href="#Trash" />
+                        </svg>
+                        <span class="d-none d-sm-block">Deleted Posts</span>
+                    </span>
+                </button>
+            </div>
         </div>
-        <div class="row mt-5" id="Announcements" data-aos="fade-down">
+        <div class="row mt-5 anncon" id="Announcements">
         </div>
     </div>
     <script src="../../Utilities/Third-party/AOS/js/aos.js"></script>

@@ -20,7 +20,7 @@ try {
         response(['status' => 'error', 'message' => 'Please fill all the required fields']);
     }
 
-/*     $postDetails = htmlspecialchars($_POST['postDetails'], ENT_QUOTES, 'UTF-8');
+    $postDetails = htmlspecialchars($_POST['postDetails'], ENT_QUOTES, 'UTF-8');
     $priority = $_POST['priority'];
     $userUUID = $_POST['userUUID'];
     $postID = bin2hex(random_bytes(16));
@@ -30,7 +30,7 @@ try {
     $stmt->bind_param("issss", $priority, $postID, $userUUID, $postDetails, $postDate);
     $stmt->execute();
     $stmt->close();
- */
+
     response(['status' => 'success', 'message' => 'Post created successfully']);
 
 } catch (Exception $e) {

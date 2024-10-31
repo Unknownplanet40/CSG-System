@@ -62,26 +62,63 @@ function createPost() {
     },
     success: function (response) {
       if (response.status == "success") {
-        QueueNotification(["success", "Post created successfully", 5000]);
+        QueueNotification([
+          "success",
+          "Post created successfully",
+          5000,
+          "bottom",
+        ]);
         $("#closePostModal").click();
         getuserPosts(userUUID);
       } else {
-        QueueNotification(["info", "Post creation failed", 3000]);
+        QueueNotification(["info", "Post creation failed", 3000, "top"]);
       }
     },
     error: function (xhr, status, error) {
-      QueueNotification(["error", "Something went wrong", 3000]);
+      QueueNotification(["error", "Something went wrong", 3000, "bottom"]);
     },
   });
 }
 
-function getuserPosts(UUID) {
+function scrollToAnnouncements(duration = 500) {
+  $("html, body").animate(
+    {
+      scrollTop: $("#Announcements").offset().top,
+    },
+    duration
+  );
+}
+
+function getuserPosts(UUID = "", type = "all") {
   let annCon = $("#Announcements");
   $.ajax({
     url: "../Functions/api/getAnnouncements.php",
     type: "GET",
-    data: { UUID: UUID },
+    data: {
+      UUID: UUID,
+      type: type,
+    },
     success: function (data) {
+      let Empty_Title = "No Title";
+      let Empty_Content = "No Content";
+
+      if (type === "deleted") {
+        Empty_Title = "No Deleted Posts";
+        Empty_Content = "You have not deleted any posts yet";
+      } else if (type === "all") {
+        Empty_Title = "No Announcements Found";
+        Empty_Content = "Stay tuned for more updates";
+      } else if (type === "low") {
+        Empty_Title = "Low Priority Announcements";
+        Empty_Content = "Currently no low priority announcements";
+      } else if (type === "normal") {
+        Empty_Title = "Normal Priority Announcements";
+        Empty_Content = "Currently no normal priority announcements";
+      } else if (type === "high") {
+        Empty_Title = "High Priority Announcements";
+        Empty_Content = "Currently no high priority announcements";
+      }
+
       if (data.status === "success") {
         annCon.empty();
         data.data.forEach((announcement) => {
@@ -89,6 +126,21 @@ function getuserPosts(UUID) {
           let postLikes = announcement.postLikes;
           let postDislikes = announcement.postDislikes;
           let largeNum = ["K", "M", "B", "T"];
+          let lastPost = "";
+          let isDeleted = "d-none";
+          let showRestore = "d-none";
+
+          if (data.data[data.data.length - 1] !== announcement) {
+            lastPost = "anal";
+          }
+
+          if (announcement.isDeleted === 0) {
+            isDeleted = "";
+          }
+          
+          if (announcement.isDeleted === 1 && type === "deleted") {
+            showRestore = "";
+          }
 
           function formatNumber(num) {
             let formatted = num;
@@ -97,7 +149,6 @@ function getuserPosts(UUID) {
               num /= 1000;
               formatted = num.toFixed(1) + largeNum[i];
             }
-
             return formatted;
           }
 
@@ -191,8 +242,7 @@ function getuserPosts(UUID) {
             }
           }
 
-          annCon.append(`<div class="col-12 anal" data-aos="fade-up" data-aos-anchor="#Announcements" data-aos-offset="150"
-                            data-aos-duration="500">
+          annCon.append(`<div class="col-12 ${lastPost}">
                             <div class="alert bg-body rounded-1 border shadow" role="alert">
                                 <div class="hstack gap-0">
                                     <div>
@@ -210,16 +260,32 @@ function getuserPosts(UUID) {
                                         </div>
                                     </div>
                                     <div class="ms-auto me-1 p-1">
-                                        <div class="priority">
+                                        <div class="hstack gap-1">
+                                          <div class="priority">
                                             <svg width="24" height="24">
                                                 <use
                                                     xlink:href="#${announcement.priority}"></use>
                                             </svg>
+                                          </div>
                                         </div>
                                     </div>
                                 </div>
                                 <p class="alert-heading" style="white-space: pre-wrap;">${announcement.postContent}</p>
                                 <!-- Reactions -->
+                                <div class="hstack gap-1 user-select-none">
+                                  <div class="ms-auto text-danger ${isDeleted}" id="delete-${announcement.postID}" title="Delete Post" style="cursor: pointer;">
+                                    <svg width="18" height="18">
+                                      <use xlink:href="#Trash"></use>
+                                    </svg>
+                                    <small>Delete</small>
+                                  </div>
+                                  <div class="ms-auto text-success ${showRestore}" id="restore-${announcement.postID}" title="Restore Post" style="cursor: pointer;">
+                                    <svg width="18" height="18" class="text-secondary">
+                                      <use xlink:href="#Restore"></use>
+                                    </svg>
+                                    <small>Restore</small>
+                                  </div>
+                                </div>
                                 <div class="hstack gap-1 user-select-none d-none">
                                     <div
                                         class="p-1 rounded-5 d-flex align-items-center fw-bold user-select-none reaction" id="like-${announcement.postID}">
@@ -418,11 +484,92 @@ function getuserPosts(UUID) {
               });
             }
           });
+
+          $(`#delete-${announcement.postID}`).on("click", function () {
+            Swal.fire({
+              title: "Delete Post",
+              text: "Are you sure you want to delete this post?",
+              icon: "info",
+              confirmButtonText: "Yes, delete it",
+              cancelButtonText: "No thanks",
+              showCancelButton: true,
+              allowOutsideClick: false,
+              customClass: {
+                popup: "alert-popup-inform",
+                confirmButton: "btn btn-sm btn-danger",
+                cancelButton: "btn btn-sm btn-secondary",
+                container: "alert-container",
+                htmlContainer: "alert-html-container",
+                title: "alert-title",
+              },
+            }).then((result) => {
+              if (result.isConfirmed) {
+                $.ajax({
+                  url: "../../Src/Functions/api/del-ResAnnouncement.php",
+                  type: "POST",
+                  data: {
+                    postID: announcement.postID,
+                    UUID: UUID,
+                    Action: "delete",
+                  },
+
+                  success: function (recRes) {
+                    if (recRes.status === "success") {
+                      QueueNotification([
+                        "success",
+                        "Post deleted successfully",
+                        5000,
+                        "bottom",
+                      ]);
+                      getuserPosts(UUID, type);
+                    } else {
+                      QueueNotification([
+                        "error",
+                        "Failed to delete the post",
+                        5000,
+                        "bottom",
+                      ]);
+                    }
+                  },
+                });
+              }
+            });
+          });
+
+          $(`#restore-${announcement.postID}`).on("click", function () {
+            $.ajax({
+              url: "../../Src/Functions/api/del-ResAnnouncement.php",
+              type: "POST",
+              data: {
+                postID: announcement.postID,
+                UUID: UUID,
+                Action: "restore",
+              },
+
+              success: function (recRes) {
+                if (recRes.status === "success") {
+                  QueueNotification([
+                    "success",
+                    "Post restored successfully",
+                    5000,
+                    "bottom",
+                  ]);
+                  getuserPosts(UUID, "deleted");
+                } else {
+                  QueueNotification([
+                    "error",
+                    "Failed to restore the post",
+                    5000,
+                    "bottom",
+                  ]);
+                }
+              },
+            });
+          });
         });
       } else {
         annCon.empty();
-        annCon.append(`<div class="col-12 anal" data-aos="fade-up" data-aos-anchor="#Announcements" data-aos-offset="150"
-                            data-aos-duration="500">
+        annCon.append(`<div class="col-12">
                             <div class="alert bg-body rounded-1 border-0 bg-transparent d-flex justify-content-center" role="alert">
                                 <div class="card-body text-center">
                                     <div class="hstack gap-3 d-flex justify-content-center">
@@ -439,8 +586,8 @@ function getuserPosts(UUID) {
                                             </div>
                                         </div>
                                         <div class="p-2 text-start ms-5">
-                                            <h5 class="fw-bold mt-2">No Announcements Found</h5>
-                                            <p class="text-secondary">Stay tuned for more updates</p>
+                                            <h5 class="fw-bold mt-2">${Empty_Title}</h5>
+                                            <p class="text-secondary">${Empty_Content}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -534,4 +681,29 @@ $(document).ready(function () {
   });
 
   getuserPosts($("#USER_UUID").val());
+
+  $("#defPri").click(function () {
+    scrollToAnnouncements(300);
+    getuserPosts($("#USER_UUID").val(), "all");
+  });
+
+  $("#LowPri").click(function () {
+    scrollToAnnouncements();
+    getuserPosts($("#USER_UUID").val(), "low");
+  });
+
+  $("#NormPri").click(function () {
+    scrollToAnnouncements();
+    getuserPosts($("#USER_UUID").val(), "normal");
+  });
+
+  $("#HighPri").click(function () {
+    scrollToAnnouncements();
+    getuserPosts($("#USER_UUID").val(), "high");
+  });
+
+  $("#delPost").click(function () {
+    scrollToAnnouncements();
+    getuserPosts($("#USER_UUID").val(), "deleted");
+  });
 });

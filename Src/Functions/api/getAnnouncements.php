@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 
 require_once  "../../Database/Config.php";
@@ -21,13 +22,35 @@ try {
         response(['status' => 'error', 'message' => 'Unauthorized']);
     }
 
-    if (!isset($_GET['UUID'])) {
-        $stmt = $conn->prepare("SELECT * FROM userannouncement ORDER BY priority DESC, postedDate DESC, RAND() LIMIT 10");
-    } else {
-        $stmt = $conn->prepare("SELECT * FROM userannouncement WHERE postedBy = ? ORDER BY priority DESC, postedDate DESC, RAND() LIMIT 10");
+    if (isset($_GET['UUID']) && isset($_GET['type'])) {
+        switch ($_GET['type']) {
+            case 'high':
+                $stmt = $conn->prepare("SELECT * FROM userannouncement WHERE postedBy = ? AND priority = 3 AND isDeleted = 0 ORDER BY postedDate DESC, RAND() LIMIT 10");
+                $stmt->bind_param("s", $_GET['UUID']);
+                break;
+            case 'normal':
+                $stmt = $conn->prepare("SELECT * FROM userannouncement WHERE postedBy = ? AND priority = 2 AND isDeleted = 0 ORDER BY postedDate DESC, RAND() LIMIT 10");
+                $stmt->bind_param("s", $_GET['UUID']);
+                break;
+            case 'low':
+                $stmt = $conn->prepare("SELECT * FROM userannouncement WHERE postedBy = ? AND priority = 1 AND isDeleted = 0 ORDER BY postedDate DESC, RAND() LIMIT 10");
+                $stmt->bind_param("s", $_GET['UUID']);
+                break;
+            case 'deleted':
+                $stmt = $conn->prepare("SELECT * FROM userannouncement WHERE postedBy = ? AND isDeleted = 1 ORDER BY postedDate DESC, RAND() LIMIT 10");
+                $stmt->bind_param("s", $_GET['UUID']);
+                break;
+            default:
+                $stmt = $conn->prepare("SELECT * FROM userannouncement WHERE isDeleted = 0 ORDER BY priority DESC, postedDate DESC, RAND() LIMIT 10");
+                break;
+        }
+    } elseif (isset($_GET['UUID'])) {
+        $stmt = $conn->prepare("SELECT * FROM userannouncement WHERE postedBy = ? AND isDeleted = 0 ORDER BY priority DESC, postedDate DESC, RAND() LIMIT 10");
         $stmt->bind_param("s", $_GET['UUID']);
+    } else {
+        $stmt = $conn->prepare("SELECT * FROM userannouncement WHERE isDeleted = 0 ORDER BY priority DESC, postedDate DESC, RAND() LIMIT 10");
     }
-    
+
     $stmt->execute();
     $result = $stmt->get_result();
     $stmt->close();
@@ -109,7 +132,7 @@ try {
                             $user = $result6->fetch_assoc();
                             if ($_SESSION['UUID'] == $value) {
                                 $dislikeBy_Name[$key] = "You";
-                            }else {
+                            } else {
                                 $dislikeBy_Name[$key] = $user['First_Name'] . " " . $user['Last_Name'];
                             }
                             $dislikeBy[$key] = $user['UUID'];
@@ -157,13 +180,13 @@ try {
                     'postedDate' => date('F j, Y', strtotime($row['postedDate'])),
                     'profileImage' => $image
                 ];
+            }
         }
-    }
 
-    response(['status' => 'success', 'data' => $data]);
-} else {
-    response(['status' => 'error', 'message' => 'No announcements found']);
-}
+        response(['status' => 'success', 'data' => $data]);
+    } else {
+        response(['status' => 'error', 'message' => 'No announcements found']);
+    }
 } catch (Exception $e) {
     response(['status' => 'error', 'message' => $e->getMessage()]);
 }

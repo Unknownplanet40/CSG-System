@@ -44,8 +44,6 @@ try {
         $autoLogin = false;
     }
 
-    $temp_UUID = $data['UUID'];
-
     $stmt = $conn->prepare("SELECT student_Number, password, LoginStat, BanExpired, UUID FROM accounts WHERE student_Number = ?");
     $stmt->bind_param("i", $studentNumber);
     $stmt->execute();
@@ -57,6 +55,8 @@ try {
 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
+
+        $temp_UUID = $row['UUID'];
 
         // Check if the account is locked
         if ($row['LoginStat'] === 'Locked') {

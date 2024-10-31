@@ -112,3 +112,129 @@
     z-index: 4;
     animation-delay: 2400ms;
   }
+
+  .anncon{
+    transition: 800ms cubic-bezier(1, 0, 0, 1) all;
+  }
+  
+  .anal{
+    animation: opascale linear both;
+    animation-timeline: view(block);
+    animation-range: cover 5% contain 35%;
+  }
+  
+  .anals{
+    animation: none;
+    opacity: 1;
+  }
+  
+  @keyframes opascale {
+    from {
+      transform: scale(0.9);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
+  .pbtn{
+    transition: 300ms;
+    cursor: pointer;
+  }
+
+  .pbtn:hover{
+    transform: scale(1.1);
+  }
+
+  .pbtn:active{
+    transform: scale(0.9);
+  }
+
+  .swal2-actions{
+    justify-content: center !important;
+  }
+  
+  .colored-toast.swal2-icon-warning {
+    background-color: var(--bs-body-bg) !important;
+  }
+  
+  .colored-toast .swal2-title {
+    color: var(--bs-body-color);
+  }
+  
+  .colored-toast .swal2-close {
+    color: var(--bs-body-color);
+  }
+  
+  .colored-toast .swal2-html-container {
+    color: var(--bs-body-color);
+  }
+  
+  .swal2-show {
+    animation: faderight 500ms ease-in-out forwards !important;
+  }
+  
+  @keyframes faderight {
+    0% {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    25% {
+      opacity: 0.5;
+      transform: translateX(10px);
+    }
+    50% {
+      opacity: 0.75;
+      transform: translateX(-5px);
+    }
+    75% {
+      opacity: 0.9;
+      transform: translateX(2px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  .colored-progress-bar{
+    background-color: var(--bs-gray);
+  }
+  
+  .searchbox{
+    position: relative;
+  }
+  
+  .floatingResult{
+    position: absolute;
+    z-index: 1000;
+    width: 100%;
+    background-color: rgba(var(--bs-body-color-rgb), 0.3);
+    backdrop-filter: blur(5px);
+    overflow: auto;
+    max-height: 50vh;
+  }
+  
+  div:where(.alert-container).swal2-backdrop-show, div:where(.alert-container).swal2-noanimation {
+    backdrop-filter: blur(5px);
+  }
+  
+  div:where(.alert-container) div:where(.alert-popup-inform) {
+    background: rgba(var(--bs-body-bg-rgb), 0.8) !important;
+    color: var(--bs-body-color);
+    backdrop-filter: blur(5px);
+    border-radius: 2px !important;
+  }
+  
+  div:where(.alert-container) h2:where(.alert-title) {
+    color: var(--bs-body-color) !important;
+  }
+  
+  div:where(.alert-container) div:where(.alert-html-container) {
+    color:  rgba(var(--bs-body-color-rgb), 0.8) !important;
+  }
+  
+  div:where(.alert-container) button:where(.swal2-styled).alert-button-confirm{
+    background-color: var(--bs-danger) !important;
+    border-radius: 2px;
+  }
