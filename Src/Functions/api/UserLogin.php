@@ -247,7 +247,7 @@ try {
                     $SMTPMessage = "Message could not be sent. Mailer Error: " . $mail->ErrorInfo;
                 }
             }
-            writeLog($logPath, "error", $UUID, "Account Locked", $ipAddress, "Failed");
+            writeLog($logPath, "error", $temp_UUID, "Account Locked", $ipAddress, "Failed");
 
             response(['status' => 'error', 'message' => $message, 'isLocked' => $isLocked, 'Date' => $ReAttemptDate, 'SMTPErr' => $SMTPMessage]);
         }
