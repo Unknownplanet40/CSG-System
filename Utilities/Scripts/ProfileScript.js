@@ -1,5 +1,19 @@
 import { QueueNotification } from "./Modules/Queueing_Notification.js";
 
+const tooltipTriggerList = document.querySelectorAll(
+  '[data-bs-toggle="tooltip"]'
+);
+const tooltipList = [...tooltipTriggerList].map(
+  (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl)
+);
+
+const popoverTriggerList = document.querySelectorAll(
+  '[data-bs-toggle="popover"]'
+);
+const popoverList = [...popoverTriggerList].map(
+  (popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl)
+);
+
 function setPriority(priority) {
   $("#input-priority").val(priority);
   if (priority == 1) {
@@ -273,13 +287,13 @@ function getuserPosts(UUID = "", type = "all") {
                                 <p class="alert-heading" style="white-space: pre-wrap;">${announcement.postContent}</p>
                                 <!-- Reactions -->
                                 <div class="hstack gap-1 user-select-none">
-                                  <div class="ms-auto text-danger ${isDeleted}" id="delete-${announcement.postID}" title="Delete Post" style="cursor: pointer;">
+                                  <div class="ms-auto text-danger ${isDeleted}" id="delete-${announcement.postID}" style="cursor: pointer;" title="Delete this post">
                                     <svg width="18" height="18">
                                       <use xlink:href="#Trash"></use>
                                     </svg>
                                     <small>Delete</small>
                                   </div>
-                                  <div class="ms-auto text-success ${showRestore}" id="restore-${announcement.postID}" title="Restore Post" style="cursor: pointer;">
+                                  <div class="ms-auto text-success ${showRestore}" id="restore-${announcement.postID}" style="cursor: pointer;" title="Restore this post">
                                     <svg width="18" height="18" class="text-secondary">
                                       <use xlink:href="#Restore"></use>
                                     </svg>
@@ -627,20 +641,6 @@ function getuserPosts(UUID = "", type = "all") {
 }
 
 $(document).ready(function () {
-  const tooltipTriggerList = document.querySelectorAll(
-    '[data-bs-toggle="tooltip"]'
-  );
-  const tooltipList = [...tooltipTriggerList].map(
-    (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl)
-  );
-
-  const popoverTriggerList = document.querySelectorAll(
-    '[data-bs-toggle="popover"]'
-  );
-  const popoverList = [...popoverTriggerList].map(
-    (popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl)
-  );
-
   var maxRows = 10;
   $("#post-details").on("input", function () {
     this.style.height = "auto";
@@ -706,4 +706,29 @@ $(document).ready(function () {
     scrollToAnnouncements();
     getuserPosts($("#USER_UUID").val(), "deleted");
   });
+
+  $.ajax({
+    url: '../Functions/api/getProfileCover.php',
+    type: 'POST',
+    data: {
+        UUID: $('#USER_UUID').val()
+    },
+
+    beforeSend: function () {
+        $('#coverImage').attr('src', '../../Assets/Images/Default-Cover.gif');
+    },
+
+    success: function (data) {
+        if (data.status == 'success') {
+            $('#coverImage').attr('src', data.cover);
+        } else {
+          throw new Error(data.message);
+        }
+    },
+
+    error: function (xhr, status, error) {
+        $('#coverImage').attr('src', '../../Assets/Images/Default-Cover.gif');
+        console.log(xhr.responseText);
+    }
+});
 });

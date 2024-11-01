@@ -27,7 +27,11 @@ function displayReAttempt() {
 
       // Display the result in the element with id="demo"
       $("#log-btn-lbl").text(
-        "Last attempt was unsuccessful. Please wait " + minutes + "m " + seconds + "s"
+        "Last attempt was unsuccessful. Please wait " +
+          minutes +
+          "m " +
+          seconds +
+          "s"
       );
 
       // If the count down is finished, write some text
@@ -100,7 +104,7 @@ export async function LoginProcess(data) {
       setTimeout(function () {
         window.location.reload();
       }, 15000);
-      return
+      return;
     }
 
     if (resData.status == "success") {
@@ -149,7 +153,12 @@ export async function LoginProcess(data) {
 }
 
 export async function FPStep1Process(data) {
-  const response = await fetch("../../Src/Functions/testing.php", {
+  if (localStorage.getItem("ForgotStep") != null) {
+    localStorage.removeItem("ForgotStep");
+  }
+
+  localStorage.setItem("ForgotStep", "1");
+  const response = await fetch("../../Src/Functions/api/ResetPass.php", {
     method: "POST",
     body: JSON.stringify(data),
     headers: {
@@ -167,31 +176,71 @@ export async function FPStep1Process(data) {
   if (resData.status == "error") {
     $("#FpS1-btn").addClass("shake");
 
-    $("#FpS1-btn-label").removeClass("d-none");
     $("#FpS1-btn-loader").addClass("d-none");
-    $("#fps1-btn-lbl").removeClass("d-none");
-
-    $("#fps1-btn-lbl").text(resData.message);
+    $("#FpS1-btn-label").removeClass("d-none");
+    $("#FpS1-btn-label").text(resData.message);
+    $("#resendOTP").text(resData.message);
 
     setTimeout(function () {
       $("#FpS1-btn").removeClass("shake");
-      $("#fps1-btn-lbl").text("");
-      $("#fps1-btn-lbl").addClass("d-none");
-      $("#FpS1-btn").text("Next").removeAttr("disabled");
+      $("#FpS1-btn").removeAttr("disabled");
+      $("#FpS1-btn-label").text("Next");
+      $("#resendOTP").removeAttr("disabled");
+      $("#resendOTP").text("Resend OTP");
     }, 2500);
 
     return;
   }
 
   if (resData.status == "success") {
-    alert(resData.message);
+    //id otpTimer
+    // get Expiry time
+    var expiryTime = resData.ExpireAt; // 2024-11-02 04:30:58
+    var countDownDate = new Date(expiryTime).getTime();
+
+    // Update the count down every 1 second
+    var x = setInterval(function () {
+      // Get today's date and time
+      var now = new Date().getTime();
+
+      // Find the distance between now and the count down date
+      var distance = countDownDate - now;
+
+      // Time calculations for days, hours, minutes and seconds
+      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      // Display the result in the element with id="demo"
+      $("#otpTimer").text(minutes + "m " + seconds + "s");
+
+      // If the count down is finished, write some text
+      if (distance < 0) {
+        clearInterval(x);
+        $("#otpTimer").text("EXPIRED");
+        $("#resendOTP").removeAttr("disabled");
+      }
+    }, 1000);
+
+    $("#resendOTP").removeAttr("disabled");
+    $("#resendOTP").text("Successfully sent Token");
+
+    setTimeout(function () {
+      $("#resendOTP").text("Resend OTP");
+    }, 5000);
 
     $("#FpS1-btn").removeAttr("disabled");
     $("#FpS1-btn-label").removeClass("d-none");
     $("#FpS1-btn-loader").addClass("d-none");
 
-    $("#Forgot-Step1-container").attr("hidden", "hidden");
-    $("#Forgot-Step2-container").removeClass("d-none");
+    // add data-isvalid="true" to the $("#fps1-studnum") element
+    $("#fps1-studnum").attr("data-isvalid", "true");
+    $("#fps1-email").attr("data-isvalid", "true");
+
+    if (localStorage.getItem("ForgotStep") != null) {
+      localStorage.removeItem("ForgotStep");
+    }
+
+    localStorage.setItem("ForgotStep", "2");
 
     localStorage.setItem("current-form", "Forgot");
     showCurrentForm();
@@ -199,7 +248,7 @@ export async function FPStep1Process(data) {
 }
 
 export async function FPStep2Process(data) {
-  const response = await fetch("../../Src/Functions/testing.php", {
+  const response = await fetch("../../Src/Functions/api/ResetPass.php", {
     method: "POST",
     body: JSON.stringify(data),
     headers: {
@@ -219,15 +268,61 @@ export async function FPStep2Process(data) {
 
     $("#FpS2-btn-label").removeClass("d-none");
     $("#FpS2-btn-loader").addClass("d-none");
-    $("#fps2-btn-lbl").removeClass("d-none");
-
-    $("#fps2-btn-lbl").text(resData.message);
+    $("#fps2-btn-label").text(resData.message);
 
     setTimeout(function () {
-      $("#FpS2-btn").removeClass("shake");
-      $("#fps2-btn-lbl").text("");
-      $("#fps2-btn-lbl").addClass("d-none");
-      $("#FpS2-btn").text("Reset Password").removeAttr("disabled");
+      $("#FpS2-btn").removeClass("shake").removeAttr("disabled");
+      $("#fps2-btn-label").text("Verify Token and Proceed");
+    }, 2500);
+    return;
+  }
+
+  if (resData.status == "success") {
+    $("#FpS2-btn").removeAttr("disabled");
+    $("#FpS2-btn-label").removeClass("d-none");
+    $("#FpS2-btn-loader").addClass("d-none");
+
+    if (localStorage.getItem("ForgotStep") != null) {
+      localStorage.removeItem("ForgotStep");
+    }
+
+    localStorage.setItem("ForgotStep", "3");
+
+    localStorage.setItem("current-form", "Forgot");
+    showCurrentForm();
+  }
+}
+
+export async function FPStep3Process(data) {
+  const response = await fetch("../../Src/Functions/api/ResetPass.php", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+    },
+  });
+
+  if (!response.ok) {
+    const message = `An error has occured: ${response.status}`;
+    throw new Error(message);
+  }
+
+  const resData = await response.json();
+
+  if (resData.status == "error") {
+    $("#FpS3-btn").addClass("shake");
+
+    $("#FpS3-btn-label").removeClass("d-none");
+    $("#FpS3-btn-loader").addClass("d-none");
+    $("#fps3-btn-lbl").removeClass("d-none");
+
+    $("#fps3-btn-lbl").text(resData.message);
+
+    setTimeout(function () {
+      $("#FpS3-btn").removeClass("shake");
+      $("#fps3-btn-lbl").text("");
+      $("#fps3-btn-lbl").addClass("d-none");
+      $("#FpS3-btn").text("Reset Password").removeAttr("disabled");
     }, 2500);
 
     return;
@@ -236,9 +331,13 @@ export async function FPStep2Process(data) {
   if (resData.status == "success") {
     alert(resData.message);
 
-    $("#FpS2-btn").removeAttr("disabled");
-    $("#FpS2-btn-label").removeClass("d-none");
-    $("#FpS2-btn-loader").addClass("d-none");
+    $("#FpS3-btn").removeAttr("disabled");
+    $("#FpS3-btn-label").removeClass("d-none");
+    $("#FpS3-btn-loader").addClass("d-none");
+
+    if (localStorage.getItem("ForgotStep") != null) {
+      localStorage.removeItem("ForgotStep");
+    }
 
     localStorage.setItem("current-form", "Login");
     window.location.reload();
@@ -266,6 +365,8 @@ export function showCurrentForm() {
       $("#Login-container").removeClass("d-none");
       $("#Register-container").addClass("d-none");
       $("#Forgot-Step1-container").addClass("d-none");
+      $("#Forgot-Step2-container").addClass("d-none");
+      $("#Forgot-Step3-container").addClass("d-none");
 
       $("#side-login").addClass("selected");
       $("#side-register").removeClass("selected");
@@ -289,6 +390,9 @@ export function showCurrentForm() {
       $("#Register-container").removeClass("d-none");
       $("#Login-container").addClass("d-none");
       $("#Forgot-Step1-container").addClass("d-none");
+      $("#Forgot-Step1-container").addClass("d-none");
+      $("#Forgot-Step2-container").addClass("d-none");
+      $("#Forgot-Step3-container").addClass("d-none");
 
       $("#side-register").addClass("selected");
       $("#side-login").removeClass("selected");
@@ -313,7 +417,34 @@ export function showCurrentForm() {
 
       $("#Reg-stdnum").val("");
 
-      $("#Forgot-Step1-container").removeClass("d-none");
+      // check if stdnum and email is valid
+
+      if ($("#fps1-studnum").attr("data-isvalid") == "true" && $("#fps1-email").attr("data-isvalid") == "true") {
+        if (localStorage.getItem("ForgotStep") != null) {
+          if (localStorage.getItem("ForgotStep") == "1") {
+            $("#Forgot-Step1-container").toggleClass("d-none", false);
+            $("#Forgot-Step2-container").toggleClass("d-none", true);
+            $("#Forgot-Step3-container").toggleClass("d-none", true);
+          } else if (localStorage.getItem("ForgotStep") == "2") {
+            $("#Forgot-Step1-container").toggleClass("d-none", true);
+            $("#Forgot-Step2-container").toggleClass("d-none", false);
+            $("#Forgot-Step3-container").toggleClass("d-none", true);
+          } else {
+            $("#Forgot-Step1-container").toggleClass("d-none", true);
+            $("#Forgot-Step2-container").toggleClass("d-none", true);
+            $("#Forgot-Step3-container").toggleClass("d-none", false);
+          }
+        } else {
+          $("#Forgot-Step1-container").toggleClass("d-none", false);
+          $("#Forgot-Step2-container").toggleClass("d-none", true);
+          $("#Forgot-Step3-container").toggleClass("d-none", true);
+        }
+      } else {
+        $("#Forgot-Step1-container").toggleClass("d-none", false);
+        $("#Forgot-Step2-container").toggleClass("d-none", true);
+        $("#Forgot-Step3-container").toggleClass("d-none", true);
+      }
+
       $("#Login-container").addClass("d-none");
       $("#Register-container").addClass("d-none");
 

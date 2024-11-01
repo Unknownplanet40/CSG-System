@@ -193,3 +193,12 @@ div:where(.toast-icon) .swal2-warning {
   border-color: var(--bs-warning-border) !important;
   color: var(--bs-warning-border) !important;
 }
+
+::-webkit-scrollbar {
+  width: 3px !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(var(--bs-body-color-rgb), 0.5) !important;
+  border-radius: 10px !important;
+}

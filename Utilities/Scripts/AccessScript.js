@@ -3,6 +3,7 @@ import {
   LoginProcess,
   FPStep1Process,
   FPStep2Process,
+  FPStep3Process,
   showCurrentForm,
   changeColor,
 } from "./Modules/AccessModules.js";
@@ -18,12 +19,13 @@ import { QueueNotification } from "./Modules/Queueing_Notification.js";
 import { sha256 } from "./Modules/hash256.js";
 
 var $ipAddress = null;
+
 if (navigator.onLine) {
   $.getJSON("https://api.ipify.org?format=json", function (data) {
     $ipAddress = data.ip;
   });
 } else {
-  $ipAddress = "000.000.000.000";
+  window.location.href = "../../Src/Pages/Error.html?Error=NoInternet";
 }
 
 $(document).ready(function () {
@@ -46,10 +48,7 @@ $(document).ready(function () {
     localStorage.removeItem("error");
   }
 
-  if (
-    localStorage.getItem("studentnum") != null &&
-    localStorage.getItem("password") != null
-  ) {
+  if (localStorage.getItem("studentnum") != null && localStorage.getItem("password") != null) {
     var autoLoginData = {
       studentnum: localStorage.getItem("studentnum"),
       password: localStorage.getItem("password"),
@@ -263,7 +262,6 @@ $(document).ready(function () {
   });
 
   // Register Form Validation
-
   $("#eyecon-input2").click(function () {
     if ($("#Reg-password").attr("type") == "password") {
       $("#Reg-password").attr("type", "text");
@@ -280,7 +278,7 @@ $(document).ready(function () {
 
   // Forgot Password 1 & 2 Form Validation
 
-  // Step 1
+  // Step 1 - Check if Student Number and Email is valid
   $("#fps1-studnum").keyup(function () {
     if ($("#fps1-studnum").val().length == 0) {
       $("#fps1-studnum").removeClass("is-invalid");
@@ -394,149 +392,52 @@ $(document).ready(function () {
     // api or ajax call here
     var data = {
       studentnum: $("#fps1-studnum").val(),
-      password: $("#fps1-email").val(),
+      primaryEmail: $("#fps1-email").val(),
+      step: 1,
     };
 
     FPStep1Process(data);
   });
 
-  // Step 2
-  $("#eyecon-input3").click(function () {
-    if ($("#fpS2-password").attr("type") == "password") {
-      $("#fpS2-password").attr("type", "text");
-      $("#eyecon-input3").html(
-        '<svg width="22" height="22"><use xlink:href="#PassHide" /></svg>'
-      );
-    } else {
-      $("#fpS2-password").attr("type", "password");
-      $("#eyecon-input3").html(
-        '<svg width="22" height="22"><use xlink:href="#PassShow" /></svg>'
-      );
-    }
+  // resend OTP
+  $("#resendOTP").click(function () {
+
+    $("#resendOTP").attr("disabled", "disabled");
+    $("#resendOTP").html("Resending OTP...");
+
+    var data = {
+      studentnum: $("#fps1-studnum").val(),
+      primaryEmail: $("#fps1-email").val(),
+      step: 1,
+    };
+
+    FPStep1Process(data);
   });
-
-  $("#eyecon-input4").click(function () {
-    if ($("#fpS2-cpassword").attr("type") == "password") {
-      $("#fpS2-cpassword").attr("type", "text");
-      $("#eyecon-input4").html(
-        '<svg width="22" height="22"><use xlink:href="#PassHide" /></svg>'
-      );
-    } else {
-      $("#fpS2-cpassword").attr("type", "password");
-      $("#eyecon-input4").html(
-        '<svg width="22" height="22"><use xlink:href="#PassShow" /></svg>'
-      );
-    }
-  });
-
-  $("#fpS2-password").keyup(function () {
-    if ($("#fpS2-password").val().length == 0) {
-      $("#fpS2-password").removeClass("is-invalid");
-      $("#passwordHelp1").text("");
-      return;
-    }
-
-    if (!PasswordRegex.test($("#fpS2-password").val())) {
-      $("#fpS2-password").addClass("is-invalid");
-      $("#passwordHelp1").text(
-        "Password must be at least 8 characters long and must contain at least one uppercase letter, one lowercase letter, one number and one special character."
-      );
-      return;
-    }
-
-    $("#fpS2-password").removeClass("is-invalid");
-    $("#fpS2-password").addClass("is-valid");
-    $("#passwordHelp1").text("");
-
-    setTimeout(function () {
-      $("#fpS2-password").removeClass("is-valid");
-    }, 1000);
-  });
-
-  $("#fpS2-cpassword").keyup(function () {
-    if ($("#fpS2-cpassword").val().length == 0) {
-      $("#fpS2-cpassword").removeClass("is-invalid");
-      $("#cpasswordHelp").text("");
-      return;
-    }
-
-    if ($("#fpS2-password").val() != $("#fpS2-cpassword").val()) {
-      $("#fpS2-cpassword").addClass("is-invalid");
-      $("#cpasswordHelp").text("Password does not match.");
-      return;
-    }
-
-    $("#fpS2-cpassword").removeClass("is-invalid");
-    $("#fpS2-cpassword").addClass("is-valid");
-    $("#cpasswordHelp").text("");
-
-    setTimeout(function () {
-      $("#fpS2-cpassword").removeClass("is-valid");
-    }, 1000);
-  });
+  // Step 2 - Verify the OTP
 
   $("#FpS2-btn").click(function () {
     //before Secondary Validation
-    if ($("#fpS2-password").val() == "" || $("#fpS2-cpassword").val() == "") {
-      if ($("#fpS2-password").val() == "") {
-        $("#fpS2-password").focus();
-        $("#fpS2-password").addClass("is-invalid");
-        $("#passwordHelp1").text("Please enter your password.");
+    if ($("#ResetToken").val() == "") {
+      $("#ResetToken").focus();
+      $("#ResetToken").addClass("is-invalid");
+      $("#otpHelp").text("Please enter the OTP.");
 
-        $("#fpS2-password").addClass("shake");
-        setTimeout(function () {
-          $("#fpS2-password").removeClass("shake");
-        }, 500);
-      } else {
-        $("#fpS2-password").removeClass("is-invalid");
-        $("#passwordHelp1").text("");
-
-        $("#fpS2-cpassword").focus();
-        $("#fpS2-cpassword").addClass("is-invalid");
-        $("#cpasswordHelp").text("Please confirm your password.");
-
-        $("#fpS2-cpassword").addClass("shake");
-        setTimeout(function () {
-          $("#fpS2-cpassword").removeClass("shake");
-        }, 500);
-      }
+      $("#ResetToken").addClass("shake");
+      setTimeout(function () {
+        $("#ResetToken").removeClass("shake");
+      }, 500);
 
       $("#FpS2-btn").attr("disabled", "disabled");
 
       setTimeout(function () {
         $("#FpS2-btn").removeAttr("disabled");
       }, 1500);
-
-      return;
-    }
-
-    // for Password
-    if (!PasswordRegex.test($("#fpS2-password").val())) {
-      $("#fpS2-password").focus();
-      $("#fpS2-password").addClass("is-invalid");
-      $("#passwordHelp").text("Your password format is not valid.");
-      return;
-    }
-
-    // for Confirm Password
-    if ($("#fpS2-password").val() != $("#fpS2-cpassword").val()) {
-      $("#fpS2-cpassword").focus();
-      $("#fpS2-cpassword").addClass("is-invalid");
-      $("#cpasswordHelp").text("Password does not match.");
-
-      setTimeout(function () {
-        $("#fpS2-cpassword").removeClass("is-invalid");
-        $("#cpasswordHelp").text("");
-      }, 3000);
       return;
     }
 
     // after validation
-    $("#fpS2-password").removeClass("is-invalid");
-    $("#fpS2-cpassword").removeClass("is-invalid");
-
-    $("#passwordHelp1").text("");
-    $("#cpasswordHelp").text("");
+    $("#ResetToken").removeClass("is-invalid");
+    $("#otpHelp").text("");
 
     $("#FpS2-btn").attr("disabled", "disabled");
     $("#FpS2-btn-label").addClass("d-none");
@@ -544,27 +445,163 @@ $(document).ready(function () {
 
     var data = {
       studentnum: $("#fps1-studnum").val(),
-      password: $("#fps1-email").val(),
+      primaryEmail: $("#fps1-email").val(),
+      token: $("#ResetToken").val(),
+      step: 2,
     };
 
     FPStep2Process(data);
   });
 
-  let iconMenu = $(".bodymovinanim");
-
-  let animation = bodymovin.loadAnimation({
-    container: iconMenu[0],
-    renderer: "svg",
-    loop: false,
-    autoplay: false,
-    path: "../../Assets/Icons/animated-SVG/menuV3.json",
+  // Step 3 - Change Password
+  $("#eyecon-input3").click(function () {
+    if ($("#fpS3-password").attr("type") == "password") {
+      $("#fpS3-password").attr("type", "text");
+      $("#eyecon-input3").html(
+        '<svg width="22" height="22"><use xlink:href="#PassHide" /></svg>'
+      );
+    } else {
+      $("#fpS3-password").attr("type", "password");
+      $("#eyecon-input3").html(
+        '<svg width="22" height="22"><use xlink:href="#PassShow" /></svg>'
+      );
+    }
   });
 
-  var direction = 1;
-  iconMenu.click(function () {
-    animation.setDirection(direction);
-    animation.play();
-    direction = -direction;
-    animation.setSpeed(2);
+  $("#eyecon-input4").click(function () {
+    if ($("#fpS3-cpassword").attr("type") == "password") {
+      $("#fpS3-cpassword").attr("type", "text");
+      $("#eyecon-input4").html(
+        '<svg width="22" height="22"><use xlink:href="#PassHide" /></svg>'
+      );
+    } else {
+      $("#fpS3-cpassword").attr("type", "password");
+      $("#eyecon-input4").html(
+        '<svg width="22" height="22"><use xlink:href="#PassShow" /></svg>'
+      );
+    }
+  });
+
+  $("#fpS3-password").keyup(function () {
+    if ($("#fpS3-password").val().length == 0) {
+      $("#fpS3-password").removeClass("is-invalid");
+      $("#passwordHelp1").text("");
+      return;
+    }
+
+    if (!PasswordRegex.test($("#fpS3-password").val())) {
+      $("#fpS3-password").addClass("is-invalid");
+      $("#passwordHelp1").text(
+        "Password must be at least 8 characters long and must contain at least one uppercase letter, one lowercase letter, one number and one special character."
+      );
+      return;
+    }
+
+    $("#fpS3-password").removeClass("is-invalid");
+    $("#fpS3-password").addClass("is-valid");
+    $("#passwordHelp1").text("");
+
+    setTimeout(function () {
+      $("#fpS3-password").removeClass("is-valid");
+    }, 1000);
+  });
+
+  $("#fpS3-cpassword").keyup(function () {
+    if ($("#fpS3-cpassword").val().length == 0) {
+      $("#fpS3-cpassword").removeClass("is-invalid");
+      $("#cpasswordHelp").text("");
+      return;
+    }
+
+    if ($("#fpS3-password").val() != $("#fpS3-cpassword").val()) {
+      $("#fpS3-cpassword").addClass("is-invalid");
+      $("#cpasswordHelp").text("Password does not match.");
+      return;
+    }
+
+    $("#fpS3-cpassword").removeClass("is-invalid");
+    $("#fpS3-cpassword").addClass("is-valid");
+    $("#cpasswordHelp").text("");
+
+    setTimeout(function () {
+      $("#fpS3-cpassword").removeClass("is-valid");
+    }, 1000);
+  });
+
+  $("#fpS3-btn").click(function () {
+    //before Secondary Validation
+    if ($("#fpS3-password").val() == "" || $("#fpS3-cpassword").val() == "") {
+      if ($("#fpS3-password").val() == "") {
+        $("#fpS3-password").focus();
+        $("#fpS3-password").addClass("is-invalid");
+        $("#passwordHelp1").text("Please enter your password.");
+
+        $("#fpS3-password").addClass("shake");
+        setTimeout(function () {
+          $("#fpS3-password").removeClass("shake");
+        }, 500);
+      } else {
+        $("#fpS3-password").removeClass("is-invalid");
+        $("#passwordHelp1").text("");
+
+        $("#fpS3-cpassword").focus();
+        $("#fpS3-cpassword").addClass("is-invalid");
+        $("#cpasswordHelp").text("Please confirm your password.");
+
+        $("#fpS3-cpassword").addClass("shake");
+        setTimeout(function () {
+          $("#fpS3-cpassword").removeClass("shake");
+        }, 500);
+      }
+
+      $("#fpS3-btn").attr("disabled", "disabled");
+
+      setTimeout(function () {
+        $("#fpS3-btn").removeAttr("disabled");
+      }, 1500);
+
+      return;
+    }
+
+    // for Password
+    if (!PasswordRegex.test($("#fpS3-password").val())) {
+      $("#fpS3-password").focus();
+      $("#fpS3-password").addClass("is-invalid");
+      $("#passwordHelp").text("Your password format is not valid.");
+      return;
+    }
+
+    // for Confirm Password
+    if ($("#fpS3-password").val() != $("#fpS3-cpassword").val()) {
+      $("#fpS3-cpassword").focus();
+      $("#fpS3-cpassword").addClass("is-invalid");
+      $("#cpasswordHelp").text("Password does not match.");
+
+      setTimeout(function () {
+        $("#fpS3-cpassword").removeClass("is-invalid");
+        $("#cpasswordHelp").text("");
+      }, 3000);
+      return;
+    }
+
+    // after validation
+    $("#fpS3-password").removeClass("is-invalid");
+    $("#fpS3-cpassword").removeClass("is-invalid");
+
+    $("#passwordHelp1").text("");
+    $("#cpasswordHelp").text("");
+
+    $("#fpS3-btn").attr("disabled", "disabled");
+    $("#fpS3-btn-label").addClass("d-none");
+    $("#fpS3-btn-loader").removeClass("d-none");
+
+    var data = {
+      studentnum: $("#fps1-studnum").val(),
+      primaryEmail: $("#fps1-email").val(),
+      newpassword: $("#fpS3-password").val(),
+      step: 3,
+    };
+
+    FPStep3Process(data);
   });
 });

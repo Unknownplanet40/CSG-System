@@ -90,6 +90,10 @@
               document.getElementById("error-title").innerText = "No API Keys";
               document.getElementById("error-message").innerText = "No API keys were found. Please contact the administrator for more information.";
               break;
+            case "NoInternet":
+              document.getElementById("error-title").innerText = "No Internet Connection";
+              document.getElementById("error-message").innerText = "No internet connection was detected. Please check your connection and try again.";
+              break;
             default:
               document.getElementById("error-title").innerText = errors_title[0];
               document.getElementById("error-message").innerText = errors_message[0];

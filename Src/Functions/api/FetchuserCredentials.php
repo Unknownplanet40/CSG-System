@@ -31,13 +31,20 @@ function fetchUserCredentials($conn, $studentNumber)
                 $Profile = $result->fetch_assoc();
                 $Image = $Profile['imagePath'] . "." . $Profile['imageExt'];
             } else {
-                $stmt = $conn->prepare("SELECT * FROM userprofile WHERE UUID = 'b605fa08-8d3d-11ef-985d-14b31f13ae97'");
-                $stmt->execute();
-                $result = $stmt->get_result();
-                $stmt->close();
+                $Image = "Default-Profile.gif";
+            }
 
-                $Profile = $result->fetch_assoc();
-                $Image = $Profile['imagePath'] . "." . $Profile['imageExt'];
+            $stmt = $conn->prepare("SELECT * FROM userpositions WHERE UUID = ?");
+            $stmt->bind_param("s", $row['UUID']);
+            $stmt->execute();
+            $pos = $stmt->get_result();
+            $stmt->close();
+
+            if ($pos->num_rows > 0) {
+                $position = $pos->fetch_assoc();
+                $role = $position['role'];
+            } else {
+                $role = 3;
             }
 
 
@@ -52,6 +59,7 @@ function fetchUserCredentials($conn, $studentNumber)
             $_SESSION['sessionID'] = $row['sessionID'];
             $_SESSION['Created_On'] = $row['created_at'];
             $_SESSION['ProfileImage'] = $Image;
+            $_SESSION['role'] = $role;
         }
 
         $data = [
@@ -63,7 +71,8 @@ function fetchUserCredentials($conn, $studentNumber)
             'isLogged' => $_SESSION['isLogged'],
             'Created_On' => $_SESSION['Created_On'],
             'SessionID' => $_SESSION['sessionID'],
-            'ProfileImage' => $_SESSION['ProfileImage']
+            'ProfileImage' => $_SESSION['ProfileImage'],
+            'role' => $_SESSION['role']
         ];
         unset($_SESSION['sessionID']);
         return $data;

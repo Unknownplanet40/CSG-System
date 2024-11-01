@@ -1,157 +1,112 @@
 @import url("./Animations.css");
 
 nav {
-    padding: 0 10px;
+  padding: 0 10px;
 }
 
 nav ul {
-    width: 100%;
-    list-style: none;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
+  width: 100%;
+  list-style: none;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
-
 nav li {
-    height: 50px;
+  height: 50px;
 }
 
 nav a {
-    height: 100%;
-    padding: 0 20px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    color: var(--bs-body-color);
+  height: 100%;
+  padding: 0 20px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  color: var(--bs-body-color);
 }
 
 nav li:not(:first-child):not(.sidebars li):not(.menu-btn) :hover {
-    transition: 0.3s ease;
-    animation: nav-zoom 0.3s ease;
+  transition: 0.3s ease;
+  animation: nav-zoom 0.3s ease;
 }
 
 nav li:active {
-    transform: scale(0.9);
+  transform: scale(0.9);
 }
 
 nav li:first-child {
-    margin-right: auto;
+  margin-right: auto;
 }
 
 .sidebars {
-    position: fixed;
-    padding-left: 10px;
-    top: 0;
-    right: 0;
-    height: 100vh;
-    width: 250px;
-    box-shadow: -10px 0px 10px rgba(0, 0, 0, 0.1);
-    display: none;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-    transition: 0.5s ease;
-    z-index: 100;
+  position: fixed;
+  padding-left: 10px;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 250px;
+  box-shadow: -10px 0px 10px rgba(0, 0, 0, 0.1);
+  display: none;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  transition: 0.5s ease;
+  z-index: 100;
 }
 
 .sidebars li:not(:first-child) :hover {
-    transition: 0.3s ease;
-    animation: nozoom 0.3s ease-in-out;
-    transform: translateX(10px);
+  transition: 0.3s ease;
+  animation: nozoom 0.3s ease-in-out;
+  transform: translateX(10px);
 }
 
-.sidebars>*:first-child {
-    margin: 0 0 0 auto;
+.sidebars > *:first-child {
+  margin: 0 0 0 auto;
 }
 
 .menu-btn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .hideLabel {
     display: none;
+  }
 }
 
-
-@media(max-width: 768px) {
-    .hideLabel {
-        display: none;
-    }
-}
-
-@media(max-width: 500px) {
-    .sidebars {
-        width: 100%;
-    }
+@media (max-width: 500px) {
+  .sidebars {
+    width: 100%;
+  }
 }
 
 .LogoMain a span {
-    background-image: url("https://i.imgur.com/Xd06F5f.jpeg");
-    background-size: cover;
-    background-position: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    position: relative;
+  background-image: url("https://i.imgur.com/Xd06F5f.jpeg");
+  background-size: cover;
+  background-position: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
-
-
 
 .LogoMain a span::after {
-    content: "CSG";
-    position: absolute;
-    top: 50%;
-    left: 180%;
-    transform: translate(-50%, -50%);
-    color: var(--bs-body-color);
-    font-weight: bold;
-    font-size: 1.2rem;
+  content: "CSG";
+  position: absolute;
+  top: 50%;
+  left: 180%;
+  transform: translate(-50%, -50%);
+  color: var(--bs-body-color);
+  font-weight: bold;
+  font-size: 1.2rem;
 }
 
-/* for scroll bar */
 ::-webkit-scrollbar {
-    width: 10px;
+  width: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #ffda6a;
-    opacity: 0.5;
-    border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #ffefc1;
-    opacity: 0.5;
-}
-
-::-webkit-scrollbar-thumb:active {
-    background: #ffda6a;
-    opacity: 0.5;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--bs-body);
-}
-
-::-webkit-scrollbar-track:hover {
-    background: var(--bs-body);
-}
-
-::-webkit-scrollbar-button {
-    background: var(--bs-body);
-    display: none;
-}
-
-::-webkit-scrollbar-button:hover {
-    background: var(--bs-body);
-}
-
-::-webkit-scrollbar-button:active {
-    background: var(--bs-body);
-}
-
-::-webkit-scrollbar-corner {
-    background: var(--bs-body);
-}
-
-::-webkit-resizer {
-    background: var(--bs-body);
+  background-color: rgba(var(--bs-body-color-rgb), 0.5);
+  border-radius: 10px;
 }

@@ -19,9 +19,6 @@ if (!file_exists('../env/HiddenKeys.php')) {
 } else {
     require_once '../env/HiddenKeys.php';
 }
-
-
-require_once '../env/HiddenKeys.php';
 require_once '../../Debug/GenLog.php';
 $logPath = "../../Debug/Users/UUID.log";
 

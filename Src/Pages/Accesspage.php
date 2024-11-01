@@ -37,7 +37,6 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
     <script src="../../Utilities/Third-party/JQuery/js/jquery.min.js"></script>
     <script src="../../Utilities/Third-party/Sweetalert2/js/sweetalert2.all.min.js"></script>
     <script src="../../Utilities/Scripts/animate-browser-title.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
     <script defer type="module" src="../../Utilities/Scripts/AccessScript.js"></script>
     <script>
         function HomeRedirect() {
@@ -70,10 +69,10 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
         } elseif ($_GET['error'] == '002') {
             echo "<script>localStorage.setItem('error', 'Session expired. Please log in again');</script>";
             unset($_GET['error']);
-        } else if ($_GET['error'] == '003') {
+        } elseif ($_GET['error'] == '003') {
             echo "<script>localStorage.setItem('error', 'Please insure that your the only one logged in on this account');</script>";
             unset($_GET['error']);
-        } else if ($_GET['error'] == '004') {
+        } elseif ($_GET['error'] == '004') {
             echo "<script>localStorage.setItem('error', 'You have Encountered an E-K404 Error Code. Please Contact the Administrator');</script>";
             unset($_GET['error']);
         } else {
@@ -331,18 +330,18 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                                 <div class="mb-3">
                                     <label for="fps1-studnum" class="form-label fs-6">Student Number</label>
                                     <input type="text" class="form-control rounded-0 mx-1" id="fps1-studnum"
-                                        aria-describedby="studnumHelp FpS1-btn" maxlength="10">
+                                        aria-describedby="studnumHelp FpS1-btn" maxlength="9" data-isvalid="false">
                                     <div id="studnumHelp" class="invalid-feedback">For validation</div>
                                 </div>
                                 <div class="mb-5">
                                     <label for="fps1-email" class="form-label fs-6">Primary Email</label>
                                     <input type="text" class="form-control rounded-0 mx-1" id="fps1-email"
-                                        aria-describedby="emailHelp FpS1-btn">
+                                        aria-describedby="emailHelp FpS1-btn" data-isvalid="false">
                                     <div id="emailHelp" class="invalid-feedback">For validation</div>
                                 </div>
                                 <div class="d-grid gap-2">
                                     <button type="button" class="btn btn-success btn-sm rounded-0 py-2" id="FpS1-btn">
-                                        <strong role="status" id="FpS1-btn-label">Verify</strong>
+                                        <strong role="status" id="FpS1-btn-label">Next</strong>
                                         <div class="d-none d-flex justify-content-center" id="FpS1-btn-loader">
                                             <strong role="status">Loading...</strong>
                                             <div class="spinner-border spinner-border-sm ms-auto mt-1"
@@ -363,10 +362,42 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                         <div class="d-flex justify-content-center">
                             <div class="container">
                                 <div class="mb-3">
-                                    <label for="fpS2-password" class="form-label fs-6">Password</label>
+                                    <label for="ResetToken" class="form-label fs-6">Verification Code (<small
+                                            class="text-danger" id="otpTimer"></small>)</label>
+                                    <div class="hstack gap-3">
+                                        <input type="text" class="form-control rounded-0 mx-1" id="ResetToken"
+                                            aria-describedby="otpHelp FpS2-btn">
+                                        <div id="otpHelp" class="invalid-feedback">For validation</div>
+                                    </div>
+                                    <button class="btn btn-link btn-sm rounded-0" id="resendOTP" disabled>Resend Code</button>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button type="button" class="btn btn-success btn-sm rounded-0 py-2" id="FpS2-btn">
+                                        <strong role="status" id="FpS2-btn-label">Verify Token and Proceed</strong>
+                                        <div class="d-none d-flex justify-content-center" id="FpS2-btn-loader">
+                                            <strong role="status">Loading...</strong>
+                                            <div class="spinner-border spinner-border-sm ms-auto mt-1"
+                                                aria-hidden="true"></div>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3 d-none" id="Forgot-Step3-container">
+                        <h5 class="text-start fw-bold my-5">
+                            <svg width="18" height="18" class="mx-2">
+                                <use xlink:href="#Lock" />
+                            </svg>
+                            Forgot Password Final Step
+                        </h5>
+                        <div class="d-flex justify-content-center">
+                            <div class="container">
+                                <div class="mb-3">
+                                    <label for="fpS3-password" class="form-label fs-6">Password</label>
                                     <div class="eyeforaneye pe-5">
-                                        <input type="password" class="form-control rounded-0 mx-1" id="fpS2-password"
-                                            aria-describedby="passwordHelp1 FpS2-btn">
+                                        <input type="password" class="form-control rounded-0 mx-1" id="fpS3-password"
+                                            aria-describedby="passwordHelp1 FpS3-btn">
                                         <span class="pass-eye py-2 px-3 rounded-0" id="eyecon-input3">
                                             <svg width="22" height="22">
                                                 <use xlink:href="#PassShow" />
@@ -375,10 +406,10 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                                     </div>
                                 </div>
                                 <div class="mb-5">
-                                    <label for="fpS2-cpassword" class="form-label fs-6">Confirm Password</label>
+                                    <label for="fpS3-cpassword" class="form-label fs-6">Confirm Password</label>
                                     <div class="eyeforaneye pe-5">
-                                        <input type="password" class="form-control rounded-0 mx-1" id="fpS2-cpassword"
-                                            aria-describedby="cpasswordHelp FpS2-btn">
+                                        <input type="password" class="form-control rounded-0 mx-1" id="fpS3-cpassword"
+                                            aria-describedby="cpasswordHelp FpS3-btn">
                                         <span class="pass-eye py-2 px-3 rounded-0" id="eyecon-input4">
                                             <svg width="22" height="22">
                                                 <use xlink:href="#PassShow" />
@@ -387,9 +418,9 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                                     </div>
                                 </div>
                                 <div class="d-grid gap-2">
-                                    <button type="button" class="btn btn-success btn-sm rounded-0 py-2" id="FpS2-btn">
-                                        <strong role="status" id="FpS2-btn-label">Change Password</strong>
-                                        <div class="d-none d-flex justify-content-center" id="FpS2-btn-loader">
+                                    <button type="button" class="btn btn-success btn-sm rounded-0 py-2" id="fpS3-btn">
+                                        <strong role="status" id="FpS3-btn-label">Change Password</strong>
+                                        <div class="d-none d-flex justify-content-center" id="FpS3-btn-loader">
                                             <strong role="status">Loading...</strong>
                                             <div class="spinner-border spinner-border-sm ms-auto mt-1"
                                                 aria-hidden="true"></div>

@@ -39,15 +39,15 @@ $(function () {
     // Change page title on blur
     $(window).blur(function () {
         animateTitle();
-        $('#blurifAway').addClass('away');
-        $('.b_navbar').addClass('d-none');
+        //$('#blurifAway').addClass('away');
+        //$('.b_navbar').addClass('d-none');
     });
 
     // Change page title back on focus
     $(window).focus(function () {
             restoreTitle();
-            $('#blurifAway').removeClass('away');
-            $('.b_navbar').removeClass('d-none');
+            //$('#blurifAway').removeClass('away');
+            //$('.b_navbar').removeClass('d-none');
     });
 
 });

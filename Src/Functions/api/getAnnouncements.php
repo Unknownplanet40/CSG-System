@@ -74,6 +74,36 @@ try {
                 $user = $result2->fetch_assoc();
                 $fullName = $user['First_Name'] . " " . $user['Last_Name'];
 
+                $stmt = $conn->prepare("SELECT * FROM userpositions WHERE UUID = ?");
+                $stmt->bind_param("s", $row['postedBy']);
+                $stmt->execute();
+                $result3 = $stmt->get_result();
+                $stmt->close();
+
+                if ($result3->num_rows > 0) {
+                    $position = $result3->fetch_assoc();
+                    $Role = $position['role'];
+
+                    if ($position['org_code'] != null) {
+                        $stmt = $conn->prepare("SELECT * FROM sysorganizations WHERE org_code = ?");
+                        $stmt->bind_param("s", $position['org_code']);
+                        $stmt->execute();
+                        $org = $stmt->get_result();
+                        $stmt->close();
+
+                        if ($org->num_rows > 0) {
+                            $org = $org->fetch_assoc();
+                            $OrgShortName = $org['org_short_name'] . " - Officer";
+                        } else {
+                            $OrgShortName = "Officer";
+                        }
+                    } else {
+                        $OrgShortName = "";
+                    }
+                } else {
+                    $Role = 3;
+                }
+
                 $stmt = $conn->prepare("SELECT * FROM userprofile WHERE UUID = ?");
                 $stmt->bind_param("s", $row['postedBy']);
                 $stmt->execute();
@@ -84,13 +114,7 @@ try {
                     $profile = $result3->fetch_assoc();
                     $image = $profile['imagePath'] . "." . $profile['imageExt'];
                 } else {
-                    $stmt = $conn->prepare("SELECT * FROM userprofile WHERE UUID = 'b605fa08-8d3d-11ef-985d-14b31f13ae97'");
-                    $stmt->execute();
-                    $result4 = $stmt->get_result();
-                    $stmt->close();
-
-                    $profile = $result4->fetch_assoc();
-                    $image = $profile['imagePath'] . "." . $profile['imageExt'];
+                    $image = "Default-Profile.gif";
                 }
 
                 // convert the likeBy and dislikeBy to array
@@ -163,6 +187,16 @@ try {
                         'profileImage' => $image
                     ];
                 } */
+
+                if (!isset($_GET['type']) && !isset($_GET['UUID'])) {
+                    if ($Role == 1) {
+                        $fullName = strtoupper("System Administator");
+                    } elseif ($Role == 2) {
+                        $fullName = $fullName . " - (" . $OrgShortName . ")";
+                    } else {
+                        $fullName = $fullName;
+                    }
+                }
 
                 $data[] = [
                     'postID' => $row['postID'],

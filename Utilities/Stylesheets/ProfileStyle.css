@@ -40,10 +40,6 @@
     align-items: center;
 }
 
-.profile {
-    border-right: 2px solid var(--bs-border-color);
-}
-
 .converpic{
     animation: cover-ani 1s ease-in-out forwards;
 }
@@ -54,14 +50,9 @@
         margin-top: -60px;
     }
 
-    .profile {
-        border-right: none;
-    }
-
     .converpic{
         z-index: -1;
         border-bottom: 5px solid var(--bs-border-color);
-        border-radius: 0 0 10px 10px;
     }
 }
 

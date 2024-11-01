@@ -19,7 +19,7 @@ export function openChat(
   $("#toUserFullName").text(toUserFullName);
   $("#toUserEmail").text(isActive === 1 ? "Active Now" : "Currently Offline");
   $("#toUserUUID").val(toUserUUID);
-  $("#toUserImage").attr("src", "../../Assets/Images/UserProfiles/" + Profile);
+  $("#toUserImage").attr("src", "../../Assets/Images/" + Profile);
   let chatContainer = $("#messageContainer");
   let chatInput = $("#messageInput");
   let chatSend = $("#sendMessage");
@@ -285,14 +285,18 @@ export function loadUsers() {
         usersCons.empty();
         data.data.forEach((user) => {
           var randNum = Math.floor(Math.random() * 1000);
+          let userProfPath = "";
+          if (user.toUser_Profile.includes("Default-Profile.gif")) {
+            userProfPath = "../../Assets/Images/Default-Profile.gif";
+          } else {
+            userProfPath = `../../Assets/Images/UserProfiles/${data.toUser_Profile}`;
+          }
           usersCons.append(`
                 <div class="card rounded-0 border-0 mb-2 conusers-card" id="user-${randNum}">
                     <div class="card-body">
                         <div class="hstack gap-1">
                             <div class="position-relative">
-                                <img src="../../Assets/Images/UserProfiles/${
-                                  user.toUser_Profile
-                                }" alt="" width="48" height="48" class="rounded-circle">
+                                <img src="${userProfPath}" alt="" width="48" height="48" class="rounded-circle">
                                 <span class="position-absolute top-100 start-100 translate-middle p-1 ${
                                   user.isLogin === 1
                                     ? `bg-success`
@@ -500,10 +504,17 @@ export function fetch_Announcements() {
           let postDislikes = announcement.postDislikes;
           let largeNum = ["K", "M", "B", "T"];
           let lastPost = "";
+          let profpath = "";
 
           if (data.data[data.data.length - 1] !== announcement) {
             lastPost = "anal";
           }
+
+          if (announcement.profileImage === "Default-Profile.gif") {
+            profpath = "../../Assets/Images/Default-Profile.gif";
+          } else {
+            profpath = "../../Assets/Images/UserProfiles/" + announcement.profileImage;
+          } 
 
           function formatNumber(num) {
             let formatted = num;
@@ -599,7 +610,6 @@ export function fetch_Announcements() {
                   }
                 }
               }
-
               return display_dislikeby;
             }
           }
@@ -610,9 +620,7 @@ export function fetch_Announcements() {
                                     <div>
                                         <div class="hstack gap-1 mb-1 user-select-none">
                                             <div class="p-2">
-                                                <img src="../../Assets/Images/UserProfiles/${
-                                                  announcement.profileImage
-                                                }" alt="" width="42" height="42" class="shadow rounded-circle">
+                                                <img src="${profpath}" alt="" width="42" height="42" class="shadow rounded-circle">
                                             </div>
                                             <div class="p-2">
                                                 <p class="alert-heading text-truncate fw-bold moved"

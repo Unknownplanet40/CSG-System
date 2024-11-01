@@ -118,16 +118,25 @@ $(document).ready(function () {
           result.empty();
           if (data.success) {
             data.data.forEach((user) => {
+              let userSearchProfile = "";
+              if (user.profile.includes("Default-Profile.gif")) {
+                userSearchProfile = "../../Assets/Images/Default-Profile.gif";
+              } else {
+                userSearchProfile = `../../Assets/Images/UserProfiles/${data.profile}`;
+              }
+
               let card = `<div class="card rounded-1 mb-2 conusers-card card-search user-select-none" id="${
                 user.UUID
               }">
-                                      <div class="card-body">
+              <div class="card-body">
                                           <div class="hstack gap-1">
                                               <div class="position-relative">
-                                                <img src="../../Assets/Images/UserProfiles/${
-                                                  user.profile
-                                                }" alt="" width="48" height="48" class="rounded-circle">
-                                                <span class="position-absolute top-100 start-100 translate-middle p-1 border border-light rounded-circle ${user.isLogin === 1 ? 'bg-success' : 'bg-danger' }">
+                                                <img src="${userSearchProfile}" alt="" width="48" height="48" class="rounded-circle">
+                                                <span class="position-absolute top-100 start-100 translate-middle p-1 border border-light rounded-circle ${
+                                                  user.isLogin === 1
+                                                    ? "bg-success"
+                                                    : "bg-danger"
+                                                }">
                                                   <span class="visually-hidden">New alerts</span>
                                                 </span>
                                               </div>
@@ -206,7 +215,7 @@ $(document).ready(function () {
               `<small class="text-center fw-bold text-muted">Displaying ${displaycount} results</small>`
             );
           }
-        }
+        },
       });
     } else {
       result.addClass("d-none");

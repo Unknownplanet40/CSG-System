@@ -23,7 +23,6 @@
             </div>
             <div class="col-3 dropdown">
                 <a class="col-Items" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                    <!-- <div class="bodymovinanim"></div> -->
                     <svg width="32" height="32">
                         <use xlink:href="#Menu"></use>
                     </svg>
