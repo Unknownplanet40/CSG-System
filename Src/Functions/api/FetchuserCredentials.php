@@ -47,6 +47,23 @@ function fetchUserCredentials($conn, $studentNumber)
                 $role = 3;
             }
 
+            $stmt = $conn->prepare("SELECT * FROM usersettings WHERE UUID = ?");
+            $stmt->bind_param("s", $row['UUID']);
+            $stmt->execute();
+            $set = $stmt->get_result();
+            $stmt->close();
+
+            if ($set->num_rows > 0) {
+                $settings = $set->fetch_assoc();
+                $theme = $settings['theme'];
+                $BobbleBG = $settings['bobble_BG'];
+            } else {
+                $theme = 'auto';
+                $BobbleBG = 0;
+            }
+
+
+
 
             $_SESSION['UUID'] = $row['UUID'];
             $_SESSION['FirstName'] = $row['First_Name'];
@@ -60,6 +77,8 @@ function fetchUserCredentials($conn, $studentNumber)
             $_SESSION['Created_On'] = $row['created_at'];
             $_SESSION['ProfileImage'] = $Image;
             $_SESSION['role'] = $role;
+            $_SESSION['theme'] = $theme;
+            $_SESSION['useBobbleBG'] = $BobbleBG;
         }
 
         $data = [
@@ -72,7 +91,9 @@ function fetchUserCredentials($conn, $studentNumber)
             'Created_On' => $_SESSION['Created_On'],
             'SessionID' => $_SESSION['sessionID'],
             'ProfileImage' => $_SESSION['ProfileImage'],
-            'role' => $_SESSION['role']
+            'role' => $_SESSION['role'],
+            'theme' => $_SESSION['theme'],
+            'useBobbleBG' => $_SESSION['useBobbleBG'],
         ];
         unset($_SESSION['sessionID']);
         return $data;

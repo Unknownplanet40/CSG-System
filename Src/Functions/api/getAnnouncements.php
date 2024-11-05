@@ -166,6 +166,15 @@ try {
                     $dislikeBy = [];
                 }
 
+                if (!isset($_GET['type']) && !isset($_GET['UUID'])) {
+                    if ($Role == 1) {
+                        $fullName = strtoupper("System Administator");
+                    } elseif ($Role == 2) {
+                        $fullName = $fullName . " - (" . $OrgShortName . ")";
+                    } else {
+                        $fullName = $fullName;
+                    }
+                }
 
                 // for testing purposes loop data 5 times to see the effect of the infinite scroll
 
@@ -187,16 +196,6 @@ try {
                         'profileImage' => $image
                     ];
                 } */
-
-                if (!isset($_GET['type']) && !isset($_GET['UUID'])) {
-                    if ($Role == 1) {
-                        $fullName = strtoupper("System Administator");
-                    } elseif ($Role == 2) {
-                        $fullName = $fullName . " - (" . $OrgShortName . ")";
-                    } else {
-                        $fullName = $fullName;
-                    }
-                }
 
                 $data[] = [
                     'postID' => $row['postID'],

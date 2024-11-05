@@ -44,7 +44,7 @@ nav li:first-child {
   top: 0;
   right: 0;
   height: 100vh;
-  width: 250px;
+  width: 320px;
   box-shadow: -10px 0px 10px rgba(0, 0, 0, 0.1);
   display: none;
   flex-direction: column;
@@ -52,6 +52,8 @@ nav li:first-child {
   align-items: flex-start;
   transition: 0.5s ease;
   z-index: 100;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .sidebars li:not(:first-child) :hover {
@@ -81,7 +83,7 @@ nav li:first-child {
 }
 
 .LogoMain a span {
-  background-image: url("https://i.imgur.com/Xd06F5f.jpeg");
+  background-image: url(../../Assets/Icons/PWA-Icon/MainIcon.png);
   background-size: cover;
   background-position: center;
   width: 32px;
@@ -92,14 +94,15 @@ nav li:first-child {
 }
 
 .LogoMain a span::after {
-  content: "CSG";
+  content: "ADMIN PANEL";
   position: absolute;
   top: 50%;
-  left: 180%;
+  left: 120px;
   transform: translate(-50%, -50%);
   color: var(--bs-body-color);
   font-weight: bold;
   font-size: 1.2rem;
+  width: 150px;
 }
 
 ::-webkit-scrollbar {

@@ -17,7 +17,7 @@
   "display": "standalone",
   "orientation": "natural",
   "scope": "/",
-  "start_url": "/CSG-System/Src/Pages/Homepage.php",
+  "start_url": "./Homepage.php",
   "theme_color": "#ffffff",
   "iarc_rating_id": "e58c174a-81d2-5c3c-32cc-34b8de4a52e9",
   "prefer_related_applications": false,
@@ -40,7 +40,7 @@
     {
       "name": "Home Page",
       "short_name": "Home",
-      "url": "/CSG-System/Src/Pages/Homepage.php",
+      "url": "./Homepage.php",
       "description": "Go to the homepage.",
       "icons": [
         {
@@ -54,7 +54,7 @@
     {
       "name": "Login / Register",
       "short_name": "Sign In",
-      "url": "/CSG-System/Src/Pages/Accesspage.php",
+      "url": "./Accesspage.php",
       "description": "Login to the system.",
       "icons": [
         {
@@ -68,7 +68,7 @@
     {
       "name": "View Announcements",
       "short_name": "News Feed",
-      "url": "/CSG-System/Src/Pages/Feed.php",
+      "url": "./Feed.php",
       "description": "View the latest announcements posted by the Central Student Government.",
       "icons": [
         {
@@ -82,22 +82,8 @@
     {
       "name": "View Profile",
       "short_name": "Profile",
-      "url": "/CSG-System/Src/Pages/Profile.php",
+      "url": "./Profile.php",
       "description": "View your profile.",
-      "icons": [
-        {
-          "src": "../../Assets/Icons/PWA-Icon/Icon-x96.jpeg",
-          "sizes": "96x96",
-          "type": "image/jpeg",
-          "purpose": "any"
-        }
-      ]
-    },
-    {
-      "name": "Borrow Equipment",
-      "short_name": "Borrow",
-      "url": "/CSG-System/Src/Pages/Apps/Borrowing_System/Dashboard.php",
-      "description": "Borrow equipment from the Central Student Government.",
       "icons": [
         {
           "src": "../../Assets/Icons/PWA-Icon/Icon-x96.jpeg",

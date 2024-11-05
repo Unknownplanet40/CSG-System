@@ -1,34 +1,8 @@
 
 <div class="b_navbar d-lg-none bg-body bg-blur-5 bg-opacity-25" id="b_Navbar">
-<div class="position-relative d-lg-none">
-    <div class="position-fixed bottom-0 end-0 p-3 mb-5" style="z-index: 11;">
-        <div type="button" class="btn btn-primary bg-transparent border-0 rounded-circle p-3 chat-aniSide" id="chatButton">
-            <svg width="32" height="32" class="text-body" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-html="true" data-bs-trigger="hover" data-bs-title="Messages"
-            style="cursor: pointer; outline: none;">
-                <use xlink:href="#Messages"></use>
-            </svg>
-        </div>
-    </div>
-</div>
-
-<script>
-    $("#chatButton").click(function() {
-        $('html, body').animate({
-            scrollTop: $("#UserBox").offset().top
-        }, 500);
-    });
-
-    setInterval(() => {
-        if ($(window).scrollTop() > 100) {
-            $("#chatButton").addClass("d-none");
-        } else {
-            $("#chatButton").removeClass("d-none");
-        }
-    }, 100);
-</script>
         <div class="row h-100 item-parent">
             <div class="col-3">
-                <a class="col-Items nav-active" id="b_ItemNav_Log">
+                <a class="col-Items nav-active" id="b_ItemNav_Log" onclick="window.location.href='../Pages/Feed.php'">
                     <svg width="32" height="32">
                         <use xlink:href="#Feed"></use>
                     </svg>
@@ -68,7 +42,7 @@
                         </svg>
                         Placeholder
                     </a>
-                    <a class="dropdown-item" id="b_ItemNav_Pref" onclick="window.location.href='../Pages/Preference.php'">
+                    <a class="dropdown-item" id="b_ItemNav_Pref">
                         <svg width="18" height="18" class="me-3 my-2">
                             <use xlink:href="#Settings"></use>
                         </svg>

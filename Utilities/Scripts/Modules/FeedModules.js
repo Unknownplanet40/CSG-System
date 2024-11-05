@@ -19,7 +19,11 @@ export function openChat(
   $("#toUserFullName").text(toUserFullName);
   $("#toUserEmail").text(isActive === 1 ? "Active Now" : "Currently Offline");
   $("#toUserUUID").val(toUserUUID);
-  $("#toUserImage").attr("src", "../../Assets/Images/" + Profile);
+  if (Profile === "Default-Profile.gif") {
+    $("#toUserImage").attr("src", "../../Assets/Images/Default-Profile.gif");
+  } else {
+  $("#toUserImage").attr("src", "../../Assets/Images/UserProfiles/" + Profile);
+  }
   let chatContainer = $("#messageContainer");
   let chatInput = $("#messageInput");
   let chatSend = $("#sendMessage");
@@ -286,11 +290,13 @@ export function loadUsers() {
         data.data.forEach((user) => {
           var randNum = Math.floor(Math.random() * 1000);
           let userProfPath = "";
+
           if (user.toUser_Profile.includes("Default-Profile.gif")) {
             userProfPath = "../../Assets/Images/Default-Profile.gif";
           } else {
-            userProfPath = `../../Assets/Images/UserProfiles/${data.toUser_Profile}`;
+            userProfPath = `../../Assets/Images/UserProfiles/${user.toUser_Profile}`;
           }
+          
           usersCons.append(`
                 <div class="card rounded-0 border-0 mb-2 conusers-card" id="user-${randNum}">
                     <div class="card-body">

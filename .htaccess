@@ -1,4 +1,4 @@
-errorDOCUMENT 404 http://csg.org/Src/Pages/Error.html?Error=404
-errorDOCUMENT 403 http://csg.org/Src/Pages/Error.html?Error=403
-errorDOCUMENT 500 http://csg.org/Src/Pages/Error.html?Error=500
-errorDOCUMENT 503 http://csg.org/Src/Pages/Error.html?Error=503
+errorDOCUMENT 404 https://dodgerblue-tiger-498833.hostingersite.com/Src/Pages/Error.html?Error=404
+errorDOCUMENT 403 https://dodgerblue-tiger-498833.hostingersite.com/Src/Pages/Error.html?Error=403
+errorDOCUMENT 500 https://dodgerblue-tiger-498833.hostingersite.com/Src/Pages/Error.html?Error=500
+errorDOCUMENT 503 https://dodgerblue-tiger-498833.hostingersite.com/Src/Pages/Error.html?Error=503

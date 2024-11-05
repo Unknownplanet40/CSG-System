@@ -3,10 +3,13 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
     require_once '../Database/Config.php';
+    require_once '../Debug/GenLog.php';
 }
 
 if (!isset($_SESSION['UUID'])) {
     header('Location: ../Pages/Accesspage.php?error=001');
+} else {
+    $logPath = "../Debug/Users/UUID.log";
 }
 
 $inactive = 1800; // 30 minutes inactivity
@@ -20,17 +23,16 @@ if (isset($_SESSION['last_activity'])) {
 }
 
 $_SESSION['last_activity'] = time();
-
-$_SESSION['last_activity'] = time();
 ?>
 
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="auto">
+<html lang="en" data-bs-theme="<?php echo $_SESSION['theme']; ?>">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../Utilities/Third-party/Bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../Utilities/Stylesheets/BGaniStyle.css">
     <link rel="stylesheet" href="../../Utilities/Third-party/AOS/css/aos.css">
     <link rel="stylesheet" href="../../Utilities/Stylesheets/CustomStyle.css">
     <link rel="stylesheet" href="../../Utilities/Stylesheets/NavbarStyle.css">
@@ -45,6 +47,7 @@ $_SESSION['last_activity'] = time();
 </head>
 
 <?php include_once '../../Assets/Icons/Icon_Assets.php'; ?>
+<?php $_SESSION['useBobbleBG'] == 1 ? include_once '../Components/BGanimation.php' : null; ?>
 
 <body>
     <div class="modal" id="NewPostModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
@@ -188,14 +191,19 @@ $_SESSION['last_activity'] = time();
                     <div class="container">
                         <div class="row g-2 row-cols-1 row-cols-md-2">
                             <div class="col-md-4 d-flex justify-content-center align-items-center">
-                                <img src="../../Assets/Images/UserProfiles/<?php echo $_SESSION['ProfileImage']?>"
-                                    class="object-fit-cover border rounded-circle img-fluid" style="height: 192px;"
+                                <?php if ($_SESSION['ProfileImage'] == "Default-Profile.gif") { ?>
+                                    <img src="../../Assets/Images/Default-Profile.gif" class="img-fluid border-3 rounded-circle"
+                                        width="192" height="192" alt="<?php echo $_SESSION['FirstName'] . ' ' . $_SESSION['LastName']; ?> Profile Image">
+                                <?php } else { ?>
+                                    <img src="../../Assets/Images/UserProfiles/<?php echo $_SESSION['ProfileImage']; ?>"
+                                        class="img-fluid border rounded-circle" width="192" height="192"
                                     alt="<?php echo $_SESSION['FirstName'] . ' ' . $_SESSION['LastName']; ?> Profile Image">
+                                <?php } ?>
                             </div>
                             <div class="col-md-8">
                                 <div class="ratio ratio-16x9 rounded-3 bg-body bg-opacity-10 bg-blur-3">
-                                    <img src="../../Assets/Images/Default-Cover.png"
-                                        class="object-fit-contain border-0 rounded-3 p-0">
+                                    <img src="../../Assets/Images/Default-Cover.gif" alt="Cover Image"
+                                        class="object-fit-cover border-0 rounded-3 p-0">
                                 </div>
                             </div>
                         </div>
@@ -228,22 +236,19 @@ $_SESSION['last_activity'] = time();
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 bg-body bg-opacity-10 bg-blur-3">
                                         Role
-                                        <?php
-                                            if ($_SESSION['role'] == 1) {
-                                                $role = 'Administator';
-                                            } elseif ($_SESSION['role'] == 2) {
-                                                $role = "CSG Officer";
-                                            } else {
-                                                $role = 'Officer';
-                                            } ?>
-                                        <select class="form-select border-0 rounded-0 text-end w-50 bg-transparent"
-                                            aria-label="Default select example">
-                                            <option selected hidden
-                                                value="<?php echo $_SESSION['role']; ?>">
-                                                <?php echo $role; ?>
-                                            <option class="text-center" value="1">ADMINISTRATOR</option>
-                                            <option class="text-center" value="2">CSG Officer</option>
-                                            <option class="text-center" value="3">Officer</option>
+                                        <select class="form-select border-0 rounded-0 text-end w-50 bg-transparent">
+                                            <?php
+                                            
+                                            $roles = [
+                                                1 => 'ADMINISTRATOR',
+                                                2 => 'CSG OFFICER',
+                                                3 => 'OFFICER'
+                                            ];
+                                            
+                                            foreach ($roles as $role => $label) {
+                                                echo '<option value="' . $role . '" ' . ($role == $_SESSION['role'] ? 'selected' : '') . '>' . $label . '</option>';
+                                            }
+                                            ?>
                                         </select>
                                     </li>
                                     <li
@@ -261,7 +266,7 @@ $_SESSION['last_activity'] = time();
                                                     $org = $result->fetch_assoc();
                                                 }
 
-                                                $stmt = $conn->prepare("SELECT * FROM organizations");
+                                                $stmt = $conn->prepare("SELECT * FROM sysorganizations");
                                                 $stmt->execute();
                                                 $orgs = $stmt->get_result();
                                                 $stmt->close();
@@ -289,6 +294,12 @@ $_SESSION['last_activity'] = time();
                                         Student Number
                                         <input type="text" class="form-control border-0 text-end w-50 bg-transparent"
                                             value="<?php echo $_SESSION['student_Number']; ?>">
+                                    </li>
+                                    <li
+                                        class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 bg-body bg-opacity-10 bg-blur-3">
+                                        Course & Section
+                                        <input type="text" class="form-control border-0 text-end w-50 bg-transparent"
+                                            value="BSIT-4B">
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 bg-body bg-opacity-10 bg-blur-3">
@@ -341,8 +352,21 @@ $_SESSION['last_activity'] = time();
         <div class="row g-0 row-cols-1 row-cols-md-2">
             <div class="col-md-3 text-center order-2 order-md-1 profcover">
                 <div class="profile h-100">
-                    <img src="../../Assets/Images/UserProfiles/<?php echo $_SESSION['ProfileImage']?>"
-                        alt="" class="img-fluid border rounded-circle mt-lg-3" width="128" height="128">
+                    <!--spacer for profile picture and name and role-->
+                    <div class="spacer d-none d-lg-block"></div>
+                    <style>
+                        .spacer {
+                            height: 192px;
+                            width: 100%;
+
+                        }
+                    </style>
+                    <?php if ($_SESSION['ProfileImage'] == "Default-Profile.gif") {?>
+                        <img src="../../Assets/Images/Default-Profile.gif" alt="" class="img-fluid border rounded-circle mt-lg-3" width="128" height="128">
+                    <?php } else {?>
+                        <img src="../../Assets/Images/UserProfiles/<?php echo $_SESSION['ProfileImage']?>" alt="" class="img-fluid border rounded-circle mt-lg-3" width="128" height="128">
+                    <?php }?>
+                    
                     <h5 class="fw-bold mt-2 text-truncate">
                         <?php echo $_SESSION['FirstName'] . ' ' . $_SESSION['LastName']; ?>
                     </h5>
@@ -354,8 +378,7 @@ $_SESSION['last_activity'] = time();
                                 $role = "CSG Officer";
                             } else {
                                 $role = 'Officer';
-                            }
-echo $role;
+                            }echo $role;
 ?>
                     </p>
                     <div class="d-flex justify-content-center">

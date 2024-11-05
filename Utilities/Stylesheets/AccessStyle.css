@@ -1,7 +1,53 @@
+@import url("./BGaniStyle.css");
+
 * {
   margin: 0;
   padding: 0;
 }
+
+/* body {
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::after {
+  content: "";
+  position: absolute;
+  top: 80%;
+  right: -92px;
+  width: 739px;
+  height: 100%;
+  background-image: url(../../Assets/Images/Logo-Layers/Logo-trans.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: -1;
+  transform: translateY(-50%);
+}
+ */
+body {
+  position: relative;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  bottom:  92px;
+  right: -92px;
+  width: 739px;
+  height: 100%;
+  background-image: url(../../Assets/Images/Logo-Layers/Logo-trans.png);
+  background-repeat: no-repeat;
+  background-size: cover; /* Adjust as needed */
+  opacity: 0.5; /* Make the image semi-transparent */
+  pointer-events: none; /* Prevent the ::after element from blocking interactions */
+  z-index: -1; /* Place the image behind other content */
+  transform: translateY(50%); /* Push the image lower */
+}
+
+
+
 
 .selected {
   color: var(--bs-success);

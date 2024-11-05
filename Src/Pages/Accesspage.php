@@ -82,8 +82,7 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
         echo "<script>localStorage.removeItem('error');</script>";
     }
 ?>
-
-
+    <?php //include_once "../Components/BGanimation.php";?>
     <div class="loader-container" id="loader">
         <div class="row g-4">
             <!-- version 1 -->
@@ -106,10 +105,10 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
             </div>
         </div>
     </div>
-    <div class="container-fluid con-H mt-5 d-none" id="main-content">
+    <div class="container-fluid con-H d-none" id="main-content">
         <div class="row d-flex justify-content-center row-cols-1 row-cols-md-2 g-2">
             <div class="col-md-3 d-none d-lg-block">
-                <ul class="list-group list-group-flush" style="cursor: pointer;">
+                <ul class="list-group list-group-flush sticky-top pt-5" style="cursor: pointer;">
                     <li class="list-group-item rounded selected list-hover border-0 d-inline-block text-truncate"
                         style="max-width: 220px;" onclick="RedirectToLogin()" id="side-login">
                         <svg width="16" height="16" class="me-3">
@@ -148,9 +147,14 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                     </li>
                 </ul>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-9 pt-5">
                 <div>
-                    <h3 class="text-center fw-bold my-3">Central Student Government</h3>
+                    <h3 class="fw-bold my-3">
+                        <div class="hstack gap-3">
+                            <span><img src="../../Assets/Icons/PWA-Icon/Icon-x96.jpeg" alt="csg logo" width="48"></span>
+                            <span>Central Student Government</span>
+                        </div>
+                    </h3>
                 </div>
                 <div class="row row-cols-1 row-cols-md-2 g-2">
                     <!-- Login Form Start -->
@@ -235,12 +239,6 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                                             <label for="Reg-course" class="form-label fs-6">Course</label>
                                             <select class="form-select rounded-0 mx-1" id="Reg-course"
                                                 aria-describedby="courseHelp-Reg Reg-btn">
-                                                <option selected disabled hidden>Choose...</option>
-                                                <option value="BSIT">BSIT</option>
-                                                <option value="BSCS">BSCS</option>
-                                                <option value="BSIS">BSIS</option>
-                                                <option value="BSA">BSA</option>
-                                                <option value="BSBA">BSBA</option>
                                             </select>
                                             <div id="courseHelp-Reg" class="invalid-feedback">For validation</div>
                                         </div>
@@ -248,52 +246,143 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                                             <label for="Reg-year" class="form-label fs-6">Year Level</label>
                                             <select class="form-select rounded-0 mx-1" id="Reg-year"
                                                 aria-describedby="yearHelp-Reg Reg-btn">
-                                                <option selected disabled hidden>Choose...</option>
-                                                <option value="1st Year">1st Year</option>
-                                                <option value="2nd Year">2nd Year</option>
-                                                <option value="3rd Year">3rd Year</option>
-                                                <option value="4th Year">4th Year</option>
                                             </select>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="Reg-section" class="form-label fs-6">Section</label>
                                             <select class="form-select rounded-0 mx-1" id="Reg-section"
                                                 aria-describedby="sectionHelp-Reg Reg-btn">
-                                                <option selected disabled hidden>Choose...</option>
-                                                <?php
-                                            for ($i = 65; $i <= 90; $i++) {
-                                                echo "<option value='" . chr($i) . "'>" . chr($i) . "</option>";
-                                            }?>
                                             </select>
                                         </div>
+
+                                        <script>
+                                            $(document).ready(function() {
+                                                var course = $("#Reg-course");
+
+                                                $("#Reg-year").empty().prop("disabled", true);
+                                                $("#Reg-section").empty().prop("disabled", true);
+
+                                                $.ajax({
+                                                    url: '../Functions/api/getAcadData.php',
+                                                    type: 'POST',
+                                                    data: {
+                                                        CourseID: null,
+                                                        Action: "Get-Course"
+                                                    },
+
+                                                    success: function(res) {
+                                                        if (res.status === "success") {
+                                                            course.empty();
+                                                            course.append(
+                                                                `<option selected hidden>Choose...</option>`
+                                                            );
+                                                            res.data.forEach((courses) => {
+                                                                course.append(
+                                                                    `<option value="${courses.ShortName}">${courses.CourseName}</option>`
+                                                                );
+                                                            });
+                                                        } else {
+                                                            console.error(
+                                                                'Failed to fetch courses:', res
+                                                                .message || 'Unknown error');
+                                                        }
+                                                    },
+                                                    error: function(xhr, status, error) {
+                                                        console.error('AJAX Error:', error);
+                                                    }
+                                                });
+
+                                                $("#Reg-course").change(function() {
+                                                    var year = $("#Reg-year");
+                                                    year.prop("disabled", false);
+                                                    $("#Reg-section").empty().prop("disabled", true);
+                                                    $.ajax({
+                                                        url: '../Functions/api/getAcadData.php',
+                                                        type: 'POST',
+                                                        data: {
+                                                            CourseID: $("#Reg-course").val(),
+                                                            Action: "Get-Year"
+                                                        },
+
+                                                        success: function(res) {
+                                                            if (res.status === "success") {
+                                                                year.empty();
+                                                                year.append(
+                                                                    `<option selected hidden>Choose...</option>`
+                                                                );
+                                                                res.data.forEach((
+                                                                    courses) => {
+                                                                    year.append(
+                                                                        `<option value="${courses.Year}">${courses.CourseName}</option>`
+                                                                    );
+                                                                });
+                                                            } else {
+                                                                console.error(
+                                                                    'Failed to fetch courses:',
+                                                                    res.message ||
+                                                                    'Unknown error');
+                                                            }
+                                                        },
+                                                        error: function(xhr, status, error) {
+                                                            console.error('AJAX Error:',
+                                                                error);
+                                                        }
+                                                    });
+                                                });
+
+                                                $("#Reg-year").change(function() {
+                                                    var section = $("#Reg-section");
+                                                    var yearlvl = $("#Reg-year").val();
+                                                    section.prop("disabled", false);
+                                                    $.ajax({
+                                                        url: '../Functions/api/getAcadData.php',
+                                                        type: 'POST',
+                                                        data: {
+                                                            CourseID: $("#Reg-course").val(),
+                                                            Action: "Get-Section",
+                                                            YearLevel: yearlvl
+                                                        },
+
+                                                        success: function(res) {
+                                                            if (res.status === "success") {
+                                                                section.empty();
+                                                                section.append(
+                                                                    `<option selected hidden>Choose...</option>`
+                                                                );
+                                                                res.data.forEach((
+                                                                    courses) => {
+                                                                    section.append(
+                                                                        `<option value="${courses.CourseID}">${courses.Section}</option>`
+                                                                    );
+                                                                });
+                                                            } else {
+                                                                console.error(
+                                                                    'Failed to fetch courses:',
+                                                                    res.message ||
+                                                                    'Unknown error');
+                                                            }
+                                                        },
+                                                        error: function(xhr, status, error) {
+                                                            console.error('AJAX Error:',
+                                                                error);
+                                                        }
+                                                    });
+                                                });
+                                            });
+                                        </script>
                                     </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="Reg-org" class="form-label fs-6">Organization</label>
-                                    <select class="form-select rounded-0 mx-1" id="Reg-org"
-                                        aria-describedby="orgHelp-Reg Reg-btn">
-                                        <option selected disabled hidden>Choose...</option>
-                                        <option value="CSG">Central Student Government</option>
-                                        <option value="BITS">Builders of Innovative Technologist Society</option>
-                                        <option value="BMS">Business Management Society</option>
-                                        <option value="CC">Cavite Communicators</option>
-                                        <option value="CHTS">Circle of Hospitality and Tourism Students</option>
-                                        <option value="CYLES">Cavite Young Leaders for Entrepreneurship</option>
-                                        <option value="CSC">Computer Science Clique</option>
-                                        <option value="EGE">Educators' Guild for Excellence</option>
-                                        <option value="SMS">Samahan ng mga Magaaral ng Sikolohiya</option>
-                                        <option value="YOPA">Young Office Professional Advocates</option>
-                                        <option value="ST">Sinag-Tala</option>
-                                        <option value="TF">The Flare</option>
-                                        <option value="HS">Honor Society</option>
-                                    </select>
-                                    <div id="orgHelp-Reg" class="invalid-feedback">For validation</div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="Reg-email" class="form-label fs-6">Primary Email</label>
                                     <input type="text" class="form-control rounded-0 mx-1" id="Reg-email"
                                         aria-describedby="emailHelp-Reg Reg-btn">
                                     <div id="emailHelp-Reg" class="invalid-feedback">For validation</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="Reg-phone" class="form-label fs-6">Phone Number</label>
+                                    <input type="text" class="form-control rounded-0 mx-1" id="Reg-phone"
+                                        aria-describedby="phoneHelp-Reg Reg-btn">
+                                    <div id="phoneHelp-Reg" class="invalid-feedback">For validation</div>
                                 </div>
                                 <div class="mb-5">
                                     <label for="Reg-password" class="form-label fs-6">Password</label>
@@ -318,6 +407,7 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                     </div>
                     <!-- Register Form End -->
                     <!-- Forgot Password Form Start -->
+                    <!-- Step 1 -->
                     <div class="col-md-6 mb-3 d-none" id="Forgot-Step1-container">
                         <h5 class="text-start fw-bold my-5">
                             <svg width="18" height="18" class="mx-2">
@@ -352,6 +442,7 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                             </div>
                         </div>
                     </div>
+                    <!-- Step 2 -->
                     <div class="col-md-6 mb-3 d-none" id="Forgot-Step2-container">
                         <h5 class="text-start fw-bold my-5">
                             <svg width="18" height="18" class="mx-2">
@@ -369,7 +460,8 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                                             aria-describedby="otpHelp FpS2-btn">
                                         <div id="otpHelp" class="invalid-feedback">For validation</div>
                                     </div>
-                                    <button class="btn btn-link btn-sm rounded-0" id="resendOTP" disabled>Resend Code</button>
+                                    <button class="btn btn-link btn-sm rounded-0" id="resendOTP" disabled>Resend
+                                        Code</button>
                                 </div>
                                 <div class="d-grid gap-2">
                                     <button type="button" class="btn btn-success btn-sm rounded-0 py-2" id="FpS2-btn">
@@ -384,6 +476,7 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                             </div>
                         </div>
                     </div>
+                    <!-- Step 3 -->
                     <div class="col-md-6 mb-3 d-none" id="Forgot-Step3-container">
                         <h5 class="text-start fw-bold my-5">
                             <svg width="18" height="18" class="mx-2">

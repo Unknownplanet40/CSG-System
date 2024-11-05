@@ -222,10 +222,15 @@ $(document).ready(function () {
     }
   });
 
-  loadUsers();
-  setInterval(() => {
+  // get the current filename of the page
+  const filename = window.location.pathname.split("/").pop();
+
+  if (filename === "Feed.php") {
     loadUsers();
-  }, 3000);
+    setInterval(() => {
+      loadUsers();
+    }, 3000);
+  }
 
   const driver = window.driver.js.driver;
 

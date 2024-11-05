@@ -28,12 +28,13 @@ $logout = '../Functions/api/UserLogout.php';
 
 
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="auto">
+<html lang="en" data-bs-theme="<?php echo $_SESSION['theme']; ?>">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../Utilities/Third-party/Bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../Utilities/Stylesheets/BGaniStyle.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css" />
     <link rel="stylesheet" href="../../Utilities/Stylesheets/CustomStyle.css">
     <link rel="stylesheet" href="../../Utilities/Stylesheets/MNavbarStyle.css">
@@ -79,6 +80,7 @@ $logout = '../Functions/api/UserLogout.php';
 </head>
 
 <?php include_once '../../Assets/Icons/Icon_Assets.php'; ?>
+<?php $_SESSION['useBobbleBG'] == 1 ? include_once '../Components/BGanimation.php' : null; ?>
 
 <body>
     <div class="" id="blurifAway">
@@ -209,7 +211,8 @@ $logout = '../Functions/api/UserLogout.php';
                                 </svg>
                                 <span class="ms-2">Profile</span>
                             </li>
-                            <li class="list-group-item border-0 rounded-pill feedsidebaritems" id="Dashboard-btn">
+                            <li class="list-group-item border-0 rounded-pill feedsidebaritems" id="Dashboard-btn"
+                                onclick="window.location.href='./Apps/ADMIN/Dashboard.php'">
                                 <svg width="24" height="24">
                                     <use xlink:href="#Dashboard"></use>
                                 </svg>
@@ -221,7 +224,8 @@ $logout = '../Functions/api/UserLogout.php';
                                 </svg>
                                 <span class="ms-2">Placeholder</span>
                             </li>
-                            <li class="list-group-item border-0 rounded-pill feedsidebaritems" id="Preferences-btn">
+                            <li class="list-group-item border-0 rounded-pill feedsidebaritems" id="Preferences-btn"
+                                onclick="window.location.href='./Preference.php'">
                                 <svg width="24" height="24">
                                     <use xlink:href="#Settings"></use>
                                 </svg>

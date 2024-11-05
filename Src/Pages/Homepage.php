@@ -42,36 +42,13 @@ if (!isset($_SESSION['database_status'])) {
 <?php include_once '../../Assets/Icons/Icon_Assets.php'; ?>
 
 <body class="bg-body">
-
-	<div class="background z-n1">
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-	</div>
-
+	<?php include_once "../Components/BGanimation.php"; ?>
 	<?php include_once '../Components/Navbar.php'; ?>
 
 	<div class="container">
 		<div class="d-flex justify-content-center align-items-center" style="height: 80svh;">
-			<div class="modal" id="Sys_Permissions" data-bs-backdrop="static" data-bs-keyboard="false"
-				tabindex="-1" data-aos="fade-down">
+			<div class="modal" id="Sys_Permissions" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+				data-aos="fade-down">
 				<div class="modal-dialog modal-dialog-centered modal-sm">
 					<div class="modal-content glass-default bg-opacity-25 border border-1 border-light rounded-1">
 						<div class="modal-body">
@@ -104,7 +81,8 @@ if (!isset($_SESSION['database_status'])) {
 													<div class="ms-2 me-auto">
 														<div class="fw-bold">Notifications</div>
 													</div>
-													<span class="badge text-bg-danger rounded-pill" id="notification_status">
+													<span class="badge text-bg-danger rounded-pill"
+														id="notification_status">
 														<svg width="16" height="16" fill="currentColor" class="d-none"
 															id="notification_active">
 															<use xlink:href="#Verified"></use>
@@ -134,10 +112,12 @@ if (!isset($_SESSION['database_status'])) {
 												</li>
 											</ol>
 											<div class="hstack gap-1 mt-3">
-												<button type="button" class="btn btn-sm btn-info ms-auto" id="btn_Prompt">
+												<button type="button" class="btn btn-sm btn-info ms-auto"
+													id="btn_Prompt">
 													Ask
 												</button>
-												<button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
+												<button type="button" class="btn btn-sm btn-secondary"
+													data-bs-dismiss="modal">
 													close
 												</button>
 											</div>

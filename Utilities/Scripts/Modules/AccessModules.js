@@ -54,6 +54,7 @@ setInterval(function () {
 
 export async function LoginProcess(data) {
   try {
+    let redirectTo = "";
     const response = await fetch("../../Src/Functions/api/UserLogin.php", {
       method: "POST",
       body: JSON.stringify(data),
@@ -119,18 +120,24 @@ export async function LoginProcess(data) {
       localStorage.removeItem("isLocked");
       localStorage.removeItem("lockoutTime");
 
+      if (resData.data.role == 1) {
+        redirectTo = "../../Src/Pages/Apps/ADMIN/Dashboard.php";
+      } else if (resData.data.role >= 3) {
+        redirectTo = "../../Src/Pages/Feed.php";
+      }
+
       if (resData.message == "Login successful.") {
         setTimeout(function () {
-          window.location.href = "../../Src/Pages/Feed.php";
+          window.location.href = redirectTo;
         }, 1000);
       } else if (resData.message == "Auto login successful.") {
-        window.location.href = "../../Src/Pages/Feed.php";
+        window.location.href = redirectTo;
       } else {
         $("#log-btn-lbl").removeClass("d-none");
         $("#log-btn-lbl").text(resData.message);
         setTimeout(function () {
           $("#log-btn-lbl").text("").addClass("d-none");
-          window.location.href = "../../Src/Pages/Feed.php";
+          window.location.href = redirectTo;
         }, 5000);
       }
     }
@@ -419,7 +426,10 @@ export function showCurrentForm() {
 
       // check if stdnum and email is valid
 
-      if ($("#fps1-studnum").attr("data-isvalid") == "true" && $("#fps1-email").attr("data-isvalid") == "true") {
+      if (
+        $("#fps1-studnum").attr("data-isvalid") == "true" &&
+        $("#fps1-email").attr("data-isvalid") == "true"
+      ) {
         if (localStorage.getItem("ForgotStep") != null) {
           if (localStorage.getItem("ForgotStep") == "1") {
             $("#Forgot-Step1-container").toggleClass("d-none", false);
