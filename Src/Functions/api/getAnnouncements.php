@@ -41,7 +41,8 @@ try {
                 $stmt->bind_param("s", $_GET['UUID']);
                 break;
             default:
-                $stmt = $conn->prepare("SELECT * FROM userannouncement WHERE isDeleted = 0 ORDER BY priority DESC, postedDate DESC, RAND() LIMIT 10");
+                $stmt = $conn->prepare("SELECT * FROM userannouncement WHERE postedBy = ? AND isDeleted = 0 ORDER BY priority DESC, postedDate DESC, RAND() LIMIT 10");
+                $stmt->bind_param("s", $_GET['UUID']);
                 break;
         }
     } elseif (isset($_GET['UUID'])) {

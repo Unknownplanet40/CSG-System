@@ -1,8 +1,26 @@
 <?php
 $home = $_SERVER['REQUEST_URI'];
+$link1 = "../../Apps/ADMIN/Dashboard.php";
 $link2 = "../../Feed.php";
 $link3 = "../../Functions/api/UserLogout.phps";
 $link4 = "../../Preference.php";
+$link5 = "../../Apps/ADMIN/User-Management.php";
+
+// git file name from the path
+$currentFile = $_SERVER["SCRIPT_NAME"];
+
+$seleceDashboard = "";
+$selectUserManagement = "";
+
+if (strpos($currentFile, "Dashboard.php") !== false) {
+    $link1 = "#";
+    $seleceDashboard = "selected";
+    $selectUserManagement = "";
+} elseif (strpos($currentFile, "User-Management.php") !== false) {
+    $link3 = "#";
+    $seleceDashboard = "";
+    $selectUserManagement = "selected";
+}
 ?>
 
 <nav>
@@ -15,7 +33,7 @@ $link4 = "../../Preference.php";
             </a>
         </li>
         <hr style="width: 90%; margin: 10px auto; border: 1px solid var(--bs-body-color);" />
-        <li class="list-hover border-0 selected RHBS">
+        <li class="list-hover <?php echo $seleceDashboard; ?> border-0 RHBS" onclick="window.location.href = '<?php echo $link1; ?>'" title="Dashboard">
             <svg width="24" height="24" class="mx-3">
                 <use xlink:href="#Dashboard" />
             </svg>
@@ -42,7 +60,7 @@ $link4 = "../../Preference.php";
             </svg>
             Organizations
         </li>
-        <li class="list-hover border-0 RHBS">
+        <li class="list-hover <?php echo $selectUserManagement; ?> border-0 RHBS" onclick="window.location.href = '<?php echo $link5; ?>'" title="User Management">
             <svg width="24" height="24" class="mx-3">
                 <use xlink:href="#ManageAct">
             </svg>

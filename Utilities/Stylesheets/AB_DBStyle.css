@@ -11,6 +11,23 @@
 
 body {
   font-family: "Poppins", sans-serif;
+  position: relative;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  bottom:  92px;
+  right: -92px;
+  width: 739px;
+  height: 100%;
+  background-image: url(../../Assets/Images/Logo-Layers/Logo-trans.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: -1;
+  transform: translateY(50%);
 }
 
 .RHBS {

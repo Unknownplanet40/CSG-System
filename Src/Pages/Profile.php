@@ -1,5 +1,4 @@
 <?php
-
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
     require_once '../Database/Config.php';
@@ -10,6 +9,14 @@ if (!isset($_SESSION['UUID'])) {
     header('Location: ../Pages/Accesspage.php?error=001');
 } else {
     $logPath = "../Debug/Users/UUID.log";
+}
+
+if (isset($_SESSION['accountStat'])){
+    if ($_SESSION['accountStat'] === 'pending') {
+        header('Location: ./WaitingArea.php');
+    } else if ($_SESSION['accountStat'] === 'rejected') {
+        header('Location: ../Functions/api/UserLogout.php');
+    }
 }
 
 $inactive = 1800; // 30 minutes inactivity
@@ -64,8 +71,16 @@ $_SESSION['last_activity'] = time();
                                                 <div>
                                                     <div class="hstack gap-1 mb-1">
                                                         <div class="shadow rounded-circle">
+                                                            <?php
+                                                                if ($_SESSION['ProfileImage'] == "Default-Profile.gif") {
+                                                                    ?>
+                                                            <img src="../../Assets/Images/Default-Profile.gif" alt=""
+                                                                width="42" height="42" class="rounded-circle">
+                                                            <?php
+                                                                } else {?>
                                                             <img src="../../Assets/Images/UserProfiles/<?php echo $_SESSION['ProfileImage']?>"
                                                                 alt="" width="42" height="42" class="rounded-circle">
+                                                            <?php }?>
                                                         </div>
                                                         <div class="p-2">
                                                             <p class="alert-heading text-truncate fw-bold moved"
@@ -246,7 +261,7 @@ $_SESSION['last_activity'] = time();
                                             ];
                                             
                                             foreach ($roles as $role => $label) {
-                                                echo '<option value="' . $role . '" ' . ($role == $_SESSION['role'] ? 'selected' : '') . '>' . $label . '</option>';
+                                                echo '<option value="' . $role . '" ' . ($role == $_SESSION['role'] ? 'selected' : '') . '' . ($role == 1 ? 'disabled' : ($role == 3 ? 'disabled' : '')) . '>' . $label . '</option>';
                                             }
                                             ?>
                                         </select>
@@ -311,7 +326,7 @@ $_SESSION['last_activity'] = time();
                                         class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 bg-body bg-opacity-10 bg-blur-3">
                                         Contact Number
                                         <input type="text" class="form-control border-0 text-end w-50 bg-transparent"
-                                            value="" placeholder="09xxxxxxxxx">
+                                            value="<?php echo $_SESSION['contactNumber']; ?>" pattern="[0-9]{11}" placeholder="09xxxxxxxxx">
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 bg-body bg-opacity-10 bg-blur-3">

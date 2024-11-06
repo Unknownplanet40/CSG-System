@@ -122,7 +122,7 @@ $(document).ready(function () {
               if (user.profile.includes("Default-Profile.gif")) {
                 userSearchProfile = "../../Assets/Images/Default-Profile.gif";
               } else {
-                userSearchProfile = `../../Assets/Images/UserProfiles/${data.profile}`;
+                userSearchProfile = `../../Assets/Images/UserProfiles/${user.profile}`;
               }
 
               let card = `<div class="card rounded-1 mb-2 conusers-card card-search user-select-none" id="${

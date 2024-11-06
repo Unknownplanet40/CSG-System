@@ -122,8 +122,17 @@ export async function LoginProcess(data) {
 
       if (resData.data.role == 1) {
         redirectTo = "../../Src/Pages/Apps/ADMIN/Dashboard.php";
-      } else if (resData.data.role >= 3) {
-        redirectTo = "../../Src/Pages/Feed.php";
+      } else if (resData.data.role >= 2) {
+        if (resData.data.accountStat == "pending") {
+          QueueNotification([
+            "info",
+            "Your account is still pending for approval. Please wait for the admin to approve your account.",
+            3000,
+          ]);
+          redirectTo = "../../Src/Pages/WaitingArea.php";
+        } else {
+          redirectTo = "../../Src/Pages/Feed.php";
+        }
       }
 
       if (resData.message == "Login successful.") {
@@ -503,4 +512,54 @@ export function changeColor() {
   } else {
     $("#Login-btn").removeClass("btn-success").addClass("btn-secondary");
   }
+}
+
+export function RegisterProcess(data) {
+  $.ajax({
+    url: "../../Src/Functions/api/PostReguser.php",
+    type: "POST",
+    data: data,
+    success: function (response) {
+      if (response.status == "error") {
+        $("#Reg-btn").addClass("shake");
+
+        $("#Reg-btn-label").removeClass("d-none");
+        $("#Reg-btn-loader").addClass("d-none");
+
+        $("#Reg-btn-label").text(response.message);
+
+        setTimeout(function () {
+          $("#Reg-btn").removeClass("shake").removeAttr("disabled");
+          $("#Reg-btn-label").text("Submit");
+        }, 2500);
+
+        return;
+      }
+
+      if (response.status == "success") {
+        $("#Reg-btn").removeAttr("disabled");
+        $("#Reg-btn-label").removeClass("d-none");
+        $("#Reg-btn-loader").addClass("d-none");
+
+        $("#Login-stdnum").val(data.studentnum);
+        $("#Login-password").val(data.password);
+        $("#log-btn").click();
+        
+        localStorage.setItem("current-form", "Login");
+        showCurrentForm();
+      }
+    },
+    error: function (error) {
+      console.error(error.message);
+      $("#Reg-btn").addClass("shake");
+
+      setTimeout(function () {
+        $("#Reg-btn").removeClass("shake").removeAttr("disabled");
+        $("#Reg-btn-label").removeClass("d-none");
+        $("#Reg-btn-loader").addClass("d-none");
+      }, 5000);
+
+      QueueNotification(["error", "An error has occured: " + error.message]);
+    },
+  });
 }

@@ -12,6 +12,14 @@ if (!isset($_SESSION['UUID'])) {
     $logPath = "../Debug/Users/UUID.log";
 }
 
+if (isset($_SESSION['accountStat'])){
+    if ($_SESSION['accountStat'] === 'pending') {
+        header('Location: ./WaitingArea.php');
+    } else if ($_SESSION['accountStat'] === 'rejected') {
+        header('Location: ../Functions/api/UserLogout.php');
+    }
+}
+
 $inactive = 1800; // 30 minutes inactivity
 if (isset($_SESSION['last_activity'])) {
     $session_life = time() - $_SESSION['last_activity'];

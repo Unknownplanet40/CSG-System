@@ -62,6 +62,29 @@ function fetchUserCredentials($conn, $studentNumber)
                 $BobbleBG = 0;
             }
 
+            if ($row['contactNumber'] == null) {
+                $row['contactNumber'] = "00000000000";
+            } else {
+                $row['contactNumber'] = $row['contactNumber'];
+            }
+
+            if ($row['course_code'] == null) {
+                $row['course_code'] = "000000";
+            } else {
+                $stmt = $conn->prepare("SELECT * FROM sysacadtype WHERE course_code = ?");
+                $stmt->bind_param("i", $row['course_code']);
+                $stmt->execute();
+                $course = $stmt->get_result();
+                $stmt->close();
+
+                if ($course->num_rows > 0) {
+                    $course = $course->fetch_assoc();
+                    $row['course_code'] = $course['course_short_name'] . " - " . $course['year'] . "" . $course['section'];
+                } else {
+                    $row['course_code'] = "000000";
+                }
+            }
+
 
 
 
@@ -70,8 +93,8 @@ function fetchUserCredentials($conn, $studentNumber)
             $_SESSION['LastName'] = $row['Last_Name'];
             $_SESSION['PrimaryEmail'] = $row['primary_email'];
             $_SESSION['student_Number'] = $row['student_Number'];
-            $_SESSION['Password'] = password_hash($row['password'], PASSWORD_DEFAULT); // temporary fix for the password hashing
-            // $_SESSION['Password'] = $row['password']; // note to self: remove this line when the password hashing is done
+            //$_SESSION['Password'] = password_hash($row['password'], PASSWORD_DEFAULT); // temporary fix for the password hashing
+            $_SESSION['Password'] = $row['password']; // note to self: remove this line when the password hashing is done
             $_SESSION['isLogged'] = $row['isLogin'];
             $_SESSION['sessionID'] = $row['sessionID'];
             $_SESSION['Created_On'] = $row['created_at'];
@@ -79,6 +102,10 @@ function fetchUserCredentials($conn, $studentNumber)
             $_SESSION['role'] = $role;
             $_SESSION['theme'] = $theme;
             $_SESSION['useBobbleBG'] = $BobbleBG;
+            $_SESSION['contactNumber'] = $row['contactNumber'];
+            $_SESSION['course_code'] = $row['course_code'];
+            $_SESSION['accountStat'] = $row['accountStat'];
+            $_SESSION['FullName'] = $row['fullName'];
         }
 
         $data = [
@@ -94,6 +121,10 @@ function fetchUserCredentials($conn, $studentNumber)
             'role' => $_SESSION['role'],
             'theme' => $_SESSION['theme'],
             'useBobbleBG' => $_SESSION['useBobbleBG'],
+            'contactNumber' => $_SESSION['contactNumber'],
+            'course_code' => $_SESSION['course_code'],
+            'accountStat' => $_SESSION['accountStat'],
+            'FullName' => $_SESSION['FullName']
         ];
         unset($_SESSION['sessionID']);
         return $data;

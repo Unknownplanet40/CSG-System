@@ -83,7 +83,7 @@ try {
                             if (!in_array($row['section'], array_column($data, 'Section'))) {
                                 $data[] = [
                                     'Section' => $row['section'],
-                                    'CourseName' => $CourseID
+                                    'CourseName' => $row['section'],
                                 ];
                             }
                         }

@@ -91,7 +91,7 @@ try {
 
         // if the account is not locked, proceed to login ------------------------------
         // Check if the password is correct
-        if ($row['password'] === $password) {
+        if (password_verify($password, $row['password'])) {
             $stmt = $conn->prepare("SELECT isLogin, access_date, ipAddress, UUID FROM accounts WHERE student_Number = ?");
             $stmt->bind_param("i", $studentNumber);
             $stmt->execute();

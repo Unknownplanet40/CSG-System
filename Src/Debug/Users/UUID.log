@@ -93,3 +93,21 @@
 11/05/2024 05:06:07 AM - [INFO] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: logout - IP: 49.144.133.111 - Status: Success
 11/05/2024 12:06:24 PM - [INFO] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: Login - IP: 49.144.133.111 - Status: Success
 11/05/2024 05:49:03 AM - [INFO] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: logout - IP: 49.144.133.111 - Status: Success
+11/05/2024 08:35:31 PM - [ERROR] - User: f36754bc-8936-4fbc-b6f1-c255d3ac6228 - Action: Account Locked - IP: ::1 - Status: Failed
+11/05/2024 08:37:56 PM - [INFO] - User: f36754bc-8936-4fbc-b6f1-c255d3ac6228 - Action: Login - IP: 49.144.133.111 - Status: Success
+11/05/2024 02:06:11 PM - [INFO] - User: f36754bc-8936-4fbc-b6f1-c255d3ac6228 - Action: logout - IP: 49.144.133.111 - Status: Success
+11/05/2024 09:06:49 PM - [INFO] - User: f36754bc-8936-4fbc-b6f1-c255d3ac6228 - Action: Login - IP: 49.144.133.111 - Status: Success
+11/05/2024 02:14:23 PM - [INFO] - User: f36754bc-8936-4fbc-b6f1-c255d3ac6228 - Action: logout - IP: 49.144.133.111 - Status: Success
+11/05/2024 09:14:39 PM - [INFO] - User: f36754bc-8936-4fbc-b6f1-c255d3ac6228 - Action: Login - IP: 49.144.133.111 - Status: Success
+11/05/2024 02:17:27 PM - [INFO] - User: f36754bc-8936-4fbc-b6f1-c255d3ac6228 - Action: logout - IP: 49.144.133.111 - Status: Success
+11/06/2024 02:50:36 AM - [ERROR] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: Account Locked - IP: ::1 - Status: Failed
+11/06/2024 02:53:29 AM - [INFO] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: Login - IP: 49.144.133.111 - Status: Success
+11/06/2024 01:59:44 AM - [INFO] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: logout - IP: 49.144.133.111 - Status: Success
+11/06/2024 09:03:59 AM - [INFO] - User: a5dcd436-74fe-4405-9de9-4eaca56f432a - Action: Login - IP: 49.144.133.111 - Status: Success
+11/06/2024 02:04:10 AM - [INFO] - User: a5dcd436-74fe-4405-9de9-4eaca56f432a - Action: logout - IP: 49.144.133.111 - Status: Success
+11/06/2024 09:05:19 AM - [INFO] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: Login - IP: 49.144.133.111 - Status: Success
+11/06/2024 02:20:09 AM - [INFO] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: logout - IP: 49.144.133.111 - Status: Success
+11/06/2024 09:20:20 AM - [INFO] - User: f36754bc-8936-4fbc-b6f1-c255d3ac6228 - Action: Login - IP: 49.144.133.111 - Status: Success
+11/06/2024 02:46:43 AM - [INFO] - User: f36754bc-8936-4fbc-b6f1-c255d3ac6228 - Action: logout - IP: 49.144.133.111 - Status: Success
+11/06/2024 10:07:14 AM - [ERROR] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: Account Locked - IP: ::1 - Status: Failed
+11/06/2024 10:07:21 AM - [INFO] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: Login - IP: 49.144.133.111 - Status: Success

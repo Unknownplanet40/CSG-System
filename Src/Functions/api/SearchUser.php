@@ -26,7 +26,7 @@ try {
 
     $search = $_POST['search'];
     $wildcard = "%$search%"; // the first name with last name combination
-    $stmt = $conn->prepare("SELECT * FROM usercredentials WHERE fullName LIKE ? ORDER BY First_Name ASC");
+    $stmt = $conn->prepare("SELECT * FROM usercredentials WHERE accountStat = 'active' AND fullName LIKE ? ORDER BY First_Name ASC");
     $stmt->bind_param("s", $wildcard);
     $stmt->execute();
     $data = [];

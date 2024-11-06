@@ -10,6 +10,34 @@ if (!isset($_SESSION['UUID'])) {
     header('Location: ../../Accesspage.php?error=001');
 } else {
     $logPath = "../../../Debug/Users/UUID.log";
+
+    // active users
+    $stmt = $conn->prepare("SELECT COUNT(*) AS totalUsers FROM usercredentials WHERE accountStat = 'active'");
+    $stmt->execute();
+    $activeUsers = $stmt->get_result()->fetch_assoc()['totalUsers'];
+    $stmt->close();
+
+    // csg officers
+    $stmt = $conn->prepare("SELECT COUNT(*) AS totalCSGOfficers FROM userpositions WHERE role = 2");
+    $stmt->execute();
+    $csgOfficers = $stmt->get_result()->fetch_assoc()['totalCSGOfficers'];
+    $stmt->close();
+
+    // daily logins
+    $stmt = $conn->prepare("SELECT COUNT(*) AS totalLogins FROM accounts WHERE access_date >= CURDATE()");
+    $stmt->execute();
+    $dailyLogins = $stmt->get_result()->fetch_assoc()['totalLogins'];
+    $stmt->close();
+
+    // locked accounts
+    $stmt = $conn->prepare("SELECT COUNT(*) AS totalLocked FROM usercredentials WHERE accountStat = 'locked'");
+    $stmt->execute();
+    $lockedAccounts = $stmt->get_result()->fetch_assoc()['totalLocked'];
+    $stmt->close();
+}
+
+if ($_SESSION['role'] != 1) {
+    header('Location: ../../../Pages/Feed.php');
 }
 
 $inactive = 1800; // 30 minutes inactivity
@@ -101,7 +129,7 @@ $_SESSION['last_activity'] = time();
                             </svg>
                             Organizations
                         </li>
-                        <li class="list-group-item lg">
+                        <li class="list-group-item lg" onclick="window.location.href = './User-Management.php'" title="User Management">
                             <svg class="me-3" width="24" height="24">
                                 <use xlink:href="#ManageAct" />
                             </svg>
@@ -138,7 +166,7 @@ $_SESSION['last_activity'] = time();
                             <p class="ps-3 pt-1 mb-0 fw-bold fs-4">Active Users</p>
                             <div class="card-body py-0">
                                 <div class="d-flex flex-row justify-content-between">
-                                    <p class="fs-1 fw-bold text-truncate mb-0">0</p>
+                                    <p class="fs-1 fw-bold text-truncate mb-0"><?php echo $activeUsers; ?></p>
                                 </div>
                             </div>
                         </div>
@@ -148,7 +176,7 @@ $_SESSION['last_activity'] = time();
                             <p class="ps-3 pt-1 mb-0 fw-bold fs-4">CSG Officers</p>
                             <div class="card-body py-0">
                                 <div class="d-flex flex-row justify-content-between">
-                                    <p class="fs-1 fw-bold text-truncate mb-0">0</p>
+                                    <p class="fs-1 fw-bold text-truncate mb-0"><?php echo $csgOfficers; ?></p>
                                 </div>
                             </div>
                         </div>
@@ -158,7 +186,7 @@ $_SESSION['last_activity'] = time();
                             <p class="ps-3 pt-1 mb-0 fw-bold fs-4">Daily Logins</p>
                             <div class="card-body py-0">
                                 <div class="d-flex flex-row justify-content-between">
-                                    <p class="fs-1 fw-bold text-truncate mb-0">0</p>
+                                    <p class="fs-1 fw-bold text-truncate mb-0"><?php echo $dailyLogins; ?></p>
                                 </div>
                             </div>
                         </div>
@@ -168,7 +196,7 @@ $_SESSION['last_activity'] = time();
                             <p class="ps-3 pt-1 mb-0 fw-bold fs-4">Locked Accounts</p>
                             <div class="card-body py-0">
                                 <div class="d-flex flex-row justify-content-between">
-                                    <p class="fs-1 fw-bold text-truncate mb-0">0</p>
+                                    <p class="fs-1 fw-bold text-truncate mb-0"><?php echo $lockedAccounts; ?></p>
                                 </div>
                             </div>
                         </div>

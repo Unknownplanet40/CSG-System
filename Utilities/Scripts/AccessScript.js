@@ -4,6 +4,7 @@ import {
   FPStep1Process,
   FPStep2Process,
   FPStep3Process,
+  RegisterProcess,
   showCurrentForm,
   changeColor,
 } from "./Modules/AccessModules.js";
@@ -48,7 +49,10 @@ $(document).ready(function () {
     localStorage.removeItem("error");
   }
 
-  if (localStorage.getItem("studentnum") != null && localStorage.getItem("password") != null) {
+  if (
+    localStorage.getItem("studentnum") != null &&
+    localStorage.getItem("password") != null
+  ) {
     var autoLoginData = {
       studentnum: localStorage.getItem("studentnum"),
       password: localStorage.getItem("password"),
@@ -401,7 +405,6 @@ $(document).ready(function () {
 
   // resend OTP
   $("#resendOTP").click(function () {
-
     $("#resendOTP").attr("disabled", "disabled");
     $("#resendOTP").html("Resending OTP...");
 
@@ -603,5 +606,556 @@ $(document).ready(function () {
     };
 
     FPStep3Process(data);
+  });
+
+  $("#Reg-year").empty().prop("disabled", true);
+  $("#Reg-section").empty().prop("disabled", true);
+
+  $.ajax({
+    url: "../Functions/api/getAcadData.php",
+    type: "POST",
+    data: {
+      CourseID: null,
+      Action: "Get-Course",
+    },
+
+    success: function (res) {
+      if (res.status === "success") {
+        $("#Reg-course").empty();
+        $("#Reg-course").append(`<option selected hidden>Choose...</option>`);
+        res.data.forEach((courses) => {
+          $("#Reg-course").append(
+            `<option value="${courses.ShortName}">${courses.CourseName}</option>`
+          );
+        });
+      } else {
+        console.error(
+          "Failed to fetch courses:",
+          res.message || "Unknown error"
+        );
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error("AJAX Error:", error);
+    },
+  });
+
+  $("#Reg-course").change(function () {
+    var year = $("#Reg-year");
+    year.prop("disabled", false);
+    $("#Reg-section").empty().prop("disabled", true);
+    $.ajax({
+      url: "../Functions/api/getAcadData.php",
+      type: "POST",
+      data: {
+        CourseID: $("#Reg-course").val(),
+        Action: "Get-Year",
+      },
+
+      success: function (res) {
+        if (res.status === "success") {
+          year.empty();
+          year.append(`<option selected hidden>Choose...</option>`);
+          res.data.forEach((courses) => {
+            year.append(
+              `<option value="${courses.Year}">${courses.CourseName}</option>`
+            );
+          });
+        } else {
+          console.error(
+            "Failed to fetch courses:",
+            res.message || "Unknown error"
+          );
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error("AJAX Error:", error);
+      },
+    });
+  });
+
+  $("#Reg-year").change(function () {
+    var section = $("#Reg-section");
+    var yearlvl = $("#Reg-year").val();
+    section.prop("disabled", false);
+    $.ajax({
+      url: "../Functions/api/getAcadData.php",
+      type: "POST",
+      data: {
+        CourseID: $("#Reg-course").val(),
+        Action: "Get-Section",
+        YearLevel: yearlvl,
+      },
+
+      success: function (res) {
+        if (res.status === "success") {
+          section.empty();
+          section.append(`<option selected hidden>Choose...</option>`);
+          res.data.forEach((courses) => {
+            section.append(
+              `<option value="${courses.CourseName}">${courses.Section}</option>`
+            );
+          });
+        } else {
+          console.error(
+            "Failed to fetch courses:",
+            res.message || "Unknown error"
+          );
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error("AJAX Error:", error);
+      },
+    });
+  });
+
+  $("#Reg-stdnum").keyup(function () {
+    if ($("#Reg-stdnum").val().length == 0) {
+      $("#Reg-stdnum").removeClass("is-invalid");
+      $("#stdnumHelp-Reg").text("");
+      return;
+    }
+
+    if (!StudentNumRegex.test($("#Reg-stdnum").val())) {
+      $("#Reg-stdnum").addClass("is-invalid");
+      $("#stdnumHelp-Reg").text("Student number must be 9 digits long.");
+      return;
+    }
+
+    if ($("#Reg-stdnum").val().length == 9) {
+      $.ajax({
+        url: "../../Src/Functions/api/chekSTDNUM.php",
+        type: "POST",
+        data: { studentnum: $("#Reg-stdnum").val() },
+        success: function (data) {
+          if (data.status == "success") {
+            if (data.isStudentNumExist == "true") {
+              $("#Reg-stdnum").addClass("is-invalid");
+              $("#stdnumHelp-Reg").text(
+                "Student number is already registered."
+              );
+              return;
+            } else {
+              $("#Reg-stdnum").removeClass("is-invalid");
+              $("#Reg-stdnum").addClass("is-valid");
+              $("#stdnumHelp").text("");
+            }
+          } else {
+            $("#Reg-stdnum").addClass("is-invalid");
+            $("#stdnumHelp-Reg").text(
+              "Something went wrong. Please try again."
+            );
+            return;
+          }
+        },
+
+        error: function () {
+          $("#Reg-stdnum").addClass("is-invalid");
+          $("#stdnumHelp-Reg").text("Something went wrong. Please try again.");
+          return;
+        },
+      });
+    }
+
+    if (isNaN($("#Reg-stdnum").val())) {
+      $("#Reg-stdnum").addClass("is-invalid");
+      $("#stdnumHelp-Reg").text("Student number must be numeric.");
+      return;
+    }
+
+    setTimeout(function () {
+      $("#Reg-stdnum").removeClass("is-valid");
+    }, 1000);
+  });
+
+  $("#Reg-firstname").keyup(function () {
+    if ($("#Reg-firstname").val().length == 0) {
+      $("#Reg-firstname").removeClass("is-invalid");
+      $("#firstnameHelp-Reg").text("");
+      return;
+    }
+
+    if ($("#Reg-firstname").val().length < 2) {
+      $("#Reg-firstname").addClass("is-invalid");
+      $("#firstnameHelp-Reg").text(
+        "First name must be at least 2 characters long."
+      );
+      return;
+    }
+
+    if (/[0-9]/.test($("#Reg-firstname").val())) {
+      $("#Reg-firstname").addClass("is-invalid");
+      $("#firstnameHelp-Reg").text("First name must not contain numbers.");
+      return;
+    }
+
+    $("#Reg-firstname").removeClass("is-invalid");
+    $("#Reg-firstname").addClass("is-valid");
+    $("#firstnameHelp-Reg").text("");
+
+    setTimeout(function () {
+      $("#Reg-firstname").removeClass("is-valid");
+    }, 1000);
+  });
+
+  $("#Reg-lastname").keyup(function () {
+    if ($("#Reg-lastname").val().length == 0) {
+      $("#Reg-lastname").removeClass("is-invalid");
+      $("#lastnameHelp-Reg").text("");
+      return;
+    }
+
+    if ($("#Reg-lastname").val().length < 2) {
+      $("#Reg-lastname").addClass("is-invalid");
+      $("#lastnameHelp-Reg").text(
+        "Last name must be at least 2 characters long."
+      );
+      return;
+    }
+
+    if (/[0-9]/.test($("#Reg-lastname").val())) {
+      $("#Reg-lastname").addClass("is-invalid");
+      $("#lastnameHelp-Reg").text("Last name must not contain numbers.");
+      return;
+    }
+
+    $("#Reg-lastname").removeClass("is-invalid");
+    $("#Reg-lastname").addClass("is-valid");
+    $("#lastnameHelp-Reg").text("");
+
+    setTimeout(function () {
+      $("#Reg-lastname").removeClass("is-valid");
+    }, 1000);
+  });
+
+  $("#Reg-course").change(function () {
+    if ($("#Reg-course").val() == "default") {
+      $("#Reg-course").addClass("is-invalid");
+      $("#courseHelp-Reg").text("Please select your course.");
+      return;
+    }
+
+    $("#Reg-course").removeClass("is-invalid");
+    $("#Reg-course").addClass("is-valid");
+    $("#courseHelp-Reg").text("");
+
+    setTimeout(function () {
+      $("#Reg-course").removeClass("is-valid");
+    }, 1000);
+  });
+
+  $("#Reg-year").change(function () {
+    if ($("#Reg-year").val() == "default") {
+      $("#Reg-year").addClass("is-invalid");
+      $("#courseHelp-Reg").text("Please select your year level.");
+      return;
+    }
+
+    $("#Reg-year").removeClass("is-invalid");
+    $("#Reg-year").addClass("is-valid");
+    $("#courseHelp-Reg").text("");
+
+    setTimeout(function () {
+      $("#Reg-year").removeClass("is-valid");
+    }, 1000);
+  });
+
+  $("#Reg-section").change(function () {
+    if ($("#Reg-section").val() == "default") {
+      $("#Reg-section").addClass("is-invalid");
+      $("#courseHelp-Reg").text("Please select your section.");
+      return;
+    }
+
+    $("#Reg-section").removeClass("is-invalid");
+    $("#Reg-section").addClass("is-valid");
+    $("#courseHelp-Reg").text("");
+
+    setTimeout(function () {
+      $("#Reg-section").removeClass("is-valid");
+    }, 1000);
+  });
+
+  $("#Reg-email").keyup(function () {
+    if ($("#Reg-email").val().length == 0) {
+      $("#Reg-email").removeClass("is-invalid");
+      $("#emailHelp-Reg").text("");
+      return;
+    }
+
+    if (!EmailRegex.test($("#Reg-email").val())) {
+      $("#Reg-email").addClass("is-invalid");
+      $("#emailHelp-Reg").text("Email address is not valid.");
+      return;
+    }
+
+    // after @ validate if the domain is valid
+    var onlyValidDomain = "@cvsu.edu.ph";
+    var email = $("#Reg-email").val();
+    var domain = email.substring(email.indexOf("@"));
+
+    if (domain != onlyValidDomain) {
+      $("#Reg-email").addClass("is-invalid");
+      $("#emailHelp-Reg").text(
+        "You are using an email address outside of the organization."
+      );
+      return;
+    }
+
+    $("#Reg-email").removeClass("is-invalid");
+    $("#Reg-email").addClass("is-valid");
+    $("#emailHelp-Reg").text("");
+
+    setTimeout(function () {
+      $("#Reg-email").removeClass("is-valid");
+    }, 1000);
+  });
+
+  $("#Reg-password").keyup(function () {
+    if ($("#Reg-password").val().length == 0) {
+      $("#Reg-password").removeClass("is-invalid");
+      $("#passwordHelp-Reg").text("");
+      return;
+    }
+
+    if (!PasswordRegex.test($("#Reg-password").val())) {
+      $("#Reg-password").addClass("is-invalid");
+      $("#passwordHelp-Reg").text(
+        "Password must be at least 8 characters long and must contain at least one uppercase letter, one lowercase letter, one number and one special character."
+      );
+      return;
+    }
+
+    $("#Reg-password").removeClass("is-invalid");
+    $("#Reg-password").addClass("is-valid");
+    $("#passwordHelp-Reg").text("");
+
+    setTimeout(function () {
+      $("#Reg-password").removeClass("is-valid");
+    }, 1000);
+  });
+
+  $("#Reg-phone").keyup(function () {
+    if ($("#Reg-phone").val().length == 0) {
+      $("#Reg-phone").removeClass("is-invalid");
+      $("#phoneHelp-Reg").text("");
+      return;
+    }
+
+    if (isNaN($("#Reg-phone").val())) {
+      $("#Reg-phone").addClass("is-invalid");
+      $("#phoneHelp-Reg").text("Phone number must be numeric.");
+      return;
+    }
+
+    if ($("#Reg-phone").val().length < 11) {
+      $("#Reg-phone").addClass("is-invalid");
+      $("#phoneHelp-Reg").text("Phone number must be 11 digits long.");
+      return;
+    }
+
+    $("#Reg-phone").removeClass("is-invalid");
+    $("#Reg-phone").addClass("is-valid");
+    $("#phoneHelp-Reg").text("");
+
+    setTimeout(function () {
+      $("#Reg-phone").removeClass("is-valid");
+    }, 1000);
+  });
+
+  $("#Reg-btn").click(function () {
+    if (
+      $("#Reg-stdnum").val() == "" ||
+      $("#Reg-firstname").val() == "" ||
+      $("#Reg-lastname").val() == "" ||
+      $("#Reg-course").val() == null ||
+      $("#Reg-year").val() == null ||
+      $("#Reg-section").val() == null ||
+      $("#Reg-email").val() == "" ||
+      $("#Reg-phone").val() == "" ||
+      $("#Reg-password").val() == ""
+    ) {
+      if ($("#Reg-stdnum").val() == "") {
+        $("#Reg-stdnum").focus();
+        $("#Reg-stdnum").addClass("is-invalid");
+        $("#stdnumHelp-Reg").text("Please enter your student number.");
+
+        $("#Reg-stdnum").addClass("shake");
+        setTimeout(function () {
+          $("#Reg-stdnum").removeClass("shake");
+        }, 500);
+      } else {
+        $("#Reg-stdnum").removeClass("is-invalid");
+        $("#stdnumHelp-Reg").text("");
+
+        if ($("#Reg-firstname").val() == "") {
+          $("#Reg-firstname").focus();
+          $("#Reg-firstname").addClass("is-invalid");
+          $("#firstnameHelp-Reg").text("Please enter your first name.");
+
+          $("#Reg-firstname").addClass("shake");
+          setTimeout(function () {
+            $("#Reg-firstname").removeClass("shake");
+          }, 500);
+        } else {
+          $("#Reg-firstname").removeClass("is-invalid");
+          $("#firstnameHelp-Reg").text("");
+
+          if ($("#Reg-lastname").val() == "") {
+            $("#Reg-lastname").focus();
+            $("#Reg-lastname").addClass("is-invalid");
+            $("#lastnameHelp-Reg").text("Please enter your last name.");
+
+            $("#Reg-lastname").addClass("shake");
+            setTimeout(function () {
+              $("#Reg-lastname").removeClass("shake");
+            }, 500);
+          }
+        }
+      }
+
+      $("#Reg-btn").attr("disabled", "disabled");
+
+      setTimeout(function () {
+        $("#Reg-btn").removeAttr("disabled");
+      }, 1500);
+      return;
+    } else {
+      if (!StudentNumRegex.test($("#Reg-stdnum").val())) {
+        $("#Reg-stdnum").focus();
+        $("#Reg-stdnum").addClass("is-invalid");
+        $("#stdnumHelp-Reg").text("Your student number is not valid.");
+        return;
+      }
+
+      if ($("#Reg-firstname").val().length < 2) {
+        $("#Reg-firstname").focus();
+        $("#Reg-firstname").addClass("is-invalid");
+        $("#firstnameHelp-Reg").text(
+          "First name must be at least 2 characters long."
+        );
+        return;
+      }
+
+      if (/[0-9]/.test($("#Reg-firstname").val())) {
+        $("#Reg-firstname").focus();
+        $("#Reg-firstname").addClass("is-invalid");
+        $("#firstnameHelp-Reg").text("First name must not contain numbers.");
+        return;
+      }
+
+      if ($("#Reg-lastname").val().length < 2) {
+        $("#Reg-lastname").focus();
+        $("#Reg-lastname").addClass("is-invalid");
+        $("#lastnameHelp-Reg").text(
+          "Last name must be at least 2 characters long."
+        );
+        return;
+      }
+
+      if (/[0-9]/.test($("#Reg-lastname").val())) {
+        $("#Reg-lastname").focus();
+        $("#Reg-lastname").addClass("is-invalid");
+        $("#lastnameHelp-Reg").text("Last name must not contain numbers.");
+        return;
+      }
+
+      if ($("#Reg-course").val() == "default") {
+        $("#Reg-course").addClass("is-invalid");
+        $("#courseHelp-Reg").text("Please select your course.");
+        return;
+      }
+
+      if ($("#Reg-year").val() == "default") {
+        $("#Reg-year").addClass("is-invalid");
+        $("#courseHelp-Reg").text("Please select your year level.");
+        return;
+      }
+
+      if ($("#Reg-section").val() == "default") {
+        $("#Reg-section").addClass("is-invalid");
+        $("#courseHelp-Reg").text("Please select your section.");
+        return;
+      }
+
+      if (!EmailRegex.test($("#Reg-email").val())) {
+        $("#Reg-email").focus();
+        $("#Reg-email").addClass("is-invalid");
+        $("#emailHelp-Reg").text("Your email address is not valid.");
+        return;
+      }
+
+      var onlyValidDomain = "@cvsu.edu.ph";
+      var email = $("#Reg-email").val();
+      var domain = email.substring(email.indexOf("@"));
+
+      if (domain != onlyValidDomain) {
+        $("#Reg-email").addClass("is-invalid");
+        $("#emailHelp-Reg").text(
+          "You are using an email address outside of the organization."
+        );
+        return;
+      }
+
+      if (!PasswordRegex.test($("#Reg-password").val())) {
+        $("#Reg-password").focus();
+        $("#Reg-password").addClass("is-invalid");
+        $("#passwordHelp-Reg").text("Your password format is not valid.");
+
+        setTimeout(function () {
+          $("#Reg-password").removeClass("is-invalid");
+          $("#passwordHelp-Reg").text("");
+        }, 3000);
+        return;
+      }
+
+      if (isNaN($("#Reg-phone").val())) {
+        $("#Reg-phone").addClass("is-invalid");
+        $("#phoneHelp-Reg").text("Phone number must be numeric.");
+        return;
+      }
+
+      if ($("#Reg-phone").val().length < 11) {
+        $("#Reg-phone").addClass("is-invalid");
+        $("#phoneHelp-Reg").text("Phone number must be 11 digits long.");
+        return;
+      }
+
+      $("#Reg-stdnum").removeClass("is-invalid");
+      $("#Reg-firstname").removeClass("is-invalid");
+      $("#Reg-lastname").removeClass("is-invalid");
+      $("#Reg-course").removeClass("is-invalid");
+      $("#Reg-year").removeClass("is-invalid");
+      $("#Reg-section").removeClass("is-invalid");
+      $("#Reg-email").removeClass("is-invalid");
+      $("#Reg-phone").removeClass("is-invalid");
+      $("#Reg-password").removeClass("is-invalid");
+
+      $("#stdnumHelp-Reg").text("");
+      $("#firstnameHelp-Reg").text("");
+      $("#lastnameHelp-Reg").text("");
+      $("#courseHelp-Reg").text("");
+      $("#emailHelp-Reg").text("");
+      $("#phoneHelp-Reg").text("");
+      $("#passwordHelp-Reg").text("");
+
+      $("#Reg-btn").attr("disabled", "disabled");
+      $("#Reg-btn-label").addClass("d-none");
+      $("#Reg-btn-loader").removeClass("d-none");
+
+      var data = {
+        studentnum: $("#Reg-stdnum").val(),
+        firstname: $("#Reg-firstname").val(),
+        lastname: $("#Reg-lastname").val(),
+        course: $("#Reg-course").val(),
+        year: $("#Reg-year").val(),
+        section: $("#Reg-section").val(),
+        email: $("#Reg-email").val(),
+        phone: $("#Reg-phone").val(),
+        password: $("#Reg-password").val(),
+      };
+
+      RegisterProcess(data);
+    }
   });
 });

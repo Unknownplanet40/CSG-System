@@ -31,7 +31,7 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
     <link rel="stylesheet" href="../../Utilities/Third-party/Sweetalert2/css/sweetalert2.css">
     <link rel="stylesheet" href="../../Utilities/Stylesheets/CustomStyle.css">
     <link rel="stylesheet" href="../../Utilities/Stylesheets/MNavbarStyle.css">
-    <link rel="stylesheet" href="../../Utilities/Stylesheets/Accessstyle.css">
+    <link rel="stylesheet" href="../../Utilities/Stylesheets/AccessStyle.css">
     <link rel="shortcut icon" href="../../Assets/Icons/PWA-Icon/MainIcon.png" type="image/x-icon">
     <script src="../../Utilities/Third-party/Bootstrap/js/bootstrap.bundle.js"></script>
     <script src="../../Utilities/Third-party/JQuery/js/jquery.min.js"></script>
@@ -214,7 +214,7 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                                 <div class="mb-3">
                                     <label for="Reg-stdnum" class="form-label fs-6">Student Number</label>
                                     <input type="text" class="form-control rounded-0 mx-1" id="Reg-stdnum"
-                                        aria-describedby="stdnumHelp-Reg Reg-btn">
+                                        aria-describedby="stdnumHelp-Reg Reg-btn" maxlength="9">
                                     <div id="stdnumHelp-Reg" class="invalid-feedback">For validation</div>
                                 </div>
                                 <div class="mb-3">
@@ -223,7 +223,8 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                                             <label for="Reg-firstname" class="form-label fs-6">First Name</label>
                                             <input type="text" class="form-control rounded-0 mx-1" id="Reg-firstname"
                                                 aria-describedby="firstnameHelp-Reg Reg-btn">
-                                            <div id="firstnameHelp-Reg" class="invalid-feedback">For validation</div>
+                                            <div id="firstnameHelp-Reg" class="invalid-feedback text-nowrap">For
+                                                validation</div>
                                         </div>
                                         <div class="col-md-6">
                                             <label for="Reg-lastname" class="form-label fs-6">Last Name</label>
@@ -240,136 +241,20 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                                             <select class="form-select rounded-0 mx-1" id="Reg-course"
                                                 aria-describedby="courseHelp-Reg Reg-btn">
                                             </select>
-                                            <div id="courseHelp-Reg" class="invalid-feedback">For validation</div>
+                                            <div id="courseHelp-Reg" class="invalid-feedback text-nowrap">For validation</div>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="Reg-year" class="form-label fs-6">Year Level</label>
                                             <select class="form-select rounded-0 mx-1" id="Reg-year"
-                                                aria-describedby="yearHelp-Reg Reg-btn">
+                                                aria-describedby="courseHelp-Reg Reg-btn">
                                             </select>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="Reg-section" class="form-label fs-6">Section</label>
                                             <select class="form-select rounded-0 mx-1" id="Reg-section"
-                                                aria-describedby="sectionHelp-Reg Reg-btn">
+                                                aria-describedby="courseHelp-Reg Reg-btn">
                                             </select>
                                         </div>
-
-                                        <script>
-                                            $(document).ready(function() {
-                                                var course = $("#Reg-course");
-
-                                                $("#Reg-year").empty().prop("disabled", true);
-                                                $("#Reg-section").empty().prop("disabled", true);
-
-                                                $.ajax({
-                                                    url: '../Functions/api/getAcadData.php',
-                                                    type: 'POST',
-                                                    data: {
-                                                        CourseID: null,
-                                                        Action: "Get-Course"
-                                                    },
-
-                                                    success: function(res) {
-                                                        if (res.status === "success") {
-                                                            course.empty();
-                                                            course.append(
-                                                                `<option selected hidden>Choose...</option>`
-                                                            );
-                                                            res.data.forEach((courses) => {
-                                                                course.append(
-                                                                    `<option value="${courses.ShortName}">${courses.CourseName}</option>`
-                                                                );
-                                                            });
-                                                        } else {
-                                                            console.error(
-                                                                'Failed to fetch courses:', res
-                                                                .message || 'Unknown error');
-                                                        }
-                                                    },
-                                                    error: function(xhr, status, error) {
-                                                        console.error('AJAX Error:', error);
-                                                    }
-                                                });
-
-                                                $("#Reg-course").change(function() {
-                                                    var year = $("#Reg-year");
-                                                    year.prop("disabled", false);
-                                                    $("#Reg-section").empty().prop("disabled", true);
-                                                    $.ajax({
-                                                        url: '../Functions/api/getAcadData.php',
-                                                        type: 'POST',
-                                                        data: {
-                                                            CourseID: $("#Reg-course").val(),
-                                                            Action: "Get-Year"
-                                                        },
-
-                                                        success: function(res) {
-                                                            if (res.status === "success") {
-                                                                year.empty();
-                                                                year.append(
-                                                                    `<option selected hidden>Choose...</option>`
-                                                                );
-                                                                res.data.forEach((
-                                                                    courses) => {
-                                                                    year.append(
-                                                                        `<option value="${courses.Year}">${courses.CourseName}</option>`
-                                                                    );
-                                                                });
-                                                            } else {
-                                                                console.error(
-                                                                    'Failed to fetch courses:',
-                                                                    res.message ||
-                                                                    'Unknown error');
-                                                            }
-                                                        },
-                                                        error: function(xhr, status, error) {
-                                                            console.error('AJAX Error:',
-                                                                error);
-                                                        }
-                                                    });
-                                                });
-
-                                                $("#Reg-year").change(function() {
-                                                    var section = $("#Reg-section");
-                                                    var yearlvl = $("#Reg-year").val();
-                                                    section.prop("disabled", false);
-                                                    $.ajax({
-                                                        url: '../Functions/api/getAcadData.php',
-                                                        type: 'POST',
-                                                        data: {
-                                                            CourseID: $("#Reg-course").val(),
-                                                            Action: "Get-Section",
-                                                            YearLevel: yearlvl
-                                                        },
-
-                                                        success: function(res) {
-                                                            if (res.status === "success") {
-                                                                section.empty();
-                                                                section.append(
-                                                                    `<option selected hidden>Choose...</option>`
-                                                                );
-                                                                res.data.forEach((
-                                                                    courses) => {
-                                                                    section.append(
-                                                                        `<option value="${courses.CourseID}">${courses.Section}</option>`
-                                                                    );
-                                                                });
-                                                            } else {
-                                                                console.error(
-                                                                    'Failed to fetch courses:',
-                                                                    res.message ||
-                                                                    'Unknown error');
-                                                            }
-                                                        },
-                                                        error: function(xhr, status, error) {
-                                                            console.error('AJAX Error:',
-                                                                error);
-                                                        }
-                                                    });
-                                                });
-                                            });
-                                        </script>
                                     </div>
                                 </div>
                                 <div class="mb-3">
