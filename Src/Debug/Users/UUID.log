@@ -111,3 +111,5 @@
 11/06/2024 02:46:43 AM - [INFO] - User: f36754bc-8936-4fbc-b6f1-c255d3ac6228 - Action: logout - IP: 49.144.133.111 - Status: Success
 11/06/2024 10:07:14 AM - [ERROR] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: Account Locked - IP: ::1 - Status: Failed
 11/06/2024 10:07:21 AM - [INFO] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: Login - IP: 49.144.133.111 - Status: Success
+11/06/2024 10:25:43 AM - [INFO] - User: a5dcd436-74fe-4405-9de9-4eaca56f432a - Action: Login - IP: 49.144.133.111 - Status: Success
+11/06/2024 03:26:07 AM - [INFO] - User: a5dcd436-74fe-4405-9de9-4eaca56f432a - Action: logout - IP: 49.144.133.111 - Status: Success

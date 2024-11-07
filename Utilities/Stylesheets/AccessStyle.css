@@ -25,6 +25,14 @@ body::after {
   transform: translateY(50%);
 }
 
+
+/*remove after in body if the screen is lwer than medium screen*/
+@media (max-width: 768px) {
+  body::after {
+    display: none;
+  }
+}
+
 .selected {
   color: var(--bs-success);
   font-weight: 600;

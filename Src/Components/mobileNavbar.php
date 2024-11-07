@@ -8,20 +8,25 @@
                 </a>
             </div>
             <div class="col-3">
-                <a class="col-Items" id="b_ItemNav_Reg" onclick="RedirectToRegister()">
-                    <svg width="32" height="32">
-                        <use xlink:href="#Register"></use>
-                    </svg>
-                </a>
-            </div>
-            <div class="col-3">
                 <a class="col-Items" id="b_ItemNav_For" onclick="RedirectToForgot()">
                     <svg width="32" height="32">
                         <use xlink:href="#Lock"></use>
                     </svg>
                 </a>
             </div>
-            <div class="col-3 dropdown">
+            <div class="col-3">
+                <a class="col-Items" id="b_ItemNav_Reg" onclick="HomeRedirect()">
+                    <svg width="32" height="32">
+                        <use xlink:href="#Home"></use>
+                    </svg>
+                </a>
+            </div>
+            <div class="col-3">
+                <a class="col-Items" id="b_ItemNav_Reg">
+                    <img src="../../Assets/Images/Logo-Layers/Logo.png" class="rounded-circle" width="32" height="32">
+                </a>
+            </div>
+            <div class="col-3 dropdown d-none">
                 <a class="col-Items" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
                     <svg width="32" height="32">
                         <use xlink:href="#Menu"></use>
@@ -35,12 +40,7 @@
                         </div>
                     </div>
                     <hr class="dropdown-divider">
-                    <a class="dropdown-item" onclick="HomeRedirect()">
-                        <svg width="18" height="18" class="me-3 my-2">
-                            <use xlink:href="#Home"></use>
-                        </svg>
-                        Homepages
-                    </a>
+                    ano lalagay ko dinto hahahahahhaa
                 </div>
             </div>
         </div>

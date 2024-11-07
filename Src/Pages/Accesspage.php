@@ -48,7 +48,7 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
         }
 
         function RedirectToRegister() {
-            localStorage.setItem('current-form', 'Register');
+            localStorage.setItem('current-form', 'whatdoesthefoxsay');
         }
 
         function RedirectToForgot() {
@@ -116,8 +116,8 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                         </svg>
                         Login
                     </li>
-                    <li class="list-group-item rounded list-hover border-0 d-inline-block text-truncate"
-                        style="max-width: 220px;" onclick="RedirectToRegister()" id="side-register">
+                    <li class="list-group-item rounded list-hover border-0 d-inline-block text-truncate d-none"
+                        style="max-width: 220px; display: none;" onclick="RedirectToRegister()" id="side-register">
                         <svg width="16" height="16" class="me-3">
                             <use xlink:href="#Register" />
                         </svg>
@@ -202,7 +202,8 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                     </div>
                     <!-- Login Form End -->
                     <!-- Register Form Start -->
-                    <div class="col-md-6 mb-3" id="Register-container">
+                    <!-- This feature has been deprecated - 2024-11-07 -->
+                    <div class="col-md-6 mb-3 d-none" style="display: none;" id="Register-container">
                         <h5 class="text-start fw-bold my-5">
                             <svg width="18" height="18" class="mx-2">
                                 <use xlink:href="#Register" />
@@ -285,7 +286,7 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                                 <div class="d-grid gap-2">
                                     <small>Please provide the required information to register</small>
                                     <button type="button" class="btn btn-success btn-sm rounded-0 py-2" tabindex="6"
-                                        id="Reg-btn">Submit</button>
+                                        id="Deprecated-Reg-btn">Submit</button>
                                 </div>
                             </div>
                         </div>
