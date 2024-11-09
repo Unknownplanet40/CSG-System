@@ -12,7 +12,11 @@ function writeLog($logPath, $Type, $UUID, $Action, $ipAddress, $Status)
     if ($Action == "Login") {
         $IPADDRESS = $ipAddress;
     } else {
-        if (str_contains($ipAddress, "::1")) {
+        $ipData = file_get_contents("https://api.ipify.org?format=json");
+        $ipData = json_decode($ipData, true);
+        $IPADDRESS = $ipData['ip'];
+
+       /*  if (str_contains($ipAddress, "::1")) {
             $ipData = file_get_contents("https://api.ipify.org?format=json");
             $ipData = json_decode($ipData, true);
             $IPADDRESS = $ipData['ip'];
@@ -24,7 +28,7 @@ function writeLog($logPath, $Type, $UUID, $Action, $ipAddress, $Status)
             } else {
                 $IPADDRESS = $_SERVER['REMOTE_ADDR'];
             }
-        }
+        } */
     }
 
     fwrite($file, date('m/d/Y h:i:s A') . " - [" . strtoupper($Type) . "] - User: " . $UUID . " - Action: " . $Action . " - IP: " . $IPADDRESS . " - Status: " . $Status . "\n");

@@ -184,7 +184,7 @@ try {
                 if ($loginAttempt == 3) {
                     $message = "Final attempt left before your account gets locked.";
                 } else {
-                    $message = "You have " . (3 - $loginAttempt) . " attempts left before your account gets locked.";
+                    $message = "You have " . $loginAttempt . " attempts left before your account gets locked.";
                 }
             } else {
                 $ReAttemptDate = date('Y-m-d H:i:s', strtotime('+10 minutes'));
@@ -248,6 +248,8 @@ try {
                         $stmt->execute();
                         $stmt->close();
 
+                        writeLog($logPath, "error", $temp_UUID, "Account Locked", $ipAddress, "Failed");
+
                     } else {
                         $SMTPMessage = "Email could not be sent. Mailer Error: " . $mail->ErrorInfo;
                     }
@@ -256,7 +258,6 @@ try {
                     $SMTPMessage = "Message could not be sent. Mailer Error: " . $mail->ErrorInfo;
                 }
             }
-            writeLog($logPath, "error", $temp_UUID, "Account Locked", $ipAddress, "Failed");
 
             response(['status' => 'error', 'message' => $message, 'isLocked' => $isLocked, 'Date' => $ReAttemptDate, 'SMTPErr' => $SMTPMessage]);
         }

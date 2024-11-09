@@ -1,4 +1,3 @@
-@import url(./Fonts.css);
 @import url(../Third-party/Bootstrap/css/color.css);
 @import url(./Animations.css);
 
@@ -10,14 +9,13 @@
 }
 
 body {
-  font-family: "Poppins", sans-serif;
   position: relative;
 }
 
-body::after {
+body::after{
   content: "";
   position: fixed;
-  bottom:  92px;
+  bottom: 92px;
   right: -92px;
   width: 739px;
   height: 100%;
@@ -28,6 +26,14 @@ body::after {
   pointer-events: none;
   z-index: -1;
   transform: translateY(50%);
+}
+
+/* for screen lower or equal to 768px */
+@media (max-width: 768px) {
+  body::after {
+    bottom: 420px;
+    pointer-events: none;
+  }
 }
 
 .RHBS {
@@ -173,8 +179,8 @@ body::after {
 .row > .col:nth-child(1) .image1 {
   background-image: url(../../Assets/Images/Logo-Layers/Logo-trans.png);
   animation: imageFadeIn 300ms ease forwards;
-} 
-  
+}
+
 .row > .col:nth-child(2) .image1 {
   background-image: url(../../Assets/Images/Logo-Layers/Logo-trans.png);
   animation: imageFadeIn 300ms ease forwards;

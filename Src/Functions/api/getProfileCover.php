@@ -57,7 +57,7 @@ try {
 
             if ($orgs->num_rows > 0) {
                 $org = $orgs->fetch_assoc();
-                $shortName = $org['org_short-name'];
+                $shortName = $org['org_short_name'];
 
                 $stmt = $conn->prepare("SELECT * FROM sysorgcoverphoto WHERE org_code = ?");
                 $stmt->bind_param("s", $org['org_code']);
@@ -67,13 +67,13 @@ try {
 
                 if ($coverPhoto->num_rows > 0) {
                     $cover = $coverPhoto->fetch_assoc();
-                    $cover = '../../Assets/Images/orgAssets/orgCover/Default-' . $shortName . '-' . $cover['useFor'] . '.' . $cover['imageExt'];
+                    $cover = 'Default-' . $shortName . '-' . $cover['useFor'] . '.' . $cover['imageExt'];
                     response(['status' => 'success', 'cover' => $cover]);
                 }
             }
         }
 
-        response(['status' => 'success', 'cover' => '../../Assets/Images/Default-Cover.gif']);
+        response(['status' => 'success', 'cover' => 'Default-Cover.gif']);
     }
 } catch (Exception $e) {
     response(['status' => 'error', 'message' => 'Failed to get cover photo (' . $e->getMessage() . ')']);

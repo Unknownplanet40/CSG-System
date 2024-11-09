@@ -11,7 +11,6 @@ function response($data)
     exit;
 }
 
-// Check request method and session data
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         response(['error' => 'Invalid request method']);
@@ -25,12 +24,10 @@ try {
         response(['status' => 'error', 'message' => 'Unauthorized access']);
     }
 
-    // Pagination parameters from the AJAX request
     $page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
     $pageSize = isset($_POST['pageSize']) ? (int)$_POST['pageSize'] : 5;
     $offset = ($page - 1) * $pageSize;
 
-    // Fetch total number of records for pagination
     $countStmt = $conn->prepare("SELECT COUNT(*) AS totalRecords FROM usercredentials WHERE accountStat = 'pending'");
     $countStmt->execute();
     $totalRecords = $countStmt->get_result()->fetch_assoc()['totalRecords'];
@@ -40,7 +37,6 @@ try {
     $prev = $page > 1 ? $page - 1 : null;
     $next = $page < $totalPages ? $page + 1 : null;
 
-    // Fetch the records for the current page
     $stmt = $conn->prepare("SELECT * FROM usercredentials WHERE accountStat = 'pending' LIMIT ? OFFSET ?");
     $stmt->bind_param('ii', $pageSize, $offset);
     $stmt->execute();

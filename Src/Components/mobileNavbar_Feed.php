@@ -62,7 +62,7 @@
                         </div>
                     </div>
                     <hr class="dropdown-divider">
-                    <a class="dropdown-item" id="b_ItemNav_PSet">
+                    <a class="dropdown-item d-none" id="b_ItemNav_PSet">
                         <svg width="18" height="18" class="me-3 my-2">
                             <use xlink:href="#TestIcon"></use>
                         </svg>

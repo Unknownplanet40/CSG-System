@@ -8,6 +8,7 @@ if (session_status() == PHP_SESSION_NONE) {
 if (!isset($_SESSION['UUID'])) {
     header('Location: ../Pages/Accesspage.php?error=001');
 } else {
+    echo '<script>var UUID = "' . $_SESSION['UUID'] . '";</script>';
     $logPath = "../Debug/Users/UUID.log";
 }
 

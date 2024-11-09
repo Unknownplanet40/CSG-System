@@ -1,4 +1,9 @@
 import { QueueNotification } from "./Modules/Queueing_Notification.js";
+import {
+  checkifISLogin,
+  checkIfSessionChange,
+  sessionAlert,
+} from "../Scripts/Modules/FeedModules.js";
 
 const tooltipTriggerList = document.querySelectorAll(
   '[data-bs-toggle="tooltip"]'
@@ -151,7 +156,7 @@ function getuserPosts(UUID = "", type = "all") {
           if (announcement.isDeleted === 0) {
             isDeleted = "";
           }
-          
+
           if (announcement.isDeleted === 1 && type === "deleted") {
             showRestore = "";
           }
@@ -589,13 +594,13 @@ function getuserPosts(UUID = "", type = "all") {
                                     <div class="hstack gap-3 d-flex justify-content-center">
                                         <div class="p-2 ms-5">
                                             <div class="no-ann-box">
-                                                <img src="../../Assets/Images/Logo-Layers/layer 1.png" alt="Layer 1"
+                                                <img src="../../Assets/Images/Logo-Layers/layer1.png" alt="Layer 1"
                                                     width="100" height="100" class="rounded-circle no-ann">
-                                                <img src="../../Assets/Images/Logo-Layers/layer 2.png" alt="Layer 2"
+                                                <img src="../../Assets/Images/Logo-Layers/layer2.png" alt="Layer 2"
                                                     width="100" height="100" class="rounded-circle no-ann">
-                                                <img src="../../Assets/Images/Logo-Layers/layer 3.png" alt="Layer 3"
+                                                <img src="../../Assets/Images/Logo-Layers/layer3.png" alt="Layer 3"
                                                     width="100" height="100" class="rounded-circle no-ann">
-                                                <img src="../../Assets/Images/Logo-Layers/layer 4.png" alt="Layer 4"
+                                                <img src="../../Assets/Images/Logo-Layers/layer4.png" alt="Layer 4"
                                                     width="100" height="100" class="rounded-circle no-ann">
                                             </div>
                                         </div>
@@ -618,13 +623,13 @@ function getuserPosts(UUID = "", type = "all") {
                                     <div class="hstack gap-3 d-flex justify-content-center">
                                         <div class="p-2 ms-5">
                                             <div class="no-ann-box">
-                                                <img src="../../Assets/Images/Logo-Layers/layer 1.png" alt="Layer 1"
+                                                <img src="../../Assets/Images/Logo-Layers/layer1.png" alt="Layer 1"
                                                     width="100" height="100" class="rounded-circle no-ann">
-                                                <img src="../../Assets/Images/Logo-Layers/layer 2.png" alt="Layer 2"
+                                                <img src="../../Assets/Images/Logo-Layers/layer2.png" alt="Layer 2"
                                                     width="100" height="100" class="rounded-circle no-ann">
-                                                <img src="../../Assets/Images/Logo-Layers/layer 3.png" alt="Layer 3"
+                                                <img src="../../Assets/Images/Logo-Layers/layer3.png" alt="Layer 3"
                                                     width="100" height="100" class="rounded-circle no-ann">
-                                                <img src="../../Assets/Images/Logo-Layers/layer 4.png" alt="Layer 4"
+                                                <img src="../../Assets/Images/Logo-Layers/layer4.png" alt="Layer 4"
                                                     width="100" height="100" class="rounded-circle no-ann">
                                             </div>
                                         </div>
@@ -639,6 +644,47 @@ function getuserPosts(UUID = "", type = "all") {
     },
   });
 }
+
+setInterval(() => {
+  checkifISLogin();
+  checkIfSessionChange();
+}, 5000);
+
+setInterval(() => {
+  sessionAlert();
+}, 500);
+
+$.ajax({
+  url: "../Functions/api/getProfileCover.php",
+  type: "POST",
+  data: {
+    UUID: $("#USER_UUID").val(),
+  },
+
+  beforeSend: function () {
+    $("#coverImage").attr("src", "../../Assets/Images/Default-Cover.gif");
+  },
+
+  success: function (data) {
+    if (data.status == "success") {
+      if (data.message != "Default-Cover.gif") {
+        $("#coverImage").attr(
+          "src",
+          `../../Assets/Images/orgAssets/orgCover/${data.cover}`
+        );
+      } else {
+        $("#coverImage").attr("src", "../../Assets/Images/Default-Cover.gif");
+      }
+    } else {
+      throw new Error(data.message);
+    }
+  },
+
+  error: function (xhr, status, error) {
+    $("#coverImage").attr("src", "../../Assets/Images/Default-Cover.gif");
+    console.log(xhr.responseText);
+  },
+});
 
 $(document).ready(function () {
   var maxRows = 10;
@@ -706,29 +752,4 @@ $(document).ready(function () {
     scrollToAnnouncements();
     getuserPosts($("#USER_UUID").val(), "deleted");
   });
-
-  $.ajax({
-    url: '../Functions/api/getProfileCover.php',
-    type: 'POST',
-    data: {
-        UUID: $('#USER_UUID').val()
-    },
-
-    beforeSend: function () {
-        $('#coverImage').attr('src', '../../Assets/Images/Default-Cover.gif');
-    },
-
-    success: function (data) {
-        if (data.status == 'success') {
-            $('#coverImage').attr('src', data.cover);
-        } else {
-          throw new Error(data.message);
-        }
-    },
-
-    error: function (xhr, status, error) {
-        $('#coverImage').attr('src', '../../Assets/Images/Default-Cover.gif');
-        console.log(xhr.responseText);
-    }
-});
 });

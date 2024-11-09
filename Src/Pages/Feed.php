@@ -41,6 +41,7 @@ $logout = '../Functions/api/UserLogout.php';
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="shortcut icon" href="../../Assets/Icons/PWA-Icon/MainIcon.png" type="image/x-icon">
     <link rel="stylesheet" href="../../Utilities/Stylesheets/FeedStyle.css">
+
     <script defer src="../../Utilities/Third-party/Bootstrap/js/bootstrap.bundle.js"></script>
     <script defer src="../../Utilities/Third-party/Sweetalert2/js/sweetalert2.all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
@@ -211,14 +212,14 @@ $logout = '../Functions/api/UserLogout.php';
                                 </svg>
                                 <span class="ms-2">Profile</span>
                             </li>
-                            <li class="list-group-item border-0 rounded-pill feedsidebaritems" id="Dashboard-btn"
+                            <li class="list-group-item border-0 rounded-pill feedsidebaritems <?php echo $_SESSION['role'] != 1 ? 'd-none' : ''; ?>" id="Dashboard-btn"
                                 onclick="window.location.href='./Apps/ADMIN/Dashboard.php'">
                                 <svg width="24" height="24">
                                     <use xlink:href="#Dashboard"></use>
                                 </svg>
                                 <span class="ms-2">Dashboard</span>
                             </li>
-                            <li class="list-group-item border-0 rounded-pill feedsidebaritems" id="Placeholder-btn">
+                            <li class="list-group-item border-0 rounded-pill feedsidebaritems d-none" id="Placeholder-btn">
                                 <svg width="24" height="24">
                                     <use xlink:href="#TestIcon"></use>
                                 </svg>
@@ -251,8 +252,7 @@ $logout = '../Functions/api/UserLogout.php';
                                 echo '../../Assets/Images/Default-Profile.gif';
                             } else {
                                 echo '../../Assets/Images/UserProfiles/' . $_SESSION['ProfileImage'];
-                            }
-?>
+                            }?>
                             " width="100" height="100" class="rounded-circle" alt="Profile Picture">
                             </div>
                         </div>

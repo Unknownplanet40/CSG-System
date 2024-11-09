@@ -866,13 +866,13 @@ export function fetch_Announcements() {
                                     <div class="hstack gap-3 d-flex justify-content-center">
                                         <div class="p-2 ms-5">
                                             <div class="no-ann-box">
-                                                <img src="../../Assets/Images/Logo-Layers/layer 1.png" alt="Layer 1"
+                                                <img src="../../Assets/Images/Logo-Layers/layer1.png" alt="Layer 1"
                                                     width="100" height="100" class="rounded-circle no-ann">
-                                                <img src="../../Assets/Images/Logo-Layers/layer 2.png" alt="Layer 2"
+                                                <img src="../../Assets/Images/Logo-Layers/layer2.png" alt="Layer 2"
                                                     width="100" height="100" class="rounded-circle no-ann">
-                                                <img src="../../Assets/Images/Logo-Layers/layer 3.png" alt="Layer 3"
+                                                <img src="../../Assets/Images/Logo-Layers/layer3.png" alt="Layer 3"
                                                     width="100" height="100" class="rounded-circle no-ann">
-                                                <img src="../../Assets/Images/Logo-Layers/layer 4.png" alt="Layer 4"
+                                                <img src="../../Assets/Images/Logo-Layers/layer4.png" alt="Layer 4"
                                                     width="100" height="100" class="rounded-circle no-ann">
                                             </div>
                                         </div>
@@ -894,13 +894,13 @@ export function fetch_Announcements() {
                                     <div class="hstack gap-3 d-flex justify-content-center">
                                         <div class="p-2 ms-5">
                                             <div class="no-ann-box">
-                                                <img src="../../Assets/Images/Logo-Layers/layer 1.png" alt="Layer 1"
+                                                <img src="../../Assets/Images/Logo-Layers/layer1.png" alt="Layer 1"
                                                     width="100" height="100" class="rounded-circle no-ann">
-                                                <img src="../../Assets/Images/Logo-Layers/layer 2.png" alt="Layer 2"
+                                                <img src="../../Assets/Images/Logo-Layers/layer2.png" alt="Layer 2"
                                                     width="100" height="100" class="rounded-circle no-ann">
-                                                <img src="../../Assets/Images/Logo-Layers/layer 3.png" alt="Layer 3"
+                                                <img src="../../Assets/Images/Logo-Layers/layer3.png" alt="Layer 3"
                                                     width="100" height="100" class="rounded-circle no-ann">
-                                                <img src="../../Assets/Images/Logo-Layers/layer 4.png" alt="Layer 4"
+                                                <img src="../../Assets/Images/Logo-Layers/layer4.png" alt="Layer 4"
                                                     width="100" height="100" class="rounded-circle no-ann">
                                             </div>
                                         </div>
