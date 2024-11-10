@@ -16,7 +16,7 @@
                 </a>
             </div>
             <div class="col-3">
-                <a class="col-Items" id="b_ItemNav_For">
+                <a class="col-Items" id="b_ItemNav_For" <?php echo $_SESSION['role'] != 1 ? '' : 'onclick="window.location.href=\'../Pages/Apps/ADMIN/Dashboard.php\'"' ?>>
                     <svg width="32" height="32">
                         <use xlink:href="#Dashboard"></use>
                     </svg>
@@ -36,11 +36,11 @@
                         </div>
                     </div>
                     <hr class="dropdown-divider">
-                    <a class="dropdown-item" id="b_ItemNav_PSet">
+                    <a class="dropdown-item d-none" id="b_ItemNav_MSet">
                         <svg width="18" height="18" class="me-3 my-2">
-                            <use xlink:href="#TestIcon"></use>
+                            <use xlink:href="#Messages"></use>
                         </svg>
-                        Placeholder
+                        Messages
                     </a>
                     <a class="dropdown-item" id="b_ItemNav_Pref">
                         <svg width="18" height="18" class="me-3 my-2">

@@ -1,186 +1,275 @@
 import { QueueNotification } from "./Modules/Queueing_Notification.js";
 
-function loadNUPData(page) {
-  $.ajax({
-    url: "../../../../Src/Functions/api/getNUP.php",
-    type: "POST",
-    data: { page: page, pageSize: pageSize },
-    success: function (res) {
-      var NUPData = $("#NUP_Table_Data");
-      NUPData.empty();
+const tooltipTriggerList = document.querySelectorAll(
+  '[data-bs-toggle="tooltip"]'
+);
+const tooltipList = [...tooltipTriggerList].map(
+  (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl)
+);
 
-      // Populate the table with data
-      var statformat = "";
-      res.data.forEach(function (data) {
-        if (data.accountStat === "pending") {
-          statformat = `<span class="badge bg-warning">Pending</span>`;
-        } else if (data.accountStat === "active") {
-          statformat = `<span class="badge bg-success">Active</span>`;
-        } else if (data.accountStat === "rejected") {
-          statformat = `<span class="badge bg-danger">Rejected</span>`;
-        } else {
-          statformat = `<span class="badge bg-secondary">Unknown</span>`;
-        }
-
-        NUPData.append(`<tr class="align-middle">
-                <td><span class="text-truncate">${data.fullName}</span></td>
-                <td><span class="text-truncate">${data.primary_email}</span></td>
-                <td><span class="text-truncate">${data.contactNumber}</span></td>
-                <td><span class="text-truncate">${data.course_code}</span></td>
-                <td><span class="text-truncate">${data.student_Number}</span></td>
-                <td>${statformat}</td>
-                <td class="vstack gap-1">
-                  <button class="btn btn-sm btn-outline-success" id="approve-${data.UUID}">
-                    <svg class="me-1" width="24" height="24"><use xlink:href="#Approved" /></svg>
-                    <span class="d-none d-md-inline">Approve</span>
-                  </button>
-                  <button class="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#RejectModal" onclick="getNUPInfo(${data.UUID})">
-                    <svg class="me-1" width="24" height="24"><use xlink:href="#Rejected" /></svg>
-                    <span class="d-none d-md-inline">Reject</span>
-                  </button>
-                </td>
-              </tr>`);
-
-        $(`#approve-${data.UUID}`).click(function () {
-          $("#userUUID").val(data.UUID);
-          asignRole.show();
-        });
-      });
-
-      // Generate pagination
-      pagination.empty();
-      pagination.append(`<li class="page-item ${res.prev ? "" : "disabled"}">
-                                <span class="page-link" href="#" onclick="loadNUPData(${
-                                  res.prev || page
-                                })">Previous</span>
-                              </li>`);
-      for (var i = 1; i <= res.totalPages; i++) {
-        pagination.append(`<li class="page-item ${i === page ? "active" : ""}">
-          <span class="page-link" href="#" onclick="loadNUPData(${i})">${i}</span>
-          </li>`);
-      }
-      pagination.append(`<li class="page-item ${res.next ? "" : "disabled"}">
-                                <span class="page-link" href="#" onclick="loadNUPData(${
-                                  res.next || page
-                                })">Next</span>
-                              </li>`);
-    },
-    error: function (xhr, status, error) {
-      console.error("Error loading data:", error);
-    },
+function uuidv4() {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
   });
 }
 
-if ($("#NUP-tab-pane").hasClass("active")) {
-  $("#user-tab").removeClass("active");
-  $("#admin-tab").removeClass("active");
-  var pagination = $("#NUP_Pagination");
-  var currentPage = 1;
-  var pageSize = 5;
-  const asignRole = new bootstrap.Modal(document.getElementById("userRole"), {
-    keyboard: false,
-    backdrop: "static",
-  });
-
-  $.ajax({
-    url: "../../../Functions/api/getOrgData.php",
-    type: "POST",
-    success: function (data) {
-      data.forEach((org) => {
-        $("#InputOrg").append(
-          `<option value="${org.org_code}">${org.org_name}</option>`
-        );
-      });
-    },
-  });
-
-  $("#InputOrg").on("change", function () {
-    if ($("#InputOrg").val() == "Choose...") {
-      $("#InputRole").prop("disabled", true);
-    } else {
-      $("#InputRole").prop("disabled", false);
-      $("#InputRole").empty();
-      $("#InputRole").append("<option selected hidden>Choose...</option>");
-      if ($("#InputOrg").val() == 10001) {
-        $("#InputRole").append(
-          '<option value="2" Selected>CSG Officer</option>'
-        );
-      } else {
-        $("#InputRole").append('<option value="2">CSG Officer</option>');
-      }
-      $("#InputRole").append('<option value="3">Officer</option>');
-    }
-  });
-
-  // Initial load
-  loadNUPData(currentPage);
-} else {
-  $("#NUP_Table_Data").empty();
-}
+let userTempMail = "";
+let userTempPass = "";
 
 $(document).ready(function () {
-  $("#searchUser").on("change keyup paste", function () {
-    var value = $(this).val().toLowerCase();
-    var hasResult = false;
-    $("#NUP_Table_Data tr").filter(function () {
-      var match = $(this).text().toLowerCase().indexOf(value) > -1;
-      $(this).toggle(match);
-      if (match) {
-        hasResult = true;
+  let CSGSelectedPositions = [];
+  let OfficerSelectedPositions = [];
+
+  $("#MultipleAccounts_0").removeClass("d-none");
+
+  for (let i = 0; i < 10; i++) {
+    (function (index) {
+      $("#Role_Select_" + index).change(function () {
+        let role = $(this).val();
+        let posSelect = $("#Pos_Select_" + index);
+        if (role === "1") {
+          posSelect.prop("disabled", true).val("null");
+          toggleNextAccount(index, "null");
+        } else if (role !== "null") {
+          posSelect.prop("disabled", false);
+          updatePositionOptions(role, posSelect, index);
+        }
+      });
+
+      $("#Pos_Select_" + index).change(function () {
+        let role = $("#Role_Select_" + index).val();
+        let pos = $(this).val();
+
+        if (pos !== "null") {
+          if (role === "2" && !CSGSelectedPositions.includes(pos)) {
+            CSGSelectedPositions.push(pos);
+          } else if (role === "3" && !OfficerSelectedPositions.includes(pos)) {
+            OfficerSelectedPositions.push(pos);
+          }
+
+          toggleNextAccount(index, pos);
+          updatePositionOptions(
+            role,
+            $("#Pos_Select_" + (index + 1)),
+            index + 1
+          );
+        }
+      });
+
+      function toggleNextAccount(currentIndex, pos) {
+        let nextIndex = currentIndex + 1;
+        if (nextIndex < 10) {
+          $("#MultipleAccounts_" + nextIndex).removeClass("d-none");
+        }
       }
-    });
-    if (!hasResult) {
-      $("#NUP_Table_Data").append(
-        '<tr class="no-result"><td colspan="7" class="text-center">No matching records found.</td></tr>'
-      );
+
+      function updatePositionOptions(role, posSelect, index) {
+        posSelect.find("option").prop("disabled", false);
+
+        if (role === "2") {
+          CSGSelectedPositions.forEach(function (selectedPos) {
+            posSelect
+              .find('option[value="' + selectedPos + '"]')
+              .prop("disabled", true);
+          });
+        } else if (role === "3") {
+          OfficerSelectedPositions.forEach(function (selectedPos) {
+            posSelect
+              .find('option[value="' + selectedPos + '"]')
+              .prop("disabled", true);
+          });
+        }
+      }
+    })(i);
+  }
+
+  $("#CreateMultiple_Btn").click(function () {
+    let accounts = [];
+    for (let i = 0; i < 10; i++) {
+      let role = $("#Role_Select_" + i).val();
+      let pos = $("#Pos_Select_" + i).val();
+
+      if (role !== "null") {
+        if (role > 1 && pos !== "null") {
+          accounts.push({
+            role: role,
+            pos: pos,
+          });
+        } else if (role == 1) {
+          accounts.push({
+            role: role,
+            pos: null,
+          });
+        }
+      }
+    }
+
+    if (accounts.length >= 2) {
+      $.ajax({
+        type: "POST",
+        url: "../../../Functions/api/postTempAccount.php",
+        data: {
+          action: "multi-create",
+          accounts: accounts,
+        },
+        success: function (response) {
+          if (response.stat === "success") {
+            if (response.ZipPath) {
+              var dlBtn = $("#DL_zip_Btn");
+              dlBtn.attr("href", `../../Src/TempPDF/${response.ZipPath}`);
+              dlBtn.removeClass("d-none");
+              dlBtn.attr("download", response.ZipPath);
+
+              // clear all fields
+              for (let i = 0; i < 10; i++) {
+                $("#Role_Select_" + i).val("null");
+                $("#Pos_Select_" + i).val("null");
+              }
+
+              // hide all MultipleAccounts divs except the first one
+              for (let i = 1; i < 10; i++) {
+                $("#MultipleAccounts_" + i).addClass("d-none");
+              }
+
+              //clear account arrays
+              CSGSelectedPositions = [];
+              OfficerSelectedPositions = [];
+              accounts = [];
+
+              $("#cococlose").data("zip-path", response.ZipPath);
+            } else {
+              QueueNotification([
+                "error",
+                "An error occurred while creating the accounts.",
+                3000,
+              ]);
+            }
+          } else {
+            QueueNotification(["error", response.message, 3000]);
+          }
+        },
+      });
     } else {
-      $("#NUP_Table_Data .no-result").remove();
+      QueueNotification([
+        "error",
+        "If you are creating a single account, please close this modal and use the main form.",
+        3000,
+      ]);
     }
   });
 
-  $("#saveRole").click(function () {
-    var userUUID = $("#userUUID").val();
-    var userRole = $("#InputRole").val();
-    var userOrg = $("#InputOrg").val();
-    var userIposition = $("#InputPosition").val();
+  $("#GenTemp_Btn").click(function () {
+    var uuid = uuidv4();
+    var TempMail = $("#TempMail_Input").val();
+    var TempPass = $("#TempPass_Input").val();
 
-    if (userRole == null) {
-      QueueNotification(["error", "Please select a role."]);
+    var TempMail =
+      Math.random().toString(36).substring(2, 10) + "@cvsu.temp.com";
+    var TempPass = Math.random().toString(36).substring(2, 10) + "Aa1!";
+
+    $("#UUID_Input").val(uuid);
+    $("#TempMail_Input").val(TempMail);
+    $("#TempPass_Input").val(TempPass);
+
+    $("#print_Btn").prop("disabled", false);
+  });
+
+  $("#print_Btn").click(function () {
+
+    if (userTempMail == "" || userTempPass == "") {
+      QueueNotification(["error", "Please generate a temporary account first.", 3000]);
+      return;
+    } else if (userTempMail == "Expired" || userTempPass == "Expired") {
+      QueueNotification(["error", "Temporary account has expired. Please generate a new one.", 3000]);
       return;
     }
 
-    if (userOrg == "Choose...") {
-      QueueNotification(["error", "Please select an organization."]);
+    window.location.href = `../../../Functions/TempAccount_Gen.php?Email=${userTempMail}&Password=${userTempPass}`;
+  });
+
+  $("#CreateAccount_Btn").click(function () {
+    var UUID = $("#UUID_Input").val();
+    var Role = $("#Role_Select").val();
+    var Pos = $("#Pos_Select").val();
+    var TempMail = $("#TempMail_Input").val();
+    var TempPass = $("#TempPass_Input").val();
+
+    if (
+      UUID == "" ||
+      Role == null ||
+      TempMail == "" ||
+      TempPass == ""
+    ) {
+      QueueNotification(["error", "Please fill up all the fields.", 3000]);
       return;
     }
 
-    if (userIposition == "Choose...") {
-      QueueNotification(["error", "Please input a position."]);
-      return;
-    }
+    var data = {
+      action: "create",
+      uuid: UUID,
+      role: Role,
+      pos: Pos,
+      email: TempMail,
+      password: TempPass,
+      accounts: {
+        role: Role,
+        pos: Pos,
+      },
+    };
 
     $.ajax({
-      url: "../../../Functions/api/postAddRole.php",
       type: "POST",
-      data: {
-        userUUID: userUUID,
-        userRole: userRole,
-        userOrg: userOrg,
-        userIposition: userIposition,
-      },
-      success: function (res) {
-        //response(['status' => 'success', 'message' => 'User role updated successfully']);
-        if (res.status == "success") {
-          QueueNotification(["success", "User role updated successfully"]);
-          $("#userRole").modal("hide");
-          loadNUPData(1);
+      url: "../../../Functions/api/postTempAccount.php",
+      data: data,
+      success: function (response) {
+        if (response.stat === "success") {
+          QueueNotification(["info", "Account has been created.", 3000]);
+
+          userTempMail = TempMail;
+          userTempPass = TempPass;
+          window.location.href = `../../../Functions/TempAccount_Gen.php?Email=${TempMail}&Password=${TempPass}`;
+          
+          $("#UUID_Input").val("");
+          $("#Role_Select").val("null");
+          $("#Pos_Select").val("null").attr("disabled", false);
+          $("#TempMail_Input").val("");
+          $("#TempPass_Input").val("");
+          $("#print_Btn").removeClass("d-none");
+
+          setTimeout(function () {
+            $("#print_Btn").prop("disabled", false);
+            userTempMail = "Expired";
+            userTempPass = "Expired";
+            QueueNotification(["error", "Temporary account has been expired.", 3000]);
+          }, 300000); // 5 minutes
         } else {
-          QueueNotification(["error", "Failed to update user role"]);
+          QueueNotification(["error", response.message, 3000]);
         }
       },
-      error: function (xhr, status, error) {
-        console.error("Error updating user role:", error);
-      },
     });
+  });
+
+  $("#cococlose").click(function () {
+    console.log($(this).data("zip-path"));
+
+    if ($(this).data("zip-path") !== undefined) {
+      $.ajax({
+        type: "POST",
+        url: "../../../Functions/api/postTempAccount.php",
+        data: {
+          action: "delete-zip",
+          zipname: $(this).data("zip-path"),
+        },
+        success: function (response) {
+          if (response.stat === "success") {
+            QueueNotification(["info", "Zip has been deleted.", 3000]);
+          } else {
+            console.log("error", response.message, 3000);
+          }
+        },
+      });
+    }
   });
 });

@@ -2,8 +2,7 @@
 
 require '../../vendor/autoload.php';
 
-// Use the correct FPDF namespace
-use Fpdf\Fpdf;  // Use the correct namespace for FPDF
+use Fpdf\Fpdf;
 
 $Organization = strtoupper('Central Student Government');
 $Email = 'Example@domain.com';

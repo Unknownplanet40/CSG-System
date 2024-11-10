@@ -14,7 +14,7 @@ if (!isset($_SESSION['UUID'])) {
 
 if ($_SESSION['role'] != 1) {
     header('Location: ../../../Pages/Feed.php');
-    
+
 }
 
 $inactive = 1800; // 30 minutes inactivity
@@ -88,54 +88,73 @@ $_SESSION['last_activity'] = time();
                 </div>
                 <div class="container">
                     <ul class="list-group">
-                        <li class="list-group-item lg lg-active">
+                        <li class="list-group-item lg my-2 lg-active">
                             <svg class="me-3" width="24" height="24">
                                 <use xlink:href="#Dashboard" />
                             </svg>
                             Dashboard
                         </li>
-                        <span class="hr-divider-start text-secondary"></span>
-                        <li class="list-group-item lg">
+                        <span class="hr-divider-start text-secondary d-none"></span>
+                        <li class="list-group-item lg d-none">
                             <svg class="me-3" width="24" height="24">
                                 <use xlink:href="#TestIcon" />
                             </svg>
                             Placeholder
                         </li>
-                        <span class="hr-divider-start text-secondary"></span>
-                        <li class="list-group-item lg text-truncate">
-                            <svg class="me-3" width="24" height="24">
-                                <use xlink:href="#Acad" />
-                            </svg>
-                            Academic Programs
-                        </li>
-                        <li class="list-group-item lg">
-                            <svg class="me-3" width="24" height="24">
-                                <use xlink:href="#Organic" />
-                            </svg>
-                            Organizations
-                        </li>
-                        <li class="list-group-item lg" onclick="window.location.href = './User-Management.php'"
-                            title="User Management">
-                            <svg class="me-3" width="24" height="24">
-                                <use xlink:href="#ManageAct" />
-                            </svg>
-                            User Management
-                        </li>
+                        <span class="hr-divider-start text-secondary d-none"></span>
+                        <div class="accordion accordion-flush" id="Modules_Accord">
+                            <div class="accordion-item">
+                                <li class="list-group-item my-2 lg collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#flush-collapseOne" aria-expanded="false"
+                                    aria-controls="flush-collapseOne">
+                                    <svg class="me-3" width="24" height="24">
+                                        <use xlink:href="#TestIcon" />
+                                    </svg>
+                                    Modules
+                                </li>
+                                <div id="flush-collapseOne" class="accordion-collapse collapse"
+                                    data-bs-parent="#Modules_Accord">
+                                    <div class="accordion-body">
+                                        <li class="list-group-item lg my-2 text-truncate">
+                                            <svg class="me-3" width="24" height="24">
+                                                <use xlink:href="#Acad" />
+                                            </svg>
+                                            Courses & Sections
+                                        </li>
+                                        <li class="list-group-item lg my-2">
+                                            <svg class="me-3" width="24" height="24">
+                                                <use xlink:href="#Organic" />
+                                            </svg>
+                                            Organizations
+                                        </li>
+                                        <li class="list-group-item lg my-2"
+                                            onclick="window.location.href = './User-Management.php'"
+                                            title="User Management">
+                                            <svg class="me-3" width="24" height="24">
+                                                <use xlink:href="#ManageAct" />
+                                            </svg>
+                                            User Management
+                                        </li>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <span class="hr-divider-end text-secondary"></span>
-                        <li class="list-group-item lg" onclick="window.location.href = '../../Feed.php'" title="Feed">
+                        <li class="list-group-item lg my-2" onclick="window.location.href = '../../Feed.php'"
+                            title="Feed">
                             <svg class="me-2" width="24" height="24">
                                 <use xlink:href="#Feed" />
                             </svg>
                             News Feed
                         </li>
-                        <li class="list-group-item lg" onclick="window.location.href = '../../Preference.php'"
+                        <li class="list-group-item lg my-2" onclick="window.location.href = '../../Preference.php'"
                             title="Messages">
                             <svg class="me-2" width="24" height="24">
                                 <use xlink:href="#Setting" />
                             </svg>
                             Settings
                         </li>
-                        <li class="list-group-item lg text-danger"
+                        <li class="list-group-item lg text-danger my-2"
                             onclick="window.location.href = '../../../Functions/api/UserLogout.php'" title="Logout">
                             <svg class="me-2" width="24" height="24">
                                 <use xlink:href="#Logout" />
@@ -155,6 +174,7 @@ $_SESSION['last_activity'] = time();
                             <div class="card-body py-0">
                                 <div class="d-flex flex-row justify-content-between">
                                     <p class="fs-1 fw-bold text-truncate mb-0" id="activeUsers">
+                                        0
                                     </p>
                                 </div>
                             </div>
@@ -166,6 +186,7 @@ $_SESSION['last_activity'] = time();
                             <div class="card-body py-0">
                                 <div class="d-flex flex-row justify-content-between">
                                     <p class="fs-1 fw-bold text-truncate mb-0" id="csgOfficers">
+                                        0
                                     </p>
                                 </div>
                             </div>
@@ -177,6 +198,7 @@ $_SESSION['last_activity'] = time();
                             <div class="card-body py-0">
                                 <div class="d-flex flex-row justify-content-between">
                                     <p class="fs-1 fw-bold text-truncate mb-0" id="dailyLogins">
+                                        0
                                     </p>
                                 </div>
                             </div>
@@ -188,6 +210,7 @@ $_SESSION['last_activity'] = time();
                             <div class="card-body py-0">
                                 <div class="d-flex flex-row justify-content-between">
                                     <p class="fs-1 fw-bold text-truncate mb-0" id="lockedAccounts">
+                                        0
                                     </p>
                                 </div>
                             </div>
