@@ -669,14 +669,13 @@ $.ajax({
     if (data.status == "success") {
       if (data.message != "Default-Cover.gif") {
         $("#coverImage").attr(
-          "src",
-          `../../Assets/Images/orgAssets/orgCover/${data.cover}`
+          "src", `../../Assets/Images/orgAssets/orgCover/${data.cover}`
         );
       } else {
         $("#coverImage").attr("src", "../../Assets/Images/Default-Cover.gif");
       }
     } else {
-      throw new Error(data.message);
+      $("#coverImage").attr("src", "../../Assets/Images/Default-Cover.gif");
     }
   },
 

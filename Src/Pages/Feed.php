@@ -10,6 +10,22 @@ if (!isset($_SESSION['UUID'])) {
 } else {
     echo '<script>var UUID = "' . $_SESSION['UUID'] . '";</script>';
     $logPath = "../Debug/Users/UUID.log";
+
+    $stmt = $conn->prepare("SELECT * FROM usercredentials WHERE UUID = ?");
+    {
+        $stmt->bind_param("s", $_SESSION['UUID']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $stmt->close();
+
+        if ($row['accountStat'] == 'pending') {
+            header('Location: ../Functions/api/UserLogout.php?error=005');
+        }
+
+
+    }
+
 }
 
 $inactive = 1800; // 30 minutes inactivity
@@ -28,12 +44,15 @@ $logout = '../Functions/api/UserLogout.php';
 
 
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="<?php echo $_SESSION['theme']; ?>">
+<html lang="en"
+    data-bs-theme="<?php echo $_SESSION['theme']; ?>">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../Utilities/Third-party/Bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
     <link rel="stylesheet" href="../../Utilities/Stylesheets/BGaniStyle.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css" />
     <link rel="stylesheet" href="../../Utilities/Stylesheets/CustomStyle.css">
@@ -212,14 +231,15 @@ $logout = '../Functions/api/UserLogout.php';
                                 </svg>
                                 <span class="ms-2">Profile</span>
                             </li>
-                            <li class="list-group-item border-0 rounded-pill feedsidebaritems <?php echo $_SESSION['role'] != 1 ? 'd-none' : ''; ?>" id="Dashboard-btn"
-                                onclick="window.location.href='./Apps/ADMIN/Dashboard.php'">
+                            <li class="list-group-item border-0 rounded-pill feedsidebaritems <?php echo $_SESSION['role'] != 1 ? 'd-none' : ''; ?>"
+                                id="Dashboard-btn" onclick="window.location.href='./Apps/ADMIN/Dashboard.php'">
                                 <svg width="24" height="24">
                                     <use xlink:href="#Dashboard"></use>
                                 </svg>
                                 <span class="ms-2">Dashboard</span>
                             </li>
-                            <li class="list-group-item border-0 rounded-pill feedsidebaritems d-none" id="Placeholder-btn">
+                            <li class="list-group-item border-0 rounded-pill feedsidebaritems d-none"
+                                id="Placeholder-btn">
                                 <svg width="24" height="24">
                                     <use xlink:href="#TestIcon"></use>
                                 </svg>
@@ -261,7 +281,38 @@ $logout = '../Functions/api/UserLogout.php';
                                 <h5 class="fw-bold text-wrap text-center">
                                     <?php echo $_SESSION['FirstName'] . ' ' . $_SESSION['LastName']; ?>
                                 </h5>
-                                <p class="text-secondary text-center">Placeholder</p>
+                                <p class="text-secondary text-center">
+                                    <?php
+                                        $stmt = $conn->prepare("SELECT * FROM userpositions WHERE UUID = ?");
+$stmt->bind_param("s", $_SESSION['UUID']);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$stmt->close();
+
+if ($row['org_code'] != null) {
+    $stmt = $conn->prepare("SELECT org_short_name FROM sysorganizations WHERE org_code = ?");
+    $stmt->bind_param("i", $row['org_code']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $org = $result->fetch_assoc();
+    $stmt->close();
+
+    if ($row['org_position'] == 1) {
+        echo $org['org_short_name'] . " President";
+    } elseif ($row['org_position'] == 2) {
+        echo $org['org_short_name'] . " Vice President Internal";
+    } elseif ($row['org_position'] == 3) {
+        echo $org['org_short_name'] . " Vice President External";
+    } else {
+        echo $org['org_short_name'] . " Secretary";
+    }
+} else {
+    echo "Administrator";
+}
+
+?>
+                                </p>
                             </div>
                         </div>
                         <div class="my-3 d-flex justify-content-center searchbox">

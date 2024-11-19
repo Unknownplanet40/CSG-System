@@ -143,11 +143,12 @@ try {
                     // Insert into userpositions based on role
                     if ($role > 1 && $position !== null) {
                         $org_code = $role == 2 ? 10001 : null;
-                        $stmt = $conn->prepare("INSERT INTO userpositions (UUID, role, org_code, org_position) VALUES (?, ?, ?, ?)");
+                        $isSubOrg = $role == 2 ? 0 : 1;
+                        $stmt = $conn->prepare("INSERT INTO userpositions (UUID, role, org_code, org_position, isSubOrg) VALUES (?, ?, ?, ?, ?)");
                         if (!$stmt) {
                             throw new Exception("Error preparing userpositions statement: " . $conn->error);
                         }
-                        $stmt->bind_param('siii', $UUID, $role, $org_code, $position);
+                        $stmt->bind_param('siiii', $UUID, $role, $org_code, $position, $isSubOrg);
                     } else {
                         $stmt = $conn->prepare("INSERT INTO userpositions (UUID, role, org_code, org_position) VALUES (?, 1, NULL, NULL)");
                         if (!$stmt) {
@@ -261,14 +262,14 @@ try {
         }
         $stmt->close();
 
-        // Insert into userpositions based on role
         if ($role > 1 && $position !== null) {
             $org_code = $role == 2 ? 10001 : null;
-            $stmt = $conn->prepare("INSERT INTO userpositions (UUID, role, org_code, org_position) VALUES (?, ?, ?, ?)");
+            $isSubOrg = $role == 2 ? 0 : 1;
+            $stmt = $conn->prepare("INSERT INTO userpositions (UUID, role, org_code, org_position, isSubOrg) VALUES (?, ?, ?, ?, ?)");
             if (!$stmt) {
                 throw new Exception("Error preparing userpositions statement: " . $conn->error);
             }
-            $stmt->bind_param('siii', $uuid, $role, $org_code, $position);
+            $stmt->bind_param('siiii', $uuid, $role, $org_code, $position, $isSubOrg);
         } else {
             $stmt = $conn->prepare("INSERT INTO userpositions (UUID, role, org_code, org_position) VALUES (?, 1, NULL, NULL)");
             if (!$stmt) {
@@ -306,7 +307,7 @@ try {
         }
 
         $stmt->close();
-        response(['stat' => 'success', 'message' => 'Account created successfully', 'pdfPath' => $pdfFileName]);
+        response(['stat' => 'success', 'message' => 'Account created successfully']);
     } else {
         response(['stat' => 'error', 'message' => 'Invalid action']);
     }

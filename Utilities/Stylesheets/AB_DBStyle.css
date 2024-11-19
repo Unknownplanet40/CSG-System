@@ -71,6 +71,7 @@ body::after{
 }
 
 .BS-Side {
+  position: fixed;
   height: 100svh;
   min-width: 320px;
   max-width: 250px;
@@ -79,6 +80,7 @@ body::after{
 }
 
 .BS-Main {
+  margin-left: 320px;
   width: 100%;
 }
 
@@ -198,3 +200,4 @@ body::after{
   animation: imageFadeIn 300ms ease forwards;
   animation-delay: 300ms;
 }
+

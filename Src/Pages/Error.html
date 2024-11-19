@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en" data-bs-theme="auto">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -18,10 +18,72 @@
       body {
         font-family: "Poppins";
         font-size: 1.2rem;
+        position: relative;
+      }
+
+      body::after {
+        content: "";
+        position: fixed;
+        bottom: 92px;
+        right: -92px;
+        width: 739px;
+        height: 100%;
+        background-image: url(../../Assets/Images/Logo-Layers/Logo-trans.png);
+        background-repeat: no-repeat;
+        background-size: cover;
+        opacity: 0.5;
+        pointer-events: none;
+        z-index: -1;
+        transform: translateY(50%);
+      }
+
+      /* center bg image */
+      @media (max-width: 768px) {
+        body::after {
+          display: none;
+        }
+      }
+
+      .no-ann-box {
+        position: relative;
+      }
+
+      .no-ann {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1;
+        opacity: 0; /* Start all images with opacity 0 */
+        animation: fade 800ms ease-in-out forwards;
+      }
+
+      @keyframes fade {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      .no-ann:nth-child(2) {
+        z-index: 2;
+        animation-delay: 800ms;
+      }
+
+      .no-ann:nth-child(3) {
+        z-index: 3;
+        animation-delay: 1600ms;
+      }
+
+      .no-ann:nth-child(4) {
+        z-index: 4;
+        animation-delay: 2400ms;
       }
     </style>
     <script>
-      document.addEventListener("DOMContentLoaded", function() {
+      document.addEventListener("DOMContentLoaded", function () {
         let errors_title = {
           0: "Unknown Error",
           404: "Page Not Found",
@@ -55,88 +117,137 @@
 
         if (error_code == null) {
           document.getElementById("error-title").innerText = errors_title[0];
-          document.getElementById("error-message").innerText = errors_message[0];
+          document.getElementById("error-message").innerText =
+            errors_message[0];
         } else {
           switch (error_code) {
             case "404":
-              document.getElementById("error-title").innerText = errors_title[404];
-              document.getElementById("error-message").innerText = errors_message[404];
+              document.getElementById("error-title").innerText =
+                errors_title[404];
+              document.getElementById("error-message").innerText =
+                errors_message[404];
               break;
             case "403":
-              document.getElementById("error-title").innerText = errors_title[403];
-              document.getElementById("error-message").innerText = errors_message[403];
+              document.getElementById("error-title").innerText =
+                errors_title[403];
+              document.getElementById("error-message").innerText =
+                errors_message[403];
               break;
             case "1001":
-              document.getElementById("error-title").innerText = errors_title[1001];
-              document.getElementById("error-message").innerText = errors_message[1001];
+              document.getElementById("error-title").innerText =
+                errors_title[1001];
+              document.getElementById("error-message").innerText =
+                errors_message[1001];
               break;
             case "1049":
-              document.getElementById("error-title").innerText = errors_title[1049];
-              document.getElementById("error-message").innerText = errors_message[1049];
+              document.getElementById("error-title").innerText =
+                errors_title[1049];
+              document.getElementById("error-message").innerText =
+                errors_message[1049];
               break;
             case "1045":
-              document.getElementById("error-title").innerText = errors_title[1045];
-              document.getElementById("error-message").innerText = errors_message[1045];
+              document.getElementById("error-title").innerText =
+                errors_title[1045];
+              document.getElementById("error-message").innerText =
+                errors_message[1045];
               break;
             case "2002":
-              document.getElementById("error-title").innerText = errors_title[2002];
-              document.getElementById("error-message").innerText = errors_message[2002];
+              document.getElementById("error-title").innerText =
+                errors_title[2002];
+              document.getElementById("error-message").innerText =
+                errors_message[2002];
               break;
             case "1044":
-              document.getElementById("error-title").innerText = errors_title[1044];
-              document.getElementById("error-message").innerText = errors_message[1044];
+              document.getElementById("error-title").innerText =
+                errors_title[1044];
+              document.getElementById("error-message").innerText =
+                errors_message[1044];
               break;
             case "nokeys":
               document.getElementById("error-title").innerText = "No API Keys";
-              document.getElementById("error-message").innerText = "No API keys were found. Please contact the administrator for more information.";
+              document.getElementById("error-message").innerText =
+                "No API keys were found. Please contact the administrator for more information.";
               break;
             case "NoInternet":
-              document.getElementById("error-title").innerText = "No Internet Connection";
-              document.getElementById("error-message").innerText = "No internet connection was detected. Please check your connection and try again.";
+              document.getElementById("error-title").innerText =
+                "No Internet Connection";
+              document.getElementById("error-message").innerText =
+                "No internet connection was detected. Please check your connection and try again.";
               break;
             default:
-              document.getElementById("error-title").innerText = errors_title[0];
-              document.getElementById("error-message").innerText = errors_message[0];
+              document.getElementById("error-title").innerText =
+                errors_title[0];
+              document.getElementById("error-message").innerText =
+                errors_message[0];
               break;
           }
         }
-
       });
     </script>
   </head>
 
-  <body class="bg-body">
-    <div class="container">
-      <div
-        class="row justify-content-center align-items-center"
-        style="height: 80vh"
-      >
-        <div class="col-md-12 text-center">
+  <body>
+    <div
+      class="container d-flex justify-content-center align-items-center vh-100"
+    >
+      <div class="text-center">
+        <div class="no-ann-box" style="margin-bottom: 5rem">
           <img
-            src="../../Assets/Images/Loader-v1.gif"
-            alt="Error"
+            src="../../Assets/Images/Logo-Layers/layer1.png"
+            alt="Layer 1"
             width="128"
             height="128"
-            class="mb-4"
+            class="rounded-circle no-ann"
           />
-          <h1 class="text-uppercase fw-bold text-danger mb-3"
-            id="error-title"></h1>
-          <p class="text-muted" id="error-message"></p>
+          <img
+            src="../../Assets/Images/Logo-Layers/layer2.png"
+            alt="Layer 2"
+            width="128"
+            height="128"
+            class="rounded-circle no-ann"
+          />
+          <img
+            src="../../Assets/Images/Logo-Layers/layer3.png"
+            alt="Layer 3"
+            width="128"
+            height="128"
+            class="rounded-circle no-ann"
+          />
+          <img
+            src="../../Assets/Images/Logo-Layers/layer4.png"
+            alt="Layer 4"
+            width="128"
+            height="128"
+            class="rounded-circle no-ann"
+          />
+        </div>
 
-          <div class="hstack gap-3 d-flex justify-content-center mt-4">
-            <a class="btn btn-primary" id="backHome">Homepage</a>
-          </div>
-
-          <script>
-            document
-              .getElementById("backHome")
-              .addEventListener("click", () => {
-                localStorage.removeItem("error_code");
-                window.location.href = "./Homepage.php";
-              });
-          </script>
+        <h1
+          class="text-uppercase fw-bold text-danger mb-3"
+          id="error-title"
+        ></h1>
+        <p class="text-muted" id="error-message"></p>
+        <div class="mt-4">
+          <a class="btn btn-sm btn-secondary rounded-0" id="previousPage">Previous Page</a>
+          <a class="btn btn-sm btn-secondary rounded-0" id="backHome">Back to Home</a>
         </div>
       </div>
     </div>
+    <script>
+      setInterval(() => {
+        document.querySelector(".no-ann-box").innerHTML = document.querySelector(".no-ann-box").innerHTML;
+      }, 8000);
+
+      document.getElementById("previousPage").style.display = document.referrer ? "block" : "none";
+
+      document.getElementById("previousPage").addEventListener("click", () => {
+        window.history.back();
+      });
+
+      document.getElementById("backHome").addEventListener("click", () => {
+        localStorage.removeItem("error_code");
+        window.location.href = "./Accesspage.php";
+      });
+    </script>
   </body>
 </html>

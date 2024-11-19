@@ -93,8 +93,7 @@ $logout = '../Functions/api/UserLogout.php';
                                                                 class="btn btn-sm btn-outline-success fw-bold text-uppercase"
                                                                 id="light-mode">Select</button>
                                                             <small class="text-secondary d-none"
-                                                                id="islight-Label">Currently
-                                                                selected</small>
+                                                                id="islight-Label">Currently selected</small>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -185,14 +184,14 @@ $logout = '../Functions/api/UserLogout.php';
                                 </svg>
                                 <span class="ms-2">Profile</span>
                             </li>
-                            <li class="list-group-item border-0 rounded-pill feedsidebaritems" id="Dashboard-btn"
+                            <li class="list-group-item border-0 rounded-pill feedsidebaritems <?php echo $_SESSION['role'] != 1 ? 'd-none' : ''; ?>" id="Dashboard-btn"
                                 onclick="window.location.href='./Apps/ADMIN/Dashboard.php'">
                                 <svg width="24" height="24">
                                     <use xlink:href="#Dashboard"></use>
                                 </svg>
                                 <span class="ms-2">Dashboard</span>
                             </li>
-                            <li class="list-group-item border-0 rounded-pill feedsidebaritems" id="Placeholder-btn">
+                            <li class="list-group-item border-0 rounded-pill feedsidebaritems d-none" id="Placeholder-btn">
                                 <svg width="24" height="24">
                                     <use xlink:href="#TestIcon"></use>
                                 </svg>

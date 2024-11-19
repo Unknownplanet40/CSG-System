@@ -393,9 +393,9 @@ export function loadUsers() {
   });
 }
 
-export function checkifISLogin() {
+export function checkifISLogin(path = "../Functions/api/checkUserLogin.php") {
   $.ajax({
-    url: "../Functions/api/checkUserLogin.php",
+    url: path,
     type: "GET",
     data: {
       UUID: UUID,
@@ -411,9 +411,9 @@ export function checkifISLogin() {
   });
 }
 
-export function checkIfSessionChange() {
+export function checkIfSessionChange(path = "../Functions/api/checkSession.php") {
   $.ajax({
-    url: "../Functions/api/checkSession.php",
+    url: path,
     type: "GET",
     data: {
       UUID: UUID,
@@ -431,7 +431,7 @@ export function checkIfSessionChange() {
   });
 }
 
-export function sessionAlert() {
+export function sessionAlert(errorpath = "../../Src/Functions/api/UserLogout.php?error=003") {
   if (
     localStorage.getItem("anotherSession") !== null &&
     localStorage.getItem("anotherSession") === "true"
@@ -479,8 +479,7 @@ export function sessionAlert() {
           if (result.isConfirmed) {
             localStorage.removeItem("currentSession");
             localStorage.removeItem("anotherSession");
-            window.location.href =
-              "../../Src/Functions/api/UserLogout.php?error=003";
+            window.location.href = errorpath;
             isAlertOpen = false;
           }
         });

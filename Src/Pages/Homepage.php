@@ -30,6 +30,7 @@ if (!isset($_SESSION['database_status'])) {
 	<link rel="stylesheet" href="../../Utilities/Stylesheets/CustomStyle.css">
 	<link rel="stylesheet" href="../../Utilities/Stylesheets/Homestyle.css">
 	<link rel="stylesheet" href="../../Utilities/Stylesheets/NavbarStyle.css">
+	<meta http-equiv="refresh" content="0;url=./Accesspage.php">
 	<script defer src="../../Utilities/Third-party/Bootstrap/js/bootstrap.bundle.js"></script>
 	<script src="https://cdn.lordicon.com/lordicon.js"></script>
 	<script src="../../Utilities/Third-party/JQuery/js/jquery.min.js"></script>

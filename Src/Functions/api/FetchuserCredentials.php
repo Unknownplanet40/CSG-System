@@ -3,7 +3,7 @@
 date_default_timezone_set('Asia/Manila');
 
 // this function is used to fetch the user credentials and save it to the session
-function fetchUserCredentials($conn, $studentNumber)
+function fetchUserCredentials($conn, $studentNumber, $device)
 {
     $stmt = $conn->prepare("SELECT * FROM usercredentials WHERE student_Number = ?");
     $stmt->bind_param("i", $studentNumber);
@@ -18,8 +18,24 @@ function fetchUserCredentials($conn, $studentNumber)
 
     session_regenerate_id();
 
+
+
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
+
+            $deviceType = $device['device'];
+            $deviceDetails = $device['deviceDetails'];
+            $ipData = file_get_contents("https://api.ipify.org?format=json");
+            $ipData = json_decode($ipData, true);
+            $IPADDRESS = $ipData['ip'];
+            $dateMade = date('Y-m-d H:i:s');
+            $UUID = $row['UUID'];
+            $summary = "User " . $row['First_Name'] . " " . $row['Last_Name'] . " has logged in to the system. using " . $deviceType . " with IP Address " . $IPADDRESS . " on " . date('F j, Y') . " at " . date('h:i A');
+
+            $stmt = $conn->prepare("INSERT INTO auditdevice (UUID, Device, DeviceDetails, IPaddress, dateMade, summary) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssssss", $UUID, $deviceType, $deviceDetails, $IPADDRESS, $dateMade, $summary);
+            $stmt->execute();
+            $stmt->close();
 
             $stmt = $conn->prepare("SELECT * FROM userprofile WHERE UUID = ?");
             $stmt->bind_param("s", $row['UUID']);
@@ -84,9 +100,6 @@ function fetchUserCredentials($conn, $studentNumber)
                     $row['course_code'] = "000000";
                 }
             }
-
-
-
 
             $_SESSION['UUID'] = $row['UUID'];
             $_SESSION['FirstName'] = $row['First_Name'];

@@ -10,11 +10,25 @@ function response($data)
 
 require_once  "../../Database/Config.php";
 require_once './FetchuserCredentials.php';
+// prevent direct access to this file
 if (!file_exists('../env/HiddenKeys.php')) {
-    // generate the file
-    mkdir('../env', 0777, true);
-    $file = fopen('../env/HiddenKeys.php', 'w');
+    if (!mkdir('../env', 0750, true)) {
+        response(['status' => 'error', 'message' => 'Failed to create configuration directory']);
+    }
+    if (($file = fopen('../env/HiddenKeys.php', 'w')) === false) {
+        response(['status' => 'error', 'message' => 'Failed to create configuration file']);
+    }
+    $config = "<?php\n// Database Connection\n\$DB_USERNAME = \"\";\n\$DB_PASSWORD = \"\";\n";
+    $config .= "\$DB_GENPASS = \"\";\n\$DB_DATABASE = \"\";\n\n// SMTP Configuration\n";
+    $config .= "\$SMTP_HOST = '';\n\$SMTP_PORT = 587;\n\$SMTP_USER = '';\n\$SMTP_PASS = '';\n";
+    $config .= "\$SMTP_SECURE = 'tls';\n\n// Hostinger Database Connection\n";
+    $config .= "\$H_DB_NAME = \"\";\n\$H_DB_USERNAME = \"\";\n\$H_DB_PASSWORD = \"\";\n?>";
+    if (fwrite($file, $config) === false) {
+        fclose($file);
+        response(['status' => 'error', 'message' => 'Failed to write configuration']);
+    }
     fclose($file);
+    chmod('../env/HiddenKeys.php', 0640);
     response(['status' => 'fatal', 'message' => 'You have Encountered an E-K404 Error Code. Please Contact the Administrator']);
 } else {
     require_once '../env/HiddenKeys.php';
@@ -46,6 +60,7 @@ try {
 
     $studentNumber = $data['studentnum']; // int
     $password = $data['password']; // varchar
+    $device = $data['Device'];
     $ipAddress = $data['ipAddress']; // varchar
     if (isset($data['stats']) && $data['stats'] == 'autologin') {
         $autoLogin = true;
@@ -111,16 +126,21 @@ try {
             } else {
                 if ($IPAddress != "") {
                     if ($IPAddress != $ipAddress && $access_date != $date) {
+                        $msgcode = 1;
                         $loginmessage = "Your account is being accessed outside your registered Network. (Current IP: " . $ipAddress . " | Registered IP: " . $IPAddress . ")";
                     } elseif ($isLogin == 1 && $access_date != $date) {
+                        $msgcode = 2;
                         $loginmessage = "Your previous session was not logged out correctly. Please note to logout properly next time to avoid any issues.";
                     } else {
+                        $msgcode = 3;
                         $loginmessage = "Login successful.";
                     }
                 } else {
                     if ($isLogin == 1 && $access_date != $date) {
+                        $msgcode = 2;
                         $loginmessage = "Your previous session was not logged out correctly. Please note to logout properly next time to avoid any issues.";
                     } else {
+                        $msgcode = 3;
                         $loginmessage = "Login successful.";
                     }
                 }
@@ -140,7 +160,7 @@ try {
             $stmt->close();
             
             // Fetch the account credentials to session
-            $account = fetchUserCredentials($conn, $studentNumber);
+            $account = fetchUserCredentials($conn, $studentNumber, $device);
 
             // Check if the account is fetched
             if ($account === null) {
@@ -151,8 +171,21 @@ try {
                 $stmt->execute();
                 $stmt->close();
 
-                writeLog($logPath, "info", $account['UUID'], "Login", $ipAddress, "Success");
-                
+                switch ($msgcode) {
+                    case 1:
+                        writeLog($logPath, "warn", $temp_UUID, "New login detected", $ipAddress, "New IP Address");
+                        break;
+                    case 2:
+                        writeLog($logPath, "warn", $temp_UUID, "Session Exsists", $ipAddress, "Session not logged out");
+                        break;
+                    case 3:
+                        writeLog($logPath, "info", $account['UUID'], "Login", $ipAddress, "Success");
+                        break;
+                    default:
+                        writeLog($logPath, "info", $temp_UUID, "Login", $ipAddress, "Success");
+                        break;
+                }
+
                 response([
                     'status' => 'success',
                     'message' => $loginmessage,
@@ -172,7 +205,7 @@ try {
             $ReAttemptDate = "";
 
             // Check if the account is locked
-            if ($loginAttempt != 3) {
+            if ($loginAttempt < 3) {
                 $loginAttempt++;
                 $stmt = $conn->prepare("UPDATE accounts SET LoginAttempt = ? WHERE student_Number = ?");
                 $stmt->bind_param("is", $loginAttempt, $studentNumber);
@@ -184,13 +217,13 @@ try {
                 if ($loginAttempt == 3) {
                     $message = "Final attempt left before your account gets locked.";
                 } else {
-                    $message = "You have " . $loginAttempt . " attempts left before your account gets locked.";
+                    $message = "You have " . (3 - $loginAttempt) . " attempts left before your account gets locked.";
                 }
             } else {
                 $ReAttemptDate = date('Y-m-d H:i:s', strtotime('+10 minutes'));
 
-                $stmt = $conn->prepare("UPDATE accounts SET LoginStat = 'Locked', BanExpired = ? WHERE student_Number = ?");
-                $stmt->bind_param("ss", $ReAttemptDate, $studentNumber);
+                $stmt = $conn->prepare("UPDATE accounts SET LoginStat = 'Locked', BanExpired = ? WHERE UUID = ?");
+                $stmt->bind_param("ss", $ReAttemptDate, $temp_UUID);
                 $stmt->execute();
                 $stmt->close();
                 $isLocked = true;
@@ -236,7 +269,7 @@ try {
                     // Content
                     $mail->isHTML(true); // Set email format to HTML
                     $mail->Subject = 'Security Alert';
-                    $mail->Body = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Security Alert</title><style>body{font-family:Arial,sans-serif;line-height:1.6}.container{max-width:600px;margin:0 auto;padding:20px;border:1px solid #ddd;border-radius:10px}.header{background-color:#e7d96e;color:white;padding:5px 0;text-align:center;border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:center}.content{padding:10px 20px 20px 20px}.footer{margin-top:20px;text-align:center;font-size:0.9em;color:#777}table{width:100%}td{padding:10px}img{display:block;margin:0 auto}h2{margin:0;color:#fff}ul{list-style-type:none;padding:0}li{margin-bottom:10px}p{margin:0 0 10px}</style></head><body><div class="container"><div class="header"><table><tr><td><img src="https://i.imgur.com/Xd06F5f.jpeg" alt="Company Logo" style="display: block; border-radius: 50%; margin: 0 auto;" width="48"/></td><td><h2>Central Student Government</h2></td></tr></table></div><hr/><h3 style="text-align:center">Security alert</h3><div class="content"><p>Dear <b>' . $fname . '</b>,</p><p>Please be informed that your account has been locked due to </p><p>multiple failed login attempts. It will automatically unlock after </p><p><b>' . $Month . ' ' . $Day . ', ' . $Year . ' at ' . $time . ' ' . $AMPM . '</b>.</p><div style="text-align:end"><p>Thank you!</p><p><br>Best regards,<br>CSG Team</p></div></div><div class="footer"><p>&copy; ' . date('Y') . ' Central Student Government. All rights reserved.</p></div></div></body></html>';
+                    $mail->Body = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Security Alert</title><style>body{font-family:Segoe UI,Roboto,sans-serif;line-height:1.6;}.container{max-width:600px;margin:0 auto;padding:20px;}.header{color:white;padding:5px 0;text-align:center;border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:center;}.header h2{color:black;}.content{padding:10px 20px 20px 20px;margin-top:20px;}.footer{margin-top:20px;text-align:center;font-size:0.9em;color:#777;}table{width:100%;}td{padding:10px;}img{display:block;margin:0 auto;}h2{margin:0;color:#fff;}ul{list-style-type:none;padding:0;}li{margin-bottom:10px;}p{margin:0 0 10px;}</style></head><body><div class="container"><div class="header"><table><tr><td><img src="https://i.imgur.com/Xd06F5f.jpeg" alt="Company Logo" style="display:block;border-radius:50%;margin:0 auto" width="48"/></td><td><h2>Central Student Government</h2></td></tr></table></div><hr/><h3 style="text-align:start;text-transform:uppercase;color:#333;margin-bottom:-10px;">Security alert</h3><small style="color:#777;">' . date('F j, Y') . '</small><div class="content"><p>Dear <b>' . $fname . '</b>,</p><p>Please be informed that your account has been locked due to multiple failed login attempts. It will automatically unlock after</p><p style="text-align:center;margin-top:10px"><b>' . $Month . ' ' . $Day . ', ' . $Year . ' at ' . $time . ' ' . $AMPM . '</b>.</p><div style="text-align:end"><p>Thank you!</p><p><br/>Best regards,<br/>Central Student Government</p></div></div><div class="footer"><p>&copy; ' . date('Y') . ' Central Student Government. All rights reserved.</p></div><div><p style="text-align:center;color:#777;font-size:0.8em;margin-top:20px">This email was sent to <b>' . $email . '</b> because you are a member of the CvSU Organization. If you believe this email was sent by mistake, please ignore it.</p></div></div></body></html>';
                     $mail->AltBody = 'This is a system generated email. Please do not reply to this email.';
 
                     if ($mail->send()) {

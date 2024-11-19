@@ -3,6 +3,12 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+if (isset($_GET['pending'])) {
+    session_unset();
+    session_destroy();
+    header('Location: ./Accesspage.php');
+}
+
 if (isset($_SESSION['UUID'])) {
     header('Location: ./Feed.php'); // if the user is already logged in, redirect to the homepage
     echo "<script>localStorage.setItem('currentUser', '" . Hash('sha256', $_SESSION['student_Number']) . "');" . "</script>";
@@ -32,6 +38,7 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
     <link rel="stylesheet" href="../../Utilities/Stylesheets/CustomStyle.css">
     <link rel="stylesheet" href="../../Utilities/Stylesheets/MNavbarStyle.css">
     <link rel="stylesheet" href="../../Utilities/Stylesheets/AccessStyle.css">
+    <link rel="manifest" href="./manifest.json">
     <link rel="shortcut icon" href="../../Assets/Icons/PWA-Icon/MainIcon.png" type="image/x-icon">
     <script src="../../Utilities/Third-party/Bootstrap/js/bootstrap.bundle.js"></script>
     <script src="../../Utilities/Third-party/JQuery/js/jquery.min.js"></script>
@@ -40,7 +47,7 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
     <script defer type="module" src="../../Utilities/Scripts/AccessScript.js"></script>
     <script>
         function HomeRedirect() {
-            window.location.href = './Homepage.php';
+            localStorage.setItem('current-form', 'NewAccount');
         }
 
         function RedirectToLogin() {
@@ -48,7 +55,7 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
         }
 
         function RedirectToRegister() {
-            localStorage.setItem('current-form', 'whatdoesthefoxsay');
+            localStorage.setItem('current-form', 'Register');
         }
 
         function RedirectToForgot() {
@@ -64,16 +71,19 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
     <?php
     if (isset($_GET['error'])) {
         if ($_GET['error'] == '001') {
-            echo "<script>localStorage.setItem('error', 'Cannot access the page without logging in');</script>";
+            echo "<script>localStorage.setItem('error', 'You must be logged in to access this page.');</script>";
             unset($_GET['error']);
         } elseif ($_GET['error'] == '002') {
-            echo "<script>localStorage.setItem('error', 'Session expired. Please log in again');</script>";
+            echo "<script>localStorage.setItem('error', 'Your session has expired. Please log in again to continue.');</script>";
             unset($_GET['error']);
         } elseif ($_GET['error'] == '003') {
-            echo "<script>localStorage.setItem('error', 'Please insure that your the only one logged in on this account');</script>";
+            echo "<script>localStorage.setItem('error', 'Please make sure that you are the only person using this account to maintain its security and privacy.');</script>";
             unset($_GET['error']);
         } elseif ($_GET['error'] == '004') {
-            echo "<script>localStorage.setItem('error', 'You have Encountered an E-K404 Error Code. Please Contact the Administrator');</script>";
+            echo "<script>localStorage.setItem('error', 'You have encountered an E-K404 error. Please contact the administrator for assistance.');</script>";
+            unset($_GET['error']);
+        } else if ($_GET['error'] == '005') {
+            echo "<script>localStorage.setItem('error', 'Please activate your account before proceeding.');</script>";
             unset($_GET['error']);
         } else {
             echo "<script>localStorage.removeItem('error');</script>";
@@ -116,12 +126,12 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                         </svg>
                         Login
                     </li>
-                    <li class="list-group-item rounded list-hover border-0 d-inline-block text-truncate d-none"
-                        style="max-width: 220px; display: none;" onclick="RedirectToRegister()" id="side-register">
+                    <li class="list-group-item rounded list-hover border-0 d-inline-block text-truncate"
+                        style="max-width: 220px;" onclick="RedirectToRegister()" id="side-register">
                         <svg width="16" height="16" class="me-3">
                             <use xlink:href="#Register" />
                         </svg>
-                        Register
+                        Activate Account
                     </li>
                     <li class="list-group-item rounded list-hover border-0 d-inline-block text-truncate btm-line"
                         style="max-width: 220px;" id="side-forgot" onclick="RedirectToForgot()">
@@ -131,12 +141,12 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                         Forgot Password
                     </li>
                     <hr>
-                    <li class="list-group-item rounded list-hover border-0 d-inline-block text-truncate"
+                    <li class="list-group-item rounded list-hover border-0 d-inline-block text-truncate d-none"
                         onclick="HomeRedirect()" style="max-width: 220px;">
                         <svg width="16" height="16" class="me-3">
                             <use xlink:href="#Home" />
                         </svg>
-                        Homepage
+                        Create Account
                     </li>
                     <li class="list-group-item rounded list-hover border-0 d-inline-block text-truncate d-none"
                         style="max-width: 220px;">
@@ -203,14 +213,61 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                     <!-- Login Form End -->
                     <!-- Register Form Start -->
                     <!-- This feature has been deprecated - 2024-11-07 -->
-                    <div class="col-md-6 mb-3 d-none" style="display: none;" id="Register-container">
+                    <div class="col-md-6 mb-3" id="Register-container">
                         <h5 class="text-start fw-bold my-5">
                             <svg width="18" height="18" class="mx-2">
                                 <use xlink:href="#Register" />
                             </svg>
-                            Register your account
+                            Activate your Account
                         </h5>
                         <div class="d-flex justify-content-center">
+                            <div class="container">
+                                <div class="mb-3">
+                                    <label for="act-email" class="form-label fs-6">Temporary Email Address</label>
+                                    <input type="text" class="form-control rounded-0 mx-1" id="act-email"
+                                        aria-describedby="act_emailHelp act-btn">
+                                    <div id="act_emailHelp" class="invalid-feedback">For validation</div>
+                                </div>
+                                <div class="mb-5">
+                                    <label for="act-password" class="form-label fs-6">Temporary Password</label>
+                                    <div class="eyeforaneye pe-5">
+                                        <input type="password" class="form-control rounded-0 mx-1" id="act-password"
+                                            aria-describedby="act_passwordHelp act-btn">
+                                        <div id="act_passwordHelp" class="invalid-feedback">For validation</div>
+                                        <span class="pass-eye py-2 px-3 rounded-0" id="eyeshow">
+                                            <svg width="22" height="22">
+                                                <use xlink:href="#PassShow" id="change-eye" />
+                                            </svg>
+                                        </span>
+                                        <script>
+                                            $('#eyeshow').on('click', function() {
+                                                var input = $('#act-password');
+                                                var icon = $('#change-eye');
+                                                if (input.attr('type') == 'password') {
+                                                    input.attr('type', 'text');
+                                                    icon.attr('xlink:href', '#PassHide');
+                                                } else {
+                                                    input.attr('type', 'password');
+                                                    icon.attr('xlink:href', '#PassShow');
+                                                }
+                                            });
+                                        </script>
+                                    </div>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button type="button" class="btn btn-success gradient-btn btn-sm rounded-0 py-2"
+                                        id="act-btn"><strong role="status" id="act-btn-label">Activate</strong>
+                                        <div class="d-none d-flex justify-content-center" id="act-btn-loader">
+                                            <strong role="status">Loading...</strong>
+                                            <div class="spinner-border spinner-border-sm ms-auto mt-1"
+                                                aria-hidden="true"></div>
+                                        </div>
+                                    </button>
+                                    <small class="text-muted text-center d-none" id="log-btn-lbl"></small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center d-none">
                             <div class="container">
                                 <div class="mb-3">
                                     <label for="Reg-stdnum" class="form-label fs-6">Student Number</label>
@@ -242,7 +299,8 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                                             <select class="form-select rounded-0 mx-1" id="Reg-course"
                                                 aria-describedby="courseHelp-Reg Reg-btn">
                                             </select>
-                                            <div id="courseHelp-Reg" class="invalid-feedback text-nowrap">For validation</div>
+                                            <div id="courseHelp-Reg" class="invalid-feedback text-nowrap">For validation
+                                            </div>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="Reg-year" class="form-label fs-6">Year Level</label>
@@ -419,16 +477,17 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
                         </h5>
                         <div>
                             <ul>
-                                <li class="text-start mb-3"><strong>Creating Account</strong>
+                                <li class="text-start mb-3"><strong>Activate Your Account</strong>
                                     <ul>
-                                        <li><small>Provide the requested information to register</small>
+                                        <li><small>Fill in the required details to activate your account.</small></li>
+                                        <li><small>Use the Temporary Email Address and Password provided by the
+                                                organization.</small></li>
+                                        <li><small>Follow the required format when entering your information.</small>
                                         </li>
-                                        <li><small>Make sure to enter working email address</small></li>
-                                        <li><small>Enter the information in the required format</small>
-                                        </li>
-                                        <li><small>Only organization members are allowed to register</small>
+                                        <li><small>Only organization members are eligible to register.</small></li>
                                     </ul>
                                 </li>
+
                                 <li class="text-start"><strong>Trouble logging into your
                                         account?</strong>
                                     <ul>

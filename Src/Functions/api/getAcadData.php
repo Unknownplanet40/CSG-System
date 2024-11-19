@@ -26,9 +26,9 @@ try {
     }
 
     if ($CourseID == null) {
-        $stmt = $conn->prepare("SELECT * FROM sysacadtype");
+        $stmt = $conn->prepare("SELECT DISTINCT course_short_name, course_name FROM sysacadtype WHERE course_status = 'active'");
     } else {
-        $stmt = $conn->prepare("SELECT * FROM sysacadtype WHERE course_short_name = ?");
+        $stmt = $conn->prepare("SELECT * FROM sysacadtype WHERE course_short_name = ? AND course_status = 'active'");
         $stmt->bind_param("i", $CourseID);
     }
 
@@ -72,7 +72,7 @@ try {
                 case 'Get-Section':
                     $yearlvl = $_POST['YearLevel'];
 
-                    $stmt = $conn->prepare("SELECT DISTINCT section FROM sysacadtype WHERE course_short_name = ? AND year = ?");
+                    $stmt = $conn->prepare("SELECT DISTINCT section, course_code FROM sysacadtype WHERE course_short_name = ? AND year = ?");
                     $stmt->bind_param("si", $CourseID, $yearlvl);
                     $stmt->execute();
                     $result = $stmt->get_result();
@@ -84,6 +84,7 @@ try {
                                 $data[] = [
                                     'Section' => $row['section'],
                                     'CourseName' => $row['section'],
+                                    'code' => $row['course_code'],
                                 ];
                             }
                         }
@@ -92,8 +93,8 @@ try {
                 default:
                     if (!in_array($row['course_name'], array_column($data, 'CourseName'))) {
                         $data[] = [
+                            'CourseID' => $row['course_short_name'],
                             'CourseName' => $row['course_name'],
-                            'ShortName' => $row['course_short_name'],
                         ];
                     }
                     break;

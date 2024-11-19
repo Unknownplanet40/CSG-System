@@ -20,7 +20,7 @@ try {
         response(['status' => 'error', 'message' => 'Please fill all the required fields']);
     }
 
-    $postDetails = htmlspecialchars($_POST['postDetails'], ENT_QUOTES, 'UTF-8');
+    $postDetails = $_POST['postDetails'];
     $priority = $_POST['priority'];
     $userUUID = $_POST['userUUID'];
     $postID = bin2hex(random_bytes(16));

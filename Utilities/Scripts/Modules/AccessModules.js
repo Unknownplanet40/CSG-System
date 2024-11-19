@@ -1,5 +1,4 @@
 import { QueueNotification } from "./Queueing_Notification.js";
-
 // this fuction will display the ReAttempt time for the user to try again
 function displayReAttempt() {
   $("#log-btn-lbl").removeClass("d-none");
@@ -544,7 +543,7 @@ export function RegisterProcess(data) {
         $("#Login-stdnum").val(data.studentnum);
         $("#Login-password").val(data.password);
         $("#log-btn").click();
-        
+
         localStorage.setItem("current-form", "Login");
         showCurrentForm();
       }
@@ -557,6 +556,70 @@ export function RegisterProcess(data) {
         $("#Reg-btn").removeClass("shake").removeAttr("disabled");
         $("#Reg-btn-label").removeClass("d-none");
         $("#Reg-btn-loader").addClass("d-none");
+      }, 5000);
+
+      QueueNotification(["error", "An error has occured: " + error.message]);
+    },
+  });
+}
+
+export function ActivateProcess(data) {
+  $.ajax({
+    url: "../../Src/Functions/api/ActivateUser.php",
+    type: "POST",
+    data: data,
+    success: function (response) {
+      if (response.status == "error") {
+        $("#act-btn").addClass("shake");
+
+        $("#act-btn-label").removeClass("d-none");
+        $("#act-btn-loader").addClass("d-none");
+
+        $("#act-btn-label").text(response.message);
+
+        setTimeout(function () {
+          $("#act-btn").removeClass("shake").removeAttr("disabled");
+          $("#act-btn-label").text("Activate");
+        }, 2500);
+
+        return;
+      }
+
+      if (response.status == "success") {
+        if (response.isAccountExist == "true") {
+          QueueNotification(["info", "Redirecting...", 1000]);
+          setTimeout(function () {
+            $("#act-btn").removeAttr("disabled");
+            $("#act-btn-label").removeClass("d-none");
+            $("#act-btn-loader").addClass("d-none");
+
+            window.location.href = "./WaitingArea.php";
+          }, 1500);
+        } else {
+          QueueNotification(["error", response.message]);
+          setTimeout(function () {
+            $("#act-btn").removeAttr("disabled");
+            $("#act-btn-label").removeClass("d-none");
+            $("#act-btn-loader").addClass("d-none");
+          }, 1500);
+        }
+      } else {
+        QueueNotification(["error", response.message]);
+        setTimeout(function () {
+          $("#act-btn").removeAttr("disabled");
+          $("#act-btn-label").removeClass("d-none");
+          $("#act-btn-loader").addClass("d-none");
+        }, 1500);
+      }
+    },
+    error: function (error) {
+      console.error(error.message);
+      $("#act-btn").addClass("shake");
+
+      setTimeout(function () {
+        $("#act-btn").removeClass("shake").removeAttr("disabled");
+        $("#act-btn-label").removeClass("d-none");
+        $("#act-btn-loader").addClass("d-none");
       }, 5000);
 
       QueueNotification(["error", "An error has occured: " + error.message]);

@@ -28,17 +28,15 @@ try {
     if (isset($_GET['error'])) {
         switch ($_GET['error']) {
             case '001':
-                header('Location: ../../Pages/Accesspage.php?error=001');
-                break;
             case '002':
-                header('Location: ../../Pages/Accesspage.php?error=002');
-                break;
             case '003':
-                header('Location: ../../Pages/Accesspage.php?error=003');
-                break;
+            case '004':
+            case '005':
+                header('Location: ../../Pages/Accesspage.php?error=' . $_GET['error']);
+                exit();
             default:
                 header('Location: ../../Pages/Accesspage.php');
-                break;
+                exit();
         }
     } else {
         if (isset($_GET['studentnum']) && isset($_GET['password'])) {

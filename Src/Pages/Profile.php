@@ -12,10 +12,10 @@ if (!isset($_SESSION['UUID'])) {
     $logPath = "../Debug/Users/UUID.log";
 }
 
-if (isset($_SESSION['accountStat'])){
+if (isset($_SESSION['accountStat'])) {
     if ($_SESSION['accountStat'] === 'pending') {
         header('Location: ./WaitingArea.php');
-    } else if ($_SESSION['accountStat'] === 'rejected') {
+    } elseif ($_SESSION['accountStat'] === 'rejected') {
         header('Location: ../Functions/api/UserLogout.php');
     }
 }
@@ -34,12 +34,14 @@ $_SESSION['last_activity'] = time();
 ?>
 
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="<?php echo $_SESSION['theme']; ?>">
+<html lang="en"
+    data-bs-theme="<?php echo $_SESSION['theme']; ?>">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../Utilities/Third-party/Bootstrap/css/bootstrap.css">
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
     <link rel="stylesheet" href="../../Utilities/Stylesheets/BGaniStyle.css">
     <link rel="stylesheet" href="../../Utilities/Third-party/AOS/css/aos.css">
     <link rel="stylesheet" href="../../Utilities/Stylesheets/CustomStyle.css">
@@ -47,10 +49,12 @@ $_SESSION['last_activity'] = time();
     <link rel="stylesheet" href="../../Utilities/Stylesheets/ProfileStyle.css">
     <link rel="shortcut icon" href="../../Assets/Icons/PWA-Icon/MainIcon.png" type="image/x-icon">
     <script defer src="../../Utilities/Third-party/Bootstrap/js/bootstrap.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
     <script src="../../Utilities/Third-party/Sweetalert2/js/sweetalert2.all.min.js"></script>
     <script src="../../Utilities/Third-party/JQuery/js/jquery.min.js"></script>
     <script src="../../Utilities/Scripts/animate-browser-title.js"></script>
     <script type="module" src="../../Utilities/Scripts/ProfileScript.js"></script>
+
     <title>Profile</title>
 </head>
 
@@ -154,14 +158,17 @@ $_SESSION['last_activity'] = time();
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-floating">
+                                            <div class="form-floating d-none">
                                                 <textarea class="form-control border-0" placeholder="Create a Post"
                                                     style="white-space: pre-wrap;" id="post-details"
                                                     style="height: 100px" maxlength="500" required rows="10"></textarea>
                                                 <label for="post-details">What's on your mind?</label>
                                             </div>
-
+                                            <div id="editor" class="form-control border-0 rounded-1 vh-50"
+                                                style="height: 300px; overflow-y: auto;">
+                                            </div>
                                             <hr>
+                                            <small class="text-muted">Reminder: Once posted, your announcement is permanent and visible to everyone. It cannot be edited, only deleted if necessary—make sure your message is final before posting!</small>
                                             <div class="hstack gap-1">
                                                 <div>
                                                     <button class="btn btn-sm btn-primary rounded-1 border-0 my-1 px-5"
@@ -173,14 +180,20 @@ $_SESSION['last_activity'] = time();
                                                     </button>
                                                 </div>
                                                 <div class="ms-auto blockquote-footer my-1">
-                                                    <small>
+                                                    <small class="">
                                                         <cite>
                                                             <small class="text-muted" id="charCount">0/500</small>
                                                             <input id="USER_UUID" type="hidden"
                                                                 value="<?php echo $_SESSION['UUID']; ?>">
                                                         </cite>
                                                     </small>
-                                                    <button class="btn btn-sm btn-outline-secondary rounded-1 my-1 ms-4"
+                                                    <button class="btn btn-sm btn-outline-danger border-0 rounded-1 my-1" id="ClearPost">
+                                                        <svg width="24" height="24">
+                                                            <use xlink:href="#Trash" />
+                                                        </svg>
+                                                        <span class="d-sm-none ms-2">Clear</span>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-secondary border-0 rounded-1 my-1"
                                                         data-bs-dismiss="modal" id="closePostModal">
                                                         <svg width="24" height="24">
                                                             <use xlink:href="#Close" />
@@ -206,20 +219,21 @@ $_SESSION['last_activity'] = time();
                 <div class="modal-body">
                     <div class="container">
                         <div class="row g-2 row-cols-1 row-cols-md-2">
-                            <div class="col-md-4 d-flex justify-content-center align-items-center">
+                            <div class="col-md-12 d-flex justify-content-center align-items-center">
                                 <?php if ($_SESSION['ProfileImage'] == "Default-Profile.gif") { ?>
-                                    <img src="../../Assets/Images/Default-Profile.gif" class="img-fluid border-3 rounded-circle"
-                                        width="192" height="192" alt="<?php echo $_SESSION['FirstName'] . ' ' . $_SESSION['LastName']; ?> Profile Image">
+                                <img src="../../Assets/Images/Default-Profile.gif"
+                                    class="img-fluid border-3 rounded-circle" width="192" height="192"
+                                    alt="<?php echo $_SESSION['FirstName'] . ' ' . $_SESSION['LastName']; ?> Profile Image">
                                 <?php } else { ?>
-                                    <img src="../../Assets/Images/UserProfiles/<?php echo $_SESSION['ProfileImage']; ?>"
-                                        class="img-fluid border rounded-circle" width="192" height="192"
+                                <img src="../../Assets/Images/UserProfiles/<?php echo $_SESSION['ProfileImage']; ?>"
+                                    class="img-fluid border rounded-circle" width="192" height="192"
                                     alt="<?php echo $_SESSION['FirstName'] . ' ' . $_SESSION['LastName']; ?> Profile Image">
                                 <?php } ?>
                             </div>
-                            <div class="col-md-8">
+                            <div class="col-md-8 d-none">
                                 <div class="ratio ratio-16x9 rounded-3 bg-body bg-opacity-10 bg-blur-3">
-                                    <img src="../../Assets/Images/Default-Cover.gif" alt="Cover Image"
-                                        class="object-fit-cover border-0 rounded-3 p-0">
+                                    <img src="../../Assets/Images/orgAssets/orgCover/Default-CSG-Cover.jpg"
+                                        alt="Cover Image" class="object-fit-cover border-0 rounded-3 p-0">
                                 </div>
                             </div>
                         </div>
@@ -231,7 +245,7 @@ $_SESSION['last_activity'] = time();
                                 <span>Update Profile</span>
                                 <input type="file" class="d-none" id="change-profile" accept="image/*">
                             </button>
-                            <button class="btn btn-sm text-light fw-bold rounded-1 border-0 me-5">
+                            <button class="btn btn-sm text-light fw-bold rounded-1 border-0 me-5 d-none">
                                 <svg width="24" height="24">
                                     <use xlink:href="#changeCov" />
                                 </svg>
@@ -250,25 +264,25 @@ $_SESSION['last_activity'] = time();
                                             value="<?php echo $_SESSION['FirstName'] . ' ' . $_SESSION['LastName']; ?>">
                                     </li>
                                     <li
-                                        class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 bg-body bg-opacity-10 bg-blur-3">
+                                        class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 bg-body bg-opacity-10 bg-blur-3 d-none">
                                         Role
                                         <select class="form-select border-0 rounded-0 text-end w-50 bg-transparent">
                                             <?php
-                                            
+
                                             $roles = [
                                                 1 => 'ADMINISTRATOR',
                                                 2 => 'CSG OFFICER',
                                                 3 => 'OFFICER'
                                             ];
-                                            
-                                            foreach ($roles as $role => $label) {
-                                                echo '<option value="' . $role . '" ' . ($role == $_SESSION['role'] ? 'selected' : '') . '' . ($role == 1 ? 'disabled' : ($role == 3 ? 'disabled' : '')) . '>' . $label . '</option>';
-                                            }
-                                            ?>
+
+foreach ($roles as $role => $label) {
+    echo '<option value="' . $role . '" ' . ($role == $_SESSION['role'] ? 'selected' : '') . '' . ($role == 1 ? 'disabled' : ($role == 3 ? 'disabled' : '')) . '>' . $label . '</option>';
+}
+?>
                                         </select>
                                     </li>
                                     <li
-                                        class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 bg-body bg-opacity-10 bg-blur-3">
+                                        class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 bg-body bg-opacity-10 bg-blur-3 <?php echo $_SESSION['role'] == 1 ? 'd-none' : ''; ?>">
                                         Organization
                                         <select class="form-select border-0 rounded-0 text-end w-50 bg-transparent">
                                             <?php if ($_SESSION['role'] != 1) {
@@ -327,7 +341,8 @@ $_SESSION['last_activity'] = time();
                                         class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 bg-body bg-opacity-10 bg-blur-3">
                                         Contact Number
                                         <input type="text" class="form-control border-0 text-end w-50 bg-transparent"
-                                            value="<?php echo $_SESSION['contactNumber']; ?>" pattern="[0-9]{11}" placeholder="09xxxxxxxxx">
+                                            value="<?php echo $_SESSION['contactNumber']; ?>"
+                                            pattern="[0-9]{11}" placeholder="09xxxxxxxxx">
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 bg-body bg-opacity-10 bg-blur-3">
@@ -374,28 +389,47 @@ $_SESSION['last_activity'] = time();
                         .spacer {
                             height: 192px;
                             width: 100%;
-
                         }
                     </style>
                     <?php if ($_SESSION['ProfileImage'] == "Default-Profile.gif") {?>
-                        <img src="../../Assets/Images/Default-Profile.gif" alt="" class="img-fluid border rounded-circle mt-lg-3" width="128" height="128">
+                    <img src="../../Assets/Images/Default-Profile.gif" alt=""
+                        class="img-fluid border rounded-circle mt-lg-3" width="128" height="128">
                     <?php } else {?>
-                        <img src="../../Assets/Images/UserProfiles/<?php echo $_SESSION['ProfileImage']?>" alt="" class="img-fluid border rounded-circle mt-lg-3" width="128" height="128">
+                    <img src="../../Assets/Images/UserProfiles/<?php echo $_SESSION['ProfileImage']?>"
+                        alt="" class="img-fluid border rounded-circle mt-lg-3" width="128" height="128">
                     <?php }?>
-                    
+
                     <h5 class="fw-bold mt-2 text-truncate">
                         <?php echo $_SESSION['FirstName'] . ' ' . $_SESSION['LastName']; ?>
                     </h5>
                     <p class="text-secondary text-uppercase fw-bold">
-                        <?php
-                            if ($_SESSION['role'] == 1) {
-                                $role = 'Administrator';
-                            } elseif ($_SESSION['role'] == 2) {
-                                $role = "CSG Officer";
-                            } else {
-                                $role = 'Officer';
-                            }echo $role;
-?>
+                        <?php $stmt = $conn->prepare("SELECT * FROM userpositions WHERE UUID = ?");
+$stmt->bind_param("s", $_SESSION['UUID']);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$stmt->close();
+
+if ($row['org_code'] != null) {
+    $stmt = $conn->prepare("SELECT org_short_name FROM sysorganizations WHERE org_code = ?");
+    $stmt->bind_param("i", $row['org_code']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $org = $result->fetch_assoc();
+    $stmt->close();
+
+    if ($row['org_position'] == 1) {
+        echo $org['org_short_name'] . " President";
+    } elseif ($row['org_position'] == 2) {
+        echo $org['org_short_name'] . " Vice President Internal";
+    } elseif ($row['org_position'] == 3) {
+        echo $org['org_short_name'] . " Vice President External";
+    } else {
+        echo $org['org_short_name'] . " Secretary";
+    }
+} else {
+    echo "Administrator";
+} ?>
                     </p>
                     <div class="d-flex justify-content-center">
                         <div class="hstack gap-2">
@@ -422,7 +456,10 @@ $_SESSION['last_activity'] = time();
             </div>
             <div class="col-md-9 order-1 border-0 bg-transparent">
                 <div class="converpic ratio ratio-16x9 border-0 bg-opacity-10 bg-blur-3">
-                    <img src="" class="object-fit-cover rounded-5 rounded-top-0" alt="Cover Image" id="coverImage">
+                    <img src="" class="object-fit-cover rounded-5 rounded-top-0 d-none" alt="Cover Image"
+                        id="coverImage">
+                    <img src="../../Assets/Images/orgAssets/orgCover/Default-CSG-Cover.jpg"
+                        class="object-fit-cover rounded-5 rounded-top-0" alt="Cover Image">
                 </div>
             </div>
         </div>
@@ -437,16 +474,78 @@ $_SESSION['last_activity'] = time();
                                 <div class="card-body">
                                     <ul class="list-group list-group-flush">
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            A list item
-                                            <span>asdsdsd</span>
+                                            Course & Section
+                                            <span><?php echo $_SESSION['course_code']; ?></span>
                                         </li>
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            A list item
-                                            <span>asdsdsd</span>
+                                            Organization
+                                            <span>
+                                                <?php
+                                                    try {
+                                                        $stmt = $conn->prepare("SELECT * FROM userpositions WHERE UUID = ?");
+                                                        $stmt->bind_param("s", $_SESSION['UUID']);
+                                                        $stmt->execute();
+                                                        $userPositionResult = $stmt->get_result();
+                                                        $stmt->close();
+
+                                                        if ($userPositionResult->num_rows > 0) {
+                                                            $userPosition = $userPositionResult->fetch_assoc();
+
+                                                            $stmt = $conn->prepare("SELECT * FROM sysorganizations WHERE org_code = ?");
+                                                            $stmt->bind_param("s", $userPosition['org_code']);
+                                                            $stmt->execute();
+                                                            $orgResult = $stmt->get_result();
+                                                            $stmt->close();
+
+                                                            if ($orgResult->num_rows > 0) {
+                                                                $org = $orgResult->fetch_assoc();
+                                                                echo $org['org_name'];
+                                                            } else {
+                                                                echo 'No Organization';
+                                                            }
+                                                        } else {
+                                                            echo 'No Organization';
+                                                        }
+                                                    } catch (Exception $e) {
+                                                        error_log("Database error: " . $e->getMessage());
+                                                        echo 'Error retrieving organization';
+                                                    }
+?>
+                                            </span>
                                         </li>
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            A list item
-                                            <span>asdsdsd</span>
+                                            Position
+                                            <span>
+                                                <?php
+    try {
+        $stmt = $conn->prepare("SELECT * FROM userpositions WHERE UUID = ?");
+        $stmt->bind_param("s", $_SESSION['UUID']);
+        $stmt->execute();
+        $userPositionResult = $stmt->get_result();
+        $stmt->close();
+
+        if ($userPositionResult->num_rows > 0) {
+            $userPosition = $userPositionResult->fetch_assoc();
+            if ($userPosition['org_position'] == 1) {
+                echo ' President';
+            } elseif ($userPosition['org_position'] == 2) {
+                echo ' Vice President for Internal Affairs';
+            } elseif ($userPosition['org_position'] == 3) {
+                echo ' Vice President for External Affairs';
+            } elseif ($userPosition['org_position'] == 4) {
+                echo ' Secretary';
+            } else {
+                echo 'No Position';
+            }
+        } else {
+            echo 'No Position';
+        }
+    } catch (Exception $e) {
+        error_log("Database error: " . $e->getMessage());
+        echo 'Error retrieving position';
+    }
+?>
+                                            </span>
                                         </li>
                                     </ul>
                                 </div>
@@ -463,16 +562,16 @@ $_SESSION['last_activity'] = time();
                                 <div class="card-body">
                                     <ul class="list-group list-group-flush">
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            A list item
-                                            <span>asdsdsd</span>
+                                            Cvsu Email
+                                            <span><?php echo $_SESSION['PrimaryEmail']; ?></span>
                                         </li>
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            A list item
-                                            <span>asdsdsd</span>
+                                            Contact Number
+                                            <span><?php echo "0" . $_SESSION['contactNumber']; ?></span>
                                         </li>
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            A list item
-                                            <span>asdsdsd</span>
+                                            Student Number
+                                            <span><?php echo $_SESSION['student_Number']; ?></span>
                                         </li>
                                     </ul>
                                 </div>
@@ -484,9 +583,9 @@ $_SESSION['last_activity'] = time();
             <div class="col-md-12">
                 <div class="card border-0 bg-transparent">
                     <div class="card-body">
-                        <div class="hstack gap-3 justify-content-center">
+                        <div class="hstack gap-3">
                             <span data-bs-toggle="tooltip" data-bs-placement="bottom" title="Create New Post"
-                                class="me-md-auto">
+                                class="me-md-auto <?php echo $_SESSION['role'] > 2 ? 'd-none' : ''; ?>">
                                 <button class="btn btn-sm btn-outline-primary rounded-1 border-0" data-bs-toggle="modal"
                                     data-bs-target="#NewPostModal">
                                     <svg width="30" height="30">
@@ -495,8 +594,7 @@ $_SESSION['last_activity'] = time();
                                     <span class="d-sm-none">New Post</span>
                                 </button>
                             </span>
-                            <button class="btn btn-sm btn-outline-primary rounded-1">Button 1</button>
-                            <button class="btn btn-sm btn-outline-secondary rounded-1 border-0"
+                            <button class="btn btn-sm btn-outline-secondary rounded-1 border-0 ms-auto"
                                 onclick="window.location.href='../Functions/api/UserLogout.php'">
                                 <!-- logout -->
                                 <svg width="30" height="30">
@@ -511,7 +609,8 @@ $_SESSION['last_activity'] = time();
         </div>
     </div>
     <hr>
-    <div class="container">
+    <div
+        class="container <?php echo $_SESSION['role'] > 2 ? 'd-none' : ''; ?>">
         <div class="text-center mt-3">
             <h1>Your Posts</h1>
             <div class="hstack gap-3">
@@ -565,7 +664,69 @@ $_SESSION['last_activity'] = time();
     </div>
     <script src="../../Utilities/Third-party/AOS/js/aos.js"></script>
     <script>
+        const toolbarOptions = [
+            [{'header': [1, 2, 3, 4, 5, 6, false]}],
+            ['bold', 'italic', 'underline', 'strike'], // toggled buttons
+            [{'header': 1 }, {'header': 2 }], // custom button values
+            [{'size': ['small', false, 'large', 'huge']}],
+            ['blockquote', 'code-block'],
+            [{'list': 'ordered'}, {'list': 'bullet'}, {'list': 'check'}],
+            [{'script': 'sub'}, {'script': 'super'}], // superscript/subscript
+            [{'indent': '-1'}, {'indent': '+1'}], // outdent/indent
+            [{'direction': 'rtl'}], // text direction
+            [{'align': [false, 'center', 'right', 'justify']}],
+        ];
         AOS.init();
+        const quill = new Quill('#editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: toolbarOptions
+            },
+            placeholder: 'Create a Post'
+        });
+
+        // add rounded in ql-toolbar
+        $('.ql-toolbar').addClass('border-0 mb-1');
+
+        document.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }, true);
+
+        document.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            swal.fire({
+                title: 'Warning!',
+                text: 'Dropping files is not allowed!',
+                icon: 'warning',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }, true);
+
+        let postDetails = '';
+        quill.on('text-change', function () {
+            // max of 500 characters
+            if (quill.getLength() >= 500) {
+                quill.deleteText(499, quill.getLength());
+                $('#charCount').removeClass('text-muted').addClass('text-danger');
+            } else {
+                $('#charCount').removeClass('text-danger').addClass('text-muted');
+            }
+
+            $('#charCount').text(quill.getLength() + '/500');
+
+
+            postDetails = quill.root.innerHTML;
+            document.getElementById('post-details').value = postDetails;
+        });
+        document.getElementById('ClearPost').addEventListener('click', function () {
+            quill.root.innerHTML = '';
+            $('#post-details').val('');
+        });
+
     </script>
 </body>
 

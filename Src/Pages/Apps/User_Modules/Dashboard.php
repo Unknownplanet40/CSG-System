@@ -14,9 +14,8 @@ if (!isset($_SESSION['UUID'])) {
     echo '<script>var UUID = "' . $_SESSION['UUID'] . '";</script>';
 }
 
-if ($_SESSION['role'] != 1) {
+if ($_SESSION['role'] > 3) {
     header('Location: ../../../Pages/Feed.php');
-
 }
 
 $inactive = 1800; // 30 minutes inactivity
@@ -195,14 +194,7 @@ $_SESSION['last_activity'] = time();
                             </svg>
                             Settings
                         </li>
-                        <li class="list-group-item lg my-2" onclick="window.location.href = './SystemReport.php'"
-                            title="Messages">
-                            <svg class="me-2" width="24" height="24">
-                                <use xlink:href="#Report" />
-                            </svg>
-                            Report
-                        </li>
-                        <li class="list-group-item lg text-danger my-2 mb-4"
+                        <li class="list-group-item lg text-danger my-2"
                             onclick="window.location.href = '../../../Functions/api/UserLogout.php'" title="Logout">
                             <svg class="me-2" width="24" height="24">
                                 <use xlink:href="#Logout" />

@@ -17,7 +17,7 @@
   "display": "standalone",
   "orientation": "natural",
   "scope": "/",
-  "start_url": "./Homepage.php",
+  "start_url": "./Accesspage.php",
   "theme_color": "#ffffff",
   "iarc_rating_id": "e58c174a-81d2-5c3c-32cc-34b8de4a52e9",
   "prefer_related_applications": false,
@@ -37,20 +37,6 @@
     }
   ],
   "shortcuts": [
-    {
-      "name": "Home Page",
-      "short_name": "Home",
-      "url": "./Homepage.php",
-      "description": "Go to the homepage.",
-      "icons": [
-        {
-          "src": "../../Assets/Icons/PWA-Icon/Icon-x96.jpeg",
-          "sizes": "96x96",
-          "type": "image/jpeg",
-          "purpose": "any"
-        }
-      ]
-    },
     {
       "name": "Login / Register",
       "short_name": "Sign In",
@@ -98,8 +84,8 @@
     "client_mode": ["navigate-existing", "auto"]
   },
   "web_apps": {
-    "navigation_scope": "/CSG-System/Src/Pages/Homepage.php",
-    "scope": "/CSG-System/Src/Pages/Homepage.php",
+    "navigation_scope": "/CSG-System/Src/Pages/Accesspage.php",
+    "scope": "/CSG-System/Src/Pages/Accesspage.php",
     "open_as_window": true
   },
   "icons": [

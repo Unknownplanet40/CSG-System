@@ -14,12 +14,15 @@ function response($data)
 }
 
 try {
-    $status = $_GET['status'] ?? 'active';
+    $status = $_GET['status'] ?? null;
+    $orgID = $_GET['ID'];
 
-    if ($status === 'active') {
-        $stmt = $conn->prepare("SELECT * FROM sysorganizations WHERE stat = 0");
-    } else if ($status === 'archived') {
-        $stmt = $conn->prepare("SELECT * FROM sysorganizations WHERE stat = 1");
+    if ($status === 'enable') {
+        $stmt = $conn->prepare("UPDATE sysorganizations SET stat = 0 WHERE org_code = ?");
+        $stmt->bind_param('i', $orgID);
+    } else if ($status === 'disable') {
+        $stmt = $conn->prepare("UPDATE sysorganizations SET stat = 1 WHERE org_code = ?");
+        $stmt->bind_param('i', $orgID);
     } else {
         response(['status' => 'error', 'message' => 'Invalid status', 'data' => []]);
     }
@@ -27,13 +30,7 @@ try {
     $result = $stmt->get_result();
     $stmt->close();
 
-    $data = [];
-    while ($row = $result->fetch_assoc()) {
-        $row['created_At'] = date('F d, Y h:i A', strtotime($row['created_At']));
-        $data[] = $row;
-    }
-
-    response(['status' => 'success', 'data' => $data]);
+    response(['status' => 'success', 'message' => 'Organization status has been updated']);
 } catch (Exception $e) {
     response(['status' => 'error', 'message' => $e->getMessage()]);
 }

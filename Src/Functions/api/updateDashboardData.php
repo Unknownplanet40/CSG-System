@@ -27,7 +27,7 @@ try {
      $stmt->close();
  
      // csg officers
-     $stmt = $conn->prepare("SELECT COUNT(*) AS totalCSGOfficers FROM userpositions WHERE role = 2");
+     $stmt = $conn->prepare("SELECT COUNT(*) AS totalCSGOfficers FROM userpositions JOIN usercredentials ON userpositions.UUID = usercredentials.UUID WHERE userpositions.role = 2 AND usercredentials.accountStat = 'active'");
      $stmt->execute();
      $csgOfficers = $stmt->get_result()->fetch_assoc()['totalCSGOfficers'];
      $stmt->close();
@@ -39,7 +39,7 @@ try {
      $stmt->close();
  
      // locked accounts
-     $stmt = $conn->prepare("SELECT COUNT(*) AS totalLocked FROM usercredentials WHERE accountStat = 'locked'");
+     $stmt = $conn->prepare("SELECT COUNT(*) AS totalLocked FROM accounts WHERE LoginStat = 'locked'");
      $stmt->execute();
      $lockedAccounts = $stmt->get_result()->fetch_assoc()['totalLocked'];
      $stmt->close();

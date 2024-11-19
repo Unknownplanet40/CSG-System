@@ -1,8 +1,12 @@
 <?php
 session_start();
-
 try {
-    $conn = new PDO("mysql:host=localhost;dbname=csg_database;charset=utf8", "csgsystem_root", "a*D)aslmP/4mV4T5");
+    if ($_SERVER['HTTP_HOST'] != 'localhost' && $_SERVER['HTTP_HOST'] == 'dodgerblue-tiger-498833.hostingersite.com') {
+        $conn = new PDO("mysql:host=localhost;dbname=u558575596_csg_database;charset=utf8", "u558575596_csgsystem_root", "@Csgdatabase2024");
+    } else {
+        $conn = new PDO("mysql:host=localhost;dbname=csg_database;charset=utf8", "csgsystem_root", "a*D)aslmP/4mV4T5");
+    }
+    // $conn = new PDO("mysql:host=localhost;dbname=csg_database;charset=utf8", "csgsystem_root", "a*D)aslmP/4mV4T5");
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $conn = null;
     $_SESSION['database_status'] = 'OK';

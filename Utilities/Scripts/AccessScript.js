@@ -7,6 +7,7 @@ import {
   RegisterProcess,
   showCurrentForm,
   changeColor,
+  ActivateProcess,
 } from "./Modules/AccessModules.js";
 
 import {
@@ -18,6 +19,39 @@ import {
 import { QueueNotification } from "./Modules/Queueing_Notification.js";
 
 import { sha256 } from "./Modules/hash256.js";
+
+function getDeviceName() {
+  //Windows NT 10.0
+  //Win64
+  //x64
+
+  var device = "";
+  var deviceDetails = "";
+
+  const isMobileDevice = window.navigator.userAgent
+    .toLowerCase()
+    .includes("mobi");
+
+  if (isMobileDevice) {
+    if (window.navigator.userAgent.includes("Android")) {
+      device = "android";
+      deviceDetails = window.navigator.userAgent.split(")")[0].split("(")[1];
+    } else {
+      device = "ios";
+      deviceDetails = window.navigator.userAgent.split(")")[0].split("(")[1];
+    }
+  } else {
+    device = "windows";
+    deviceDetails = window.navigator.userAgent.split(")")[0].split("(")[1];
+  }
+
+  var details = {
+    device: device,
+    deviceDetails: deviceDetails,
+  };
+
+  return details;
+}
 
 var $ipAddress = null;
 
@@ -45,7 +79,7 @@ $(document).ready(function () {
 
   if (localStorage.getItem("error") != null) {
     var message = localStorage.getItem("error");
-    QueueNotification(["error", message, 5000, "top"]);
+    QueueNotification(["error", message, 5000, "top-end"]);
     localStorage.removeItem("error");
   }
 
@@ -258,7 +292,8 @@ $(document).ready(function () {
       var data = {
         studentnum: $("#Login-stdnum").val(),
         password: $("#Login-password").val(),
-        ipAddress: $ipAddress, // get the Public IP Address of the user
+        ipAddress: $ipAddress,
+        Device: getDeviceName(),
       };
 
       LoginProcess(data);
@@ -1157,5 +1192,63 @@ $(document).ready(function () {
 
       RegisterProcess(data);
     }
+  });
+
+  $("#act-btn").click(function () {
+    let tempMail = $("#act-email").val();
+    let tempPass = $("#act-password").val();
+
+    if (tempMail == "" || tempPass == "") {
+      if (tempMail == "") {
+        $("#act-email").focus();
+        $("#act-email").addClass("is-invalid");
+        $("#act_emailHelp").text("Please enter your email address.");
+
+        $("#act-email").addClass("shake");
+        setTimeout(function () {
+          $("#act-email").removeClass("shake");
+          $("#act-email").removeClass("is-invalid");
+        }, 1500);
+        return;
+      }
+
+      if (tempPass == "") {
+        $("#act-password").focus();
+        $("#act-password").addClass("is-invalid");
+        $("#act_passwordHelp").text("Please enter your password.");
+
+        $("#act-password").addClass("shake");
+        setTimeout(function () {
+          $("#act-password").removeClass("shake");
+          $("#act-password").removeClass("is-invalid");
+        }, 1500);
+        return;
+      }
+    }
+
+    if (!EmailRegex.test(tempMail)) {
+      $("#act-email").focus();
+      $("#act-email").addClass("is-invalid");
+      $("#act_emailHelp").text("Email address is not valid.");
+      return;
+    }
+
+    if (!PasswordRegex.test(tempPass)) {
+      $("#act-password").focus();
+      $("#act-password").addClass("is-invalid");
+      $("#act_passwordHelp").text("Password format is not valid.");
+      return;
+    }
+
+    let data = {
+      email: tempMail,
+      password: tempPass,
+    };
+
+    $("#act-btn").attr("disabled", "disabled");
+    $("#act-btn-label").addClass("d-none");
+    $("#act-btn-loader").removeClass("d-none");
+
+    ActivateProcess(data);
   });
 });

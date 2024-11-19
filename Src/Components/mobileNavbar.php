@@ -15,7 +15,7 @@
                 </a>
             </div>
             <div class="col-3">
-                <a class="col-Items" id="b_ItemNav_Reg" onclick="HomeRedirect()">
+                <a class="col-Items" id="b_ItemNav_Reg" onclick="RedirectToRegister()">
                     <svg width="32" height="32">
                         <use xlink:href="#Home"></use>
                     </svg>
@@ -40,7 +40,7 @@
                         </div>
                     </div>
                     <hr class="dropdown-divider">
-                    ano lalagay ko dinto hahahahahhaa
+                    <!-- ano lalagay ko dinto hahahahahhaa -->
                 </div>
             </div>
         </div>

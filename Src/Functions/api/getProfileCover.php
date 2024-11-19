@@ -69,11 +69,13 @@ try {
                     $cover = $coverPhoto->fetch_assoc();
                     $cover = 'Default-' . $shortName . '-' . $cover['useFor'] . '.' . $cover['imageExt'];
                     response(['status' => 'success', 'cover' => $cover]);
+                } else {
+                    response(['status' => 'success', 'cover' => 'Default-Cover.gif']);
                 }
             }
+        } else {
+            response(['status' => 'success', 'cover' => 'Default-Cover.gif']);
         }
-
-        response(['status' => 'success', 'cover' => 'Default-Cover.gif']);
     }
 } catch (Exception $e) {
     response(['status' => 'error', 'message' => 'Failed to get cover photo (' . $e->getMessage() . ')']);
