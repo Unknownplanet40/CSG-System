@@ -31,6 +31,8 @@ try {
     $stmt->execute();
     $data = [];
     $profile = "";
+    $position_Out = "";
+    $org_Out = "";
 
     $result = $stmt->get_result();
     $stmt->close();
@@ -40,7 +42,7 @@ try {
 
             if (isset($_SESSION['UUID']) && $row['UUID'] == $_SESSION['UUID']) {
                 continue;
-            } 
+            }
 
             $stmt = $conn->prepare("SELECT * FROM userprofile WHERE UUID = ?");
             $stmt->bind_param("s", $row['UUID']);
@@ -72,13 +74,13 @@ try {
                     }
 
                     if ($position['org_position'] == 1) {
-                        $position['org_position'] = "President";
-                    } else if ($position['org_position'] == 2){
-                        $position['org_position'] = "Vice President for Internal Affairs";
-                    } else if ($position['org_position'] == 3){
-                        $position['org_position'] = "Vice President for External Affairs";
+                        $position_Out = "President";
+                    } elseif ($position['org_position'] == 2) {
+                        $position_Out = "Vice President Internal";
+                    } elseif ($position['org_position'] == 3) {
+                        $position_Out = "Vice President External";
                     } else {
-                        $position['org_position'] = "Secretary";
+                        $position_Out = "Secretary";
                     }
 
                     $stmt = $conn->prepare("SELECT * FROM sysorganizations WHERE org_code = ?");
@@ -89,14 +91,42 @@ try {
 
                     if ($org->num_rows > 0) {
                         $org = $org->fetch_assoc();
-                        $org = $org['org_short_name'];
+                        $org_Out = $org['org_short_name'];
                     }
                 }
             } else {
-                $position['org_position'] = "No Position";
-                $org = "No Organization";
+                if ($position->num_rows > 0) {
+                    $position = $position->fetch_assoc();
+
+                    if ($position['org_position'] == 1) {
+                        $position_Out = "President";
+                    } elseif ($position['org_position'] == 2) {
+                        $position_Out = "Vice President Internal";
+                    } elseif ($position['org_position'] == 3) {
+                        $position_Out = "Vice President External";
+                    } elseif ($position['org_position'] == 4) {
+                        $position_Out = "Secretary";
+                    } else {
+                        $position_Out = "";
+                    }
+
+                    if ($position['org_code'] != null) {
+                        $stmt = $conn->prepare("SELECT * FROM sysorganizations WHERE org_code = ?");
+                        $stmt->bind_param("i", $position['org_code']);
+                        $stmt->execute();
+                        $org = $stmt->get_result();
+                        $stmt->close();
+
+                        if ($org->num_rows > 0) {
+                            $org = $org->fetch_assoc();
+                            $org_Out = $org['org_short_name'];
+                        }
+                    } else {
+                        $org_Out = "Administator";
+                    }
+                }
             }
-            
+
 
             $data[] = [
                 'UUID' => $row['UUID'],
@@ -106,8 +136,8 @@ try {
                 'isLogin' => $row['isLogin'],
                 'fullName' => $row['fullName'],
                 'profile' => $profile,
-                'position' => $position['org_position'],
-                'org' => $org
+                'position' => $position_Out,
+                'org' => $org_Out
             ];
         }
 

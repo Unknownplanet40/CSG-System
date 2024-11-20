@@ -7,23 +7,23 @@ if (isset($_GET['pending'])) {
     session_unset();
     session_destroy();
     header('Location: ./Accesspage.php');
-}
-
-if (isset($_SESSION['UUID'])) {
-    header('Location: ./Feed.php'); // if the user is already logged in, redirect to the homepage
-    echo "<script>localStorage.setItem('currentUser', '" . Hash('sha256', $_SESSION['student_Number']) . "');" . "</script>";
-    echo "<script>localStorage.setItem('activesession', 'An account is already logged into this browser. For security reasons, please log out of the current session or use a different browser, incognito mode, or guest mode to sign in with another account.');</script>";
 } else {
-    echo "<script>localStorage.removeItem('currentUser');</script>";
-    echo "<script>localStorage.removeItem('activesession');</script>";
-}
+    if (isset($_SESSION['UUID'])) {
+        header('Location: ./Feed.php'); // if the user is already logged in, redirect to the homepage
+        echo "<script>localStorage.setItem('currentUser', '" . Hash('sha256', $_SESSION['student_Number']) . "');" . "</script>";
+        echo "<script>localStorage.setItem('activesession', 'An account is already logged into this browser. For security reasons, please log out of the current session or use a different browser, incognito mode, or guest mode to sign in with another account.');</script>";
+    } else {
+        echo "<script>localStorage.removeItem('currentUser');</script>";
+        echo "<script>localStorage.removeItem('activesession');</script>";
+    }
 
-if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
-    echo "<script>localStorage.setItem('studentnum', '" . $_GET['studentnum'] . "');</script>";
-    echo "<script>localStorage.setItem('password', '" . $_GET['password'] . "');</script>";
-} else {
-    echo "<script>localStorage.removeItem('studentnum');</script>";
-    echo "<script>localStorage.removeItem('password');</script>";
+    if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
+        echo "<script>localStorage.setItem('studentnum', '" . $_GET['studentnum'] . "');</script>";
+        echo "<script>localStorage.setItem('password', '" . $_GET['password'] . "');</script>";
+    } else {
+        echo "<script>localStorage.removeItem('studentnum');</script>";
+        echo "<script>localStorage.removeItem('password');</script>";
+    }
 }
 ?>
 
@@ -82,7 +82,7 @@ if (isset($_GET['autoLogin']) && $_GET['autoLogin'] == 'true') {
         } elseif ($_GET['error'] == '004') {
             echo "<script>localStorage.setItem('error', 'You have encountered an E-K404 error. Please contact the administrator for assistance.');</script>";
             unset($_GET['error']);
-        } else if ($_GET['error'] == '005') {
+        } elseif ($_GET['error'] == '005') {
             echo "<script>localStorage.setItem('error', 'Please activate your account before proceeding.');</script>";
             unset($_GET['error']);
         } else {
