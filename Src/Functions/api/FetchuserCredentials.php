@@ -59,8 +59,12 @@ function fetchUserCredentials($conn, $studentNumber, $device)
             if ($pos->num_rows > 0) {
                 $position = $pos->fetch_assoc();
                 $role = $position['role'];
+                $org_position = $position['org_position'];
+                $org_ID = $position['org_code'];
             } else {
                 $role = 3;
+                $org_position = null;
+                $org_ID = null;
             }
 
             $stmt = $conn->prepare("SELECT * FROM usersettings WHERE UUID = ?");
@@ -119,6 +123,8 @@ function fetchUserCredentials($conn, $studentNumber, $device)
             $_SESSION['course_code'] = $row['course_code'];
             $_SESSION['accountStat'] = $row['accountStat'];
             $_SESSION['FullName'] = $row['fullName'];
+            $_SESSION['org_position'] = $org_position;
+            $_SESSION['org_Code'] = $org_ID;
         }
 
         $data = [
@@ -137,7 +143,9 @@ function fetchUserCredentials($conn, $studentNumber, $device)
             'contactNumber' => $_SESSION['contactNumber'],
             'course_code' => $_SESSION['course_code'],
             'accountStat' => $_SESSION['accountStat'],
-            'FullName' => $_SESSION['FullName']
+            'FullName' => $_SESSION['FullName'],
+            'org_position' => $_SESSION['org_position'],
+            'org_Code' => $_SESSION['org_Code']
         ];
         unset($_SESSION['sessionID']);
         return $data;

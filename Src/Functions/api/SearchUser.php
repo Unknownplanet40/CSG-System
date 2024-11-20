@@ -55,18 +55,48 @@ try {
                 $profile = "Default-Profile.gif";
             }
 
-            /* for ($i = 0; $i <= 5; $i++) {
-                $data[] = [
-                    'UUID' => $row['UUID'],
-                    'First_Name' => $row['First_Name'],
-                    'Last_Name' => $row['Last_Name'],
-                    'primary_email' => $row['primary_email'],
-                    'isLogin' => $row['isLogin'],
-                    'fullName' => $row['fullName'],
-                    'profile' => $profile
-                ];
-            } */
+            $stmt = $conn->prepare("SELECT * FROM userpositions WHERE UUID = ?");
+            $stmt->bind_param("s", $row['UUID']);
+            $stmt->execute();
+            $position = $stmt->get_result();
+            $stmt->close();
 
+
+            if ($_SESSION['role'] > 2) {
+                if ($position->num_rows > 0) {
+                    $position = $position->fetch_assoc();
+                    if ($position['org_code'] != $_SESSION['org_Code']) {
+                        if ($position['org_position'] != $_SESSION['org_position']) {
+                            continue;
+                        }
+                    }
+
+                    if ($position['org_position'] == 1) {
+                        $position['org_position'] = "President";
+                    } else if ($position['org_position'] == 2){
+                        $position['org_position'] = "Vice President for Internal Affairs";
+                    } else if ($position['org_position'] == 3){
+                        $position['org_position'] = "Vice President for External Affairs";
+                    } else {
+                        $position['org_position'] = "Secretary";
+                    }
+
+                    $stmt = $conn->prepare("SELECT * FROM sysorganizations WHERE org_code = ?");
+                    $stmt->bind_param("i", $position['org_code']);
+                    $stmt->execute();
+                    $org = $stmt->get_result();
+                    $stmt->close();
+
+                    if ($org->num_rows > 0) {
+                        $org = $org->fetch_assoc();
+                        $org = $org['org_short_name'];
+                    }
+                }
+            } else {
+                $position['org_position'] = "No Position";
+                $org = "No Organization";
+            }
+            
 
             $data[] = [
                 'UUID' => $row['UUID'],
@@ -75,7 +105,9 @@ try {
                 'primary_email' => $row['primary_email'],
                 'isLogin' => $row['isLogin'],
                 'fullName' => $row['fullName'],
-                'profile' => $profile
+                'profile' => $profile,
+                'position' => $position['org_position'],
+                'org' => $org
             ];
         }
 

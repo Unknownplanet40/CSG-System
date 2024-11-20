@@ -54,7 +54,7 @@ $(document).ready(function () {
   );
 
   function LogoutBTN() {
-    Swal.mixin({
+    /* Swal.mixin({
       toast: true,
       position: "bottom-start",
       showConfirmButton: true,
@@ -79,7 +79,8 @@ $(document).ready(function () {
     }).fire({
       icon: "warning",
       title: "Are you sure you want to logout?",
-    });
+    }); */
+    window.location.href = $("#Logout-Button").attr("data-LogoutLink");
   }
 
   $("#Logout-Button").click(function () {
@@ -146,8 +147,14 @@ $(document).ready(function () {
                                                   } ${user.Last_Name}</p>
                                                   <small class="moveu text-truncate" style="max-width: 150px;">${
                                                     user.isLogin === 1
-                                                      ? `<span class="fw-bold text-success">Online</span>`
-                                                      : `<span class="fw-light text-danger">Offline</span>`
+                                                      ? `
+                                                      <div class="hstack gap-1 fw-bold text-success">
+                                                        <span>${user.org} ${user.position}</span>
+                                                      </div>`
+                                                      : `
+                                                      <div class="hstack gap-1 fw-bold text-danger">
+                                                        <span>${user.org} ${user.position}</span>
+                                                      </div>`
                                                   }</small>
                                               </div>
                                           </div>

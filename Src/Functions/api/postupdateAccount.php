@@ -124,7 +124,7 @@ try {
         response(['stat' => 'error', 'message' => 'Cannot process request at the moment']); 
     } else {
 
-        $stmt = $conn->prepare("INSERT INTO accounts (UUID, student_Number, password, isLogin, accessDate, ipAddress) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO accounts (UUID, student_Number, password, isLogin, access_date, ipAddress) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->execute([$perUUID, $perStudentno, $password, $isLogin, $created_at, $IPADDRESS]);
         $stmt->close();
 
