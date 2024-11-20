@@ -6,7 +6,7 @@ import {
 
 $(document).ready(function () {
   setInterval(() => {
-    checkifISLogin("../../../Functions/api/checkUserLogin.php");
+    checkifISLogin("../../../Functions/api/checkUserLogin.php", "../../../Functions/api/UserLogout.php?error=001");
     checkIfSessionChange("../../../Functions/api/checkSession.php");
   }, 5000);
 

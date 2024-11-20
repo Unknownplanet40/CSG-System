@@ -4,25 +4,7 @@ import {
   sessionAlert,
 } from "./Modules/FeedModules.js";
 
-$("#currentDate").text(
-  new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  })
-);
-
-$("#currentTime").text(
-  new Date().toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  })
-);
-
-setInterval(() => {
+function updateDateTime() {
   $("#currentDate").text(
     new Date().toLocaleDateString("en-US", {
       weekday: "long",
@@ -40,11 +22,14 @@ setInterval(() => {
       hour12: true,
     })
   );
-}, 1000);
+}
+
+updateDateTime();
+setInterval(updateDateTime, 1000);
 
 $(document).ready(function () {
   setInterval(() => {
-    checkifISLogin("../../../Functions/api/checkUserLogin.php");
+    checkifISLogin("../../../Functions/api/checkUserLogin.php", "../../../Functions/api/UserLogout.php?error=001");
     checkIfSessionChange("../../../Functions/api/checkSession.php");
   }, 5000);
 

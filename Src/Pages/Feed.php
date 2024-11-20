@@ -197,7 +197,7 @@ $logout = '../Functions/api/UserLogout.php';
                 </div>
             </div>
         </div>
-        <?php include_once '../Components/mobileNavbar_Feed.php'; ?>
+        <?php include_once '../Components/mobileNavbar.php'; ?>
         <div class="container-fluid mt-3 con-H">
             <div class="row row-cols-1 row-cols-xl-3 row-cols-lg-3 row-cols-md-2 g-0">
                 <div class="order-md-2 col-xl-7 col-lg-7 col-md-7">
@@ -215,52 +215,7 @@ $logout = '../Functions/api/UserLogout.php';
                     </div>
                 </div>
                 <div class="order-md-1 col-xl-2 col-lg-2 d-none d-lg-block">
-                    <div class="sidecon d-flex align-items-center">
-                        <ul class="list-group list-group-flush feedsidebar user-select-none">
-                            <li class="list-group-item border-0 rounded-pill feedsidebaritems feed-slected"
-                                id="Feed-btn">
-                                <svg width="24" height="24">
-                                    <use xlink:href="#Feed"></use>
-                                </svg>
-                                <span class="ms-2">Feed</span>
-                            </li>
-                            <li class="list-group-item border-0 rounded-pill feedsidebaritems"
-                                onclick="window.location.href='./Profile.php'" id="Profile-btn">
-                                <svg width="24" height="24">
-                                    <use xlink:href="#Profile"></use>
-                                </svg>
-                                <span class="ms-2">Profile</span>
-                            </li>
-                            <li class="list-group-item border-0 rounded-pill feedsidebaritems <?php echo $_SESSION['role'] != 1 ? 'd-none' : ''; ?>"
-                                id="Dashboard-btn" onclick="window.location.href='./Apps/ADMIN/Dashboard.php'">
-                                <svg width="24" height="24">
-                                    <use xlink:href="#Dashboard"></use>
-                                </svg>
-                                <span class="ms-2">Dashboard</span>
-                            </li>
-                            <li class="list-group-item border-0 rounded-pill feedsidebaritems d-none"
-                                id="Placeholder-btn">
-                                <svg width="24" height="24">
-                                    <use xlink:href="#TestIcon"></use>
-                                </svg>
-                                <span class="ms-2">Placeholder</span>
-                            </li>
-                            <li class="list-group-item border-0 rounded-pill feedsidebaritems" id="Preferences-btn"
-                                onclick="window.location.href='./Preference.php'">
-                                <svg width="24" height="24">
-                                    <use xlink:href="#Settings"></use>
-                                </svg>
-                                <span class="ms-2">Preferences</span>
-                            </li>
-                            <li class="list-group-item border-0 rounded-pill feedsidebaritems" id="Logout-Button"
-                                data-LogoutLink="<?php echo $logout; ?>">
-                                <svg width="24" height="24">
-                                    <use xlink:href="#Logout"></use>
-                                </svg>
-                                <span class="ms-2">Logout</span>
-                            </li>
-                        </ul>
-                    </div>
+                    <?php include_once './MPSB.php'; ?>
                 </div>
                 <div class="order-md-3 col-xl-3 col-lg-3 col-md-5 mb-2">
                     <div class="container-fluid rounded-0 conbox" id="UserBox">

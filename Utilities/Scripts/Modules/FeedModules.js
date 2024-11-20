@@ -393,7 +393,7 @@ export function loadUsers() {
   });
 }
 
-export function checkifISLogin(path = "../Functions/api/checkUserLogin.php") {
+export function checkifISLogin(path = "../Functions/api/checkUserLogin.php", errorpath = "../Functions/api/UserLogout.php?error=001") {
   $.ajax({
     url: path,
     type: "GET",
@@ -403,8 +403,7 @@ export function checkifISLogin(path = "../Functions/api/checkUserLogin.php") {
     success: function (data) {
       if (data.status === "success") {
         if (!data.isLogin) {
-          window.location.href =
-            "../../Src/Functions/api/UserLogout.php?error=001";
+          window.location.href = errorpath;
         }
       }
     },
