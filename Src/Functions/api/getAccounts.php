@@ -67,6 +67,20 @@ if ($result->num_rows > 0) {
             $row['Last_Name'] = '';
         }
 
+        $stmt = $conn->prepare("SELECT * FROM accounts WHERE UUID = ?");
+        $stmt->bind_param("s", $row['UUID']);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $stmt->close();
+
+        $account = $res->fetch_assoc();
+
+        if ($account) {
+            $isLocked = $account['LoginStat'] == 'Locked' ? true : false;
+        } else {
+            $isLocked = false;
+        }
+
         if ($_GET['type'] == 'user') {
             if ($row['role'] > 1) {
 
@@ -100,6 +114,7 @@ if ($result->num_rows > 0) {
                     'role' => $row['role'],
                     'org_code' => $row['org_code'],
                     'org_position' => $row['org_position'],
+                    'isLocked' => $isLocked,
                 ];
             } else {
                 continue;
@@ -123,6 +138,7 @@ if ($result->num_rows > 0) {
                         'sessionID' => $row['sessionID'],
                         'created_at' => $row['created_at'],
                         'role' => $row['role'],
+                        'isLocked' => $isLocked,
                     ];
                 }
             } else {

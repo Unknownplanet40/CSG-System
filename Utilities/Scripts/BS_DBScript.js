@@ -29,7 +29,7 @@ setInterval(updateDateTime, 1000);
 
 $(document).ready(function () {
   setInterval(() => {
-    checkifISLogin("../../../Functions/api/checkUserLogin.php", "../../../Functions/api/UserLogout.php?error=001");
+    checkifISLogin("../../../Functions/api/checkUserLogin.php", "../../../Functions/api/");
     checkIfSessionChange("../../../Functions/api/checkSession.php");
   }, 5000);
 

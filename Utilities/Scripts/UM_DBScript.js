@@ -30,7 +30,8 @@ function uuidv4() {
   });
 }
 
-let adminAPI = "../../../Functions/api/getAccounts.php?type=admin&status=active";
+let adminAPI =
+  "../../../Functions/api/getAccounts.php?type=admin&status=active";
 let userAPI = "../../../Functions/api/getAccounts.php?type=user&status=active";
 
 $("#NUP-tab").click(function () {
@@ -230,7 +231,10 @@ let funnyDeleteButtons = [
 
 $(document).ready(function () {
   setInterval(() => {
-    checkifISLogin("../../../Functions/api/checkUserLogin.php", "../../../Functions/api/UserLogout.php?error=001");
+    checkifISLogin(
+      "../../../Functions/api/checkUserLogin.php",
+      "../../../Functions/api/UserLogout.php?error=001"
+    );
     checkIfSessionChange("../../../Functions/api/checkSession.php");
   }, 5000);
 
@@ -504,6 +508,38 @@ $(document).ready(function () {
         search: {
           placeholder: "Find an account",
         },
+        buttons: [
+          {
+            extend: "print",
+            text: "Print Table",
+            title: "USER ACCOUNTS",
+            filename:
+              "Users_Accounts_" +
+              new Date().toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              }),
+            pageSize: "legal",
+            orientation: "landscape",
+            messageTop:
+              "Generated on: " +
+              new Date().toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }) +
+              " " +
+              new Date().toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              }),
+            exportOptions: {
+              columns: [1,2,3,4,5,6,7],
+            },
+          },
+        ],
       },
       topEnd: {
         info: true,
@@ -511,14 +547,24 @@ $(document).ready(function () {
       bottomStart: function () {
         return $(
           '<select id="usertype" class="form-select"><option value="active">Active</option><option value="pending">Pending</option><option value="archived">Archived</option></select>'
-        );
+        )
       },
     },
     responsive: true,
     autoWidth: false,
     order: [[0, "desc"]],
     ordering: false,
-
+    language: {
+      emptyTable: function () {
+        if ($("#usertype").val() === "active") {
+          return "<span class='text-body'>Currently no <b>ACTIVE</b> user accounts can be found.</span>";
+        } else if ($("#usertype").val() === "pending") {
+          return "<span class='text-body'>Currently no <b>PENDING</b> user accounts can be found.</span>";
+        } else {
+          return "<span class='text-body'>Currently no <b>ARCHIVED</b> user accounts can be found.</span>";
+        }
+      }
+    },
     ajax: {
       url: userAPI,
       dataSrc: "data",
@@ -528,11 +574,28 @@ $(document).ready(function () {
       { data: "UUID" },
       { data: "fullName" },
       { data: "student_Number" },
-      { data: "primary_email" },
+      { data: null,
+        render: function (data) {
+          return `<p class='text-truncate' style='max-width: 128px; cursor: pointer;' data-bs-toggle='popover' data-bs-trigger='hover' data-bs-placement='top' data-bs-title="Email Address" data-bs-content='${data.primary_email}'><span class='badge rounded-1 bg-secondary d-print-none'>View</span><span class='d-none d-print-block'>${data.primary_email}</span></p>`;
+        }
+      },
       { data: "contactNumber" },
       { data: "course_code" },
       { data: "org_code" },
-      { data: "accountStat" },
+      {
+        data: null,
+        render: function (data) {
+          if (data.accountStat !== "archived") {
+            if (data.isLocked) {
+              return "<span class='badge bg-warning'>Locked</span>";
+            } else {
+              return "<span class='badge bg-success'>Active</span>";
+            }
+          } else {
+            return "<span class='badge bg-danger'>Archived</span>";
+          }
+        },
+      },
       {
         data: null,
         render: function (data, type, row) {
@@ -566,7 +629,9 @@ $(document).ready(function () {
         render: function (data, type, row) {
           return data == "active"
             ? `<span class="badge bg-success">Active</span>`
-            : (data == "pending" ? `<span class="badge bg-warning">Pending</span>` : `<span class="badge bg-danger">Archived</span>`);
+            : data == "pending"
+            ? `<span class="badge bg-warning">Pending</span>`
+            : `<span class="badge bg-danger">Archived</span>`;
         },
       },
     ],
@@ -597,14 +662,22 @@ $(document).ready(function () {
         GetPosition(data.org_position);
 
         if (data.accountStat === "pending") {
-          $("#userSC").prop("disabled", true).text("Can't update pending account");
+          $("#userSC")
+            .prop("disabled", true)
+            .text("Can't update pending account");
         } else if (data.accountStat === "archived") {
-          $("#userRes").prop("disabled", false).text("Restore Account").removeClass("d-none");
+          $("#userRes")
+            .prop("disabled", false)
+            .text("Restore Account")
+            .removeClass("d-none");
           $("#userSC").prop("disabled", true).text("Restore first");
           $("#userDel").prop("disabled", true).addClass("d-none");
         } else {
           $("#userSC").prop("disabled", false).text("Save Changes");
-          $("#userRes").prop("disabled", true).text("Restore Account").addClass("d-none");
+          $("#userRes")
+            .prop("disabled", true)
+            .text("Restore Account")
+            .addClass("d-none");
           $("#userDel").prop("disabled", false);
         }
         UserMods.show();
@@ -656,7 +729,20 @@ $(document).ready(function () {
       { data: "primary_email" },
       { data: "contactNumber" },
       { data: "course_code" },
-      { data: "accountStat" },
+      {
+        data: null,
+        render: function (data) {
+          if (data.accountStat !== "archived") {
+            if (data.isLocked) {
+              return "<span class='badge bg-warning'>Locked</span>";
+            } else {
+              return "<span class='badge bg-success'>Active</span>";
+            }
+          } else {
+            return "<span class='badge bg-danger'>Archived</span>";
+          }
+        },
+      },
       {
         data: null,
         render: function (data, type, row) {
@@ -695,7 +781,9 @@ $(document).ready(function () {
         render: function (data) {
           return data === "active"
             ? `<span class="badge bg-success">Active</span>`
-            : (data === "pending" ? `<span class="badge bg-warning">Pending</span>` : `<span class="badge bg-danger">Archived</span>`);
+            : data === "pending"
+            ? `<span class="badge bg-warning">Pending</span>`
+            : `<span class="badge bg-danger">Archived</span>`;
         },
       },
     ],
@@ -712,9 +800,14 @@ $(document).ready(function () {
         $("#inputContact_admin").val(data.contactNumber);
 
         if (data.accountStat === "pending") {
-          $("#adminSC").prop("disabled", true).text("Can't update pending account");
+          $("#adminSC")
+            .prop("disabled", true)
+            .text("Can't update pending account");
         } else if (data.accountStat === "archived") {
-          $("#adminRes").prop("disabled", false).text("Restore Account").removeClass("d-none");
+          $("#adminRes")
+            .prop("disabled", false)
+            .text("Restore Account")
+            .removeClass("d-none");
           $("#adminSC").prop("disabled", true).text("Restore first");
           $("#adminDel").prop("disabled", true).addClass("d-none");
         } else if (data.UUID === UUID) {
@@ -745,6 +838,40 @@ $(document).ready(function () {
       });
     },
   });
+
+  $("#AdminTable").on("draw.dt", function () {
+    const tooltipTriggerList = document.querySelectorAll(
+      '[data-bs-toggle="tooltip"]'
+    );
+    const tooltipList = [...tooltipTriggerList].map(
+      (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl)
+    );
+    const popoverTriggerList = document.querySelectorAll(
+      '[data-bs-toggle="popover"]'
+    );
+    const popoverList = [...popoverTriggerList].map(
+      (popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl)
+    );
+  });
+
+  $("#UserTable").on("draw.dt", function () {
+    const tooltipTriggerList = document.querySelectorAll(
+      '[data-bs-toggle="tooltip"]'
+    );
+    const tooltipList = [...tooltipTriggerList].map(
+      (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl)
+    );
+    const popoverTriggerList = document.querySelectorAll(
+      '[data-bs-toggle="popover"]'
+    );
+    const popoverList = [...popoverTriggerList].map(
+      (popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl)
+    );
+  });
+
+  $(".buttons-pdf, .buttons-print")
+    .removeClass("btn-secondary")
+    .addClass("btn-outline-success btn-sm");
 
   $("#userSC").click(function () {
     var ID = $("#Edituser_ID").val();
@@ -857,7 +984,7 @@ $(document).ready(function () {
           container: "alert-container",
           htmlContainer: "alert-html-container",
           title: "alert-title",
-        }
+        },
       })
       .then((result) => {
         if (result.isConfirmed) {
@@ -903,7 +1030,8 @@ $(document).ready(function () {
       success: function (response) {
         if (response.stat === "success") {
           QueueNotification(["info", "Account has been restored.", 3000]);
-          userAPI = "../../../Functions/api/getAccounts.php?type=user&status=active";
+          userAPI =
+            "../../../Functions/api/getAccounts.php?type=user&status=active";
           $("#UserTable").DataTable().ajax.reload();
           UserMods.hide();
         } else {
@@ -1011,7 +1139,8 @@ $(document).ready(function () {
 
   $("#adminDel").click(function () {
     var ID = $("#Editadmin_ID").val();
-    swal.fire({
+    swal
+      .fire({
         title: "Are you sure?",
         text: "You can still recover this account in the archive.",
         icon: "info",
@@ -1027,7 +1156,7 @@ $(document).ready(function () {
           container: "alert-container",
           htmlContainer: "alert-html-container",
           title: "alert-title",
-        }
+        },
       })
       .then((result) => {
         if (result.isConfirmed) {
@@ -1073,7 +1202,8 @@ $(document).ready(function () {
       success: function (response) {
         if (response.stat === "success") {
           QueueNotification(["info", "Account has been restored.", 3000]);
-          adminAPI = "../../../Functions/api/getAccounts.php?type=admin&status=active";
+          adminAPI =
+            "../../../Functions/api/getAccounts.php?type=admin&status=active";
           $("#AdminTable").DataTable().ajax.reload();
           AdminMods.hide();
         } else {

@@ -56,7 +56,7 @@ $_SESSION['last_activity'] = time();
     <script src="../../../../Utilities/Third-party/JQuery/js/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script defer type="module" src="../../../../Utilities/Scripts/RS_DBScript.js"></script>
-    <title>Dashboard</title>
+    <title>System Report</title>
 </head>
 <?php include_once "../../../../Assets/Icons/Icon_Assets.php"; ?>
 <?php $_SESSION['useBobbleBG'] == 1 ? include_once "../../../Components/BGanimation.php" : null;?>
@@ -132,89 +132,7 @@ $_SESSION['last_activity'] = time();
                     </div>
                 </div>
                 <div class="container">
-                    <ul class="list-group">
-                        <li class="list-group-item lg my-2" onclick="window.location.href = './Dashboard.php'">
-                            <svg class="me-3" width="24" height="24">
-                                <use xlink:href="#Dashboard" />
-                            </svg>
-                            Dashboard
-                        </li>
-                        <span class="hr-divider-start text-secondary d-none"></span>
-                        <li class="list-group-item lg d-none">
-                            <svg class="me-3" width="24" height="24">
-                                <use xlink:href="#TestIcon" />
-                            </svg>
-                            Placeholder
-                        </li>
-                        <span class="hr-divider-start text-secondary d-none"></span>
-                        <div class="accordion accordion-flush" id="Modules_Accord">
-                            <div class="accordion-item bg-transparent border-0">
-                                <li class="list-group-item my-2 lg collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#flush-collapseOne" aria-expanded="false"
-                                    aria-controls="flush-collapseOne">
-                                    <svg class="me-3" width="24" height="24">
-                                        <use xlink:href="#TestIcon" />
-                                    </svg>
-                                    Modules
-                                </li>
-                                <div id="flush-collapseOne" class="accordion-collapse collapse"
-                                    data-bs-parent="#Modules_Accord">
-                                    <div class="accordion-body">
-                                        <li class="list-group-item lg my-2 text-truncate"
-                                            onclick="window.location.href = './CourseSection.php'">
-                                            <svg class="me-3" width="24" height="24">
-                                                <use xlink:href="#Acad" />
-                                            </svg>
-                                            Courses & Sections
-                                        </li>
-                                        <li class="list-group-item lg my-2"
-                                            onclick="window.location.href = './Organizations.php'">
-                                            <svg class="me-3" width="24" height="24">
-                                                <use xlink:href="#Organic" />
-                                            </svg>
-                                            Organizations
-                                        </li>
-                                        <li class="list-group-item lg my-2"
-                                            onclick="window.location.href = './User-Management.php'"
-                                            title="User Management">
-                                            <svg class="me-3" width="24" height="24">
-                                                <use xlink:href="#ManageAct" />
-                                            </svg>
-                                            User Management
-                                        </li>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <span class="hr-divider-end text-secondary"></span>
-                        <li class="list-group-item lg my-2" onclick="window.location.href = '../../Feed.php'"
-                            title="Feed">
-                            <svg class="me-2" width="24" height="24">
-                                <use xlink:href="#Feed" />
-                            </svg>
-                            News Feed
-                        </li>
-                        <li class="list-group-item lg my-2" onclick="window.location.href = '../../Preference.php'"
-                            title="Messages">
-                            <svg class="me-2" width="24" height="24">
-                                <use xlink:href="#Setting" />
-                            </svg>
-                            Settings
-                        </li>
-                        <li class="list-group-item lg my-2 lg-active" title="Messages">
-                            <svg class="me-2" width="24" height="24">
-                                <use xlink:href="#Report" />
-                            </svg>
-                            Report
-                        </li>
-                        <li class="list-group-item lg text-danger my-2 mb-4"
-                            onclick="window.location.href = '../../../Functions/api/UserLogout.php'" title="Logout">
-                            <svg class="me-2" width="24" height="24">
-                                <use xlink:href="#Logout" />
-                            </svg>
-                            Logout
-                        </li>
-                    </ul>
+                    <?php include_once "./DSB.php"; ?>
                 </div>
             </div>
         </div>
@@ -233,7 +151,31 @@ $_SESSION['last_activity'] = time();
                     </div>
                 </div>
                 <div class="container-fluid">
-
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card glass-default bg-opacity-10 border-0">
+                                <div class="card-body">
+                                    <h5 class="card-title" id="SystemReport-1">System Logs</h5>
+                                    <table class="table table-hover table-striped table-responsive" id="SystemAudit">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="text-nowrap">ID</th>
+                                                <th scope="col" class="text-nowrap">Name</th>
+                                                <th scope="col" class="text-nowrap">Event</th>
+                                                <th scope="col" class="text-nowrap">IP</th>
+                                                <th scope="col" class="text-nowrap">Details</th>
+                                                <th scope="col" class="text-nowrap">Status</th>
+                                                <th scope="col" class="text-nowrap">Date</th>
+                                                <th scope="col" class="text-nowrap">Timestamp</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
