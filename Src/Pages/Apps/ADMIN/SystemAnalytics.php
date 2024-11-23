@@ -188,8 +188,7 @@ $_SESSION['last_activity'] = time();
                                         <?php
                                         usort($data, function ($a, $b) {
                                             return $b['count'] - $a['count'];
-                                        });
-foreach ($data as $row) {?>
+                                        });foreach ($data as $row) {?>
                                         <li class="list-group-item d-flex justify-content-between align-items-start">
                                             <div class="ms-2 me-auto">
                                                 <div class="fw-bold">
@@ -223,7 +222,39 @@ foreach ($data as $row) {?>
                                         <a class="text-decoration-none text-success ms-auto"
                                             href="./SystemReport.php?status=active"><small>View More</small></a>
                                     </div>
+                                    <?php include_once "./Chart-data-2.php"; ?>
                                     <canvas id="User"></canvas>
+                                    <script>
+                                        var ctx = document.getElementById('User').getContext('2d');
+                                        var myChart = new Chart(ctx, {
+                                            type: 'doughnut',
+                                            data: {
+                                                labels: <?php echo json_encode($labels); ?> ,
+                                                datasets: [{
+                                                    label: 'User Count',
+                                                    data: <?php echo json_encode($values); ?> ,
+                                                    backgroundColor: [
+                                                        'rgba(75, 192, 192, 0.2)',
+                                                        'rgba(153, 102, 255, 0.2)'
+                                                    ],
+                                                    borderColor: [
+                                                        'rgba(75, 192, 192, 1)',
+                                                        'rgba(153, 102, 255, 1)'
+                                                    ],
+                                                    borderWidth: 1
+                                                }]
+                                            },
+                                            options: {
+                                                responsive: true,
+                                                plugins: {
+                                                    legend: {
+                                                        display: true,
+                                                        position: 'bottom',
+                                                    }
+                                                }
+                                            }
+                                        });
+                                    </script>
                                 </div>
                             </div>
                         </div>
@@ -235,7 +266,51 @@ foreach ($data as $row) {?>
                                         <a class="text-decoration-none text-success ms-auto"
                                             href="./SystemReport.php?status=active"><small>View More</small></a>
                                     </div>
-                                    <canvas id="Theme" style="width: 100%; height: 100%;"></canvas>
+                                    <?php include_once "./Chart-data-3.php"; ?>
+                                    <div class="hstack h-100">
+                                        <canvas id="Theme" style="width: 100%; height: 100%;"></canvas>
+                                    </div>
+                                    <script>
+                                        var ctx = document.getElementById('Theme').getContext('2d');
+                                        var myChart = new Chart(ctx, {
+                                            type: 'bar',
+                                            data: {
+                                                labels: <?php echo json_encode(array_merge($labels_theme1, $labels_theme2)); ?> ,
+                                                datasets: [{
+                                                    label: 'Theme Count',
+                                                    data: <?php echo json_encode(array_merge($values_theme1, $values_theme2)); ?> ,
+                                                    backgroundColor: [
+                                                        'rgba(255, 206, 86, 0.2)',
+                                                        'rgba(75, 192, 192, 0.2)',
+                                                        'rgba(255, 99, 132, 0.2)',
+                                                        'rgba(54, 162, 235, 0.2)',
+                                                    ],
+                                                    borderColor: [
+                                                        'rgba(255, 206, 86, 1)',
+                                                        'rgba(75, 192, 192, 1)',
+                                                        'rgba(255, 99, 132, 1)',
+                                                        'rgba(54, 162, 235, 1)',
+                                                    ],
+                                                    borderWidth: 1
+                                                }],
+                                            },
+                                            options: {
+                                                responsive: true,
+                                                scales: {
+                                                    r: {
+                                                        beginAtZero: true,
+                                                        suggestedMax: <?php echo max(array_merge($values_theme1, $values_theme2)); ?>
+                                                    }
+                                                },
+                                                plugins: {
+                                                    legend: {
+                                                        display: false,
+                                                        position: 'bottom',
+                                                    }
+                                                }
+                                            }
+                                        });
+                                    </script>
                                 </div>
                             </div>
                         </div>
@@ -247,7 +322,73 @@ foreach ($data as $row) {?>
                                         <a class="text-decoration-none text-success ms-auto"
                                             href="./SystemReport.php?status=active"><small>View More</small></a>
                                     </div>
+                                    <?php include_once "./Chart-data-4.php"; ?>
                                     <canvas id="Device"></canvas>
+                                    <script>
+                                        var ctx3 = document.getElementById('Device').getContext('2d');
+                                        var myChart3 = new Chart(ctx3, {
+                                            type: 'pie',
+                                            data: {
+                                                labels: <?php echo json_encode($labels_device); ?> ,
+                                                datasets: [{
+                                                    label: 'Device Count',
+                                                    data: <?php echo json_encode($values_device); ?> ,
+                                                    backgroundColor: [
+                                                        'rgba(255, 206, 86, 0.2)',
+                                                        'rgba(75, 192, 192, 0.2)',
+                                                        'rgba(255, 99, 132, 0.2)',
+                                                        'rgba(54, 162, 235, 0.2)',
+                                                    ],
+                                                    borderColor: [
+                                                        'rgba(255, 206, 86, 1)',
+                                                        'rgba(75, 192, 192, 1)',
+                                                        'rgba(255, 99, 132, 1)',
+                                                        'rgba(54, 162, 235, 1)',
+                                                    ],
+                                                    borderWidth: 1
+                                                }]
+                                            },
+                                            options: {
+                                                responsive: true,
+                                                plugins: {
+                                                    legend: {
+                                                        display: true,
+                                                        position: 'bottom',
+                                                    }
+                                                }
+                                            }
+                                        });
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1">
+                                <div class="card-body">
+                                    <div class="hstack gap-2">
+                                        <p class="fw-bold">Organization Officers</p>
+                                        <a class="text-decoration-none text-success ms-auto"
+                                            href="./SystemReport.php?status=active"><small>View More</small></a>
+                                        <?php include_once "./Chart-data-5.php"; ?>
+                                    </div>
+                                    <canvas id="Org"></canvas>
+                                    <script>
+
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1">
+                                <div class="card-body">
+                                    <div class="hstack gap-2">
+                                        <p class="fw-bold">Students by Course</p>
+                                        <a class="text-decoration-none text-success ms-auto"
+                                            href="./SystemReport.php?status=active"><small>View More</small></a>
+                                        <?php include_once "./Chart-data-6.php"; ?>
+                                    </div>
+                                    <canvas id="Course"></canvas>
+                                    <script></script>
                                 </div>
                             </div>
                         </div>
@@ -256,109 +397,6 @@ foreach ($data as $row) {?>
             </div>
         </div>
     </div>
-    <?php include_once "./Chart-data-2.php"; ?>
-    <?php include_once "./Chart-data-3.php"; ?>
-    <?php include_once "./Chart-data-4.php"; ?>
-    <script>
-        var ctx = document.getElementById('User').getContext('2d');
-        var ctx2 = document.getElementById('Theme').getContext('2d');
-        var ctx3 = document.getElementById('Device').getContext('2d');
-        var myChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: <?php echo json_encode($labels); ?> ,
-                datasets: [{
-                    label: 'User Count',
-                    data: <?php echo json_encode($values); ?> ,
-                    backgroundColor: [
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'bottom',
-                    }
-                }
-            }
-        });
-
-        var myChart2 = new Chart(ctx2, {
-            type: 'bar',
-            data: {
-                labels: <?php echo json_encode($labels_theme); ?> ,
-                datasets: [{
-                    label: 'Theme Count',
-                    data: <?php echo json_encode($values_theme); ?> ,
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                plugins: {
-                    legend: {
-                        display: false,
-                        position: 'bottom',
-                    }
-                }
-            }
-        });
-
-        var myChart3 = new Chart(ctx3, {
-            type: 'polarArea',
-            data: {
-                labels: <?php echo json_encode($labels_device); ?> ,
-                datasets: [{
-                    label: 'Device Count',
-                    data: <?php echo json_encode($values_device); ?> ,
-                    backgroundColor: [
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                    ],
-                    borderColor: [
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'bottom',
-                    }
-                },
-                scales: {
-                    r: {
-                        beginAtZero: true,
-                        suggestedMax: <?php echo max($values_device); ?>
-                    }
-                }
-            }
-        });
-    </script>
 </body>
 
 </html>
