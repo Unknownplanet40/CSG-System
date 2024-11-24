@@ -5,6 +5,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 $Feed = "./Feed.php";
 $Profile = "./Profile.php";
 $Preference = "./Preference.php";
+$logout = "../Functions/api/UserLogout.php";
 
 // Dashboards
 $Dashboard = "";
@@ -12,15 +13,15 @@ $Dashboard = "";
 if (isset($_SESSION['role'])) {
     if ($_SESSION['role'] == 2) {
         if (isset($_SESSION['org_position']) && ($_SESSION['org_position'] == 1 || $_SESSION['org_position'] == 2 || $_SESSION['org_position'] == 3)) {
-            $Dashboard = "#CSGDashboardforPresident";
+            $Dashboard = "./Apps/User_Modules/Dashboard.php";
         } else {
-            $Dashboard = "#CSGDashboardforSecretary";
+            $Dashboard = "./Apps/User_Modules/Dashboard.php";
         }
     } else if ($_SESSION['role'] == 3) {
         if (isset($_SESSION['org_position']) && ($_SESSION['org_position'] == 1 || $_SESSION['org_position'] == 2 || $_SESSION['org_position'] == 3)) {
-            $Dashboard = "#OFCDashboardforPresident";
+            $Dashboard = "./Apps/User_Modules/Dashboard.php";
         } else {
-            $Dashboard = "#OFCDashboardforSecretary";
+            $Dashboard = "./Apps/User_Modules/Dashboard.php";
         }
     } else {
         $Dashboard = "./Apps/ADMIN/Dashboard.php";

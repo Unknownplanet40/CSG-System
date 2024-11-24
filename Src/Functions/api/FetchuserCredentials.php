@@ -83,13 +83,13 @@ function fetchUserCredentials($conn, $studentNumber, $device)
             }
 
             if ($row['contactNumber'] == null) {
-                $row['contactNumber'] = "00000000000";
+                $row['contactNumber'] = "";
             } else {
                 $row['contactNumber'] = $row['contactNumber'];
             }
 
             if ($row['course_code'] == null) {
-                $row['course_code'] = "000000";
+                $row['course_code'] = "";
             } else {
                 $stmt = $conn->prepare("SELECT * FROM sysacadtype WHERE course_code = ?");
                 $stmt->bind_param("i", $row['course_code']);
@@ -101,7 +101,7 @@ function fetchUserCredentials($conn, $studentNumber, $device)
                     $course = $course->fetch_assoc();
                     $row['course_code'] = $course['course_short_name'] . " - " . $course['year'] . "" . $course['section'];
                 } else {
-                    $row['course_code'] = "000000";
+                    $row['course_code'] = "";
                 }
             }
 

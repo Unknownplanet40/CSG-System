@@ -146,7 +146,7 @@ $logout = '../Functions/api/UserLogout.php';
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-sm-6">
+                                            <div class="col-sm-6" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true" data-bs-trigger="hover focus" data-bs-title="It may cause performance issues on some devices.">
                                                 <div class="card h-100">
                                                     <img src="../../Assets/Images/Samples/AnimatedBalls_Sample.png"
                                                         class="card-img-top" alt="...">
@@ -157,7 +157,6 @@ $logout = '../Functions/api/UserLogout.php';
                                                                 class="btn btn-sm btn-outline-success fw-bold text-uppercase"
                                                                 id="bubbles-bg">Select</button>
                                                             <small class="text-danger">(Experimental feature)</small>
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

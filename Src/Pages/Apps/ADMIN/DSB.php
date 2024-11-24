@@ -8,10 +8,8 @@ $UserManagement = "./User-Management.php";
 $Feed = "../../Feed.php";
 $Preference = "../../Preference.php";
 $SystemReport = "./SystemReport.php";
-$Analytics = "./SystemAnalytics.php";
-
-
-
+$Analytics = "./SystemAnal.php";
+$UserDashboard = "../User_Modules/Dashboard.php";
 
 ?>
 
@@ -24,12 +22,12 @@ $Analytics = "./SystemAnalytics.php";
                             </svg>
                             Dashboard
                         </li>
-                        <span class="hr-divider-start text-secondary d-none"></span>
-                        <li class="list-group-item lg d-none">
+                        <span class="hr-divider-start text-secondary"></span>
+                        <li class="list-group-item lg" onclick="window.location.href = '<?php echo $UserDashboard; ?>'">
                             <svg class="me-3" width="24" height="24">
-                                <use xlink:href="#TestIcon" />
+                                <use xlink:href="#Dashboard" />
                             </svg>
-                            Placeholder
+                            Officer Dashboard
                         </li>
                         <span class="hr-divider-start text-secondary d-none"></span>
                         <div class="accordion accordion-flush" id="Modules_Accord">
@@ -88,15 +86,15 @@ $Analytics = "./SystemAnalytics.php";
                             </svg>
                             Settings
                         </li>
-                        <li class="list-group-item lg my-2 <?php echo ($current_page == 'SystemAnalytics.php') ? 'lg-active' : ''; ?>"
-                            <?php echo ($current_page != 'SystemAnalytics.php') ? 'onclick="window.location.href = \'' . $Analytics . '\'"' : ''; ?>
+                        <li class="list-group-item lg my-2 <?php echo ($current_page == 'SystemAnal.php') ? 'lg-active' : ''; echo isset($_SESSION['org_position']) && ($_SESSION['org_position'] == 2 || $_SESSION['org_position'] == 3) ? 'd-none' : ''; ?>"
+                            <?php echo ($current_page != 'SystemAnal.php') ? 'onclick="window.location.href = \'' . $Analytics . '\'"' : ''; ?>
                             title="Messages">
                             <svg class="me-2" width="24" height="24">
                                 <use xlink:href="#Analytics" />
                             </svg>
                             Analytics
                         </li>
-                        <li class="list-group-item lg my-2 <?php echo ($current_page == 'SystemReport.php') ? 'lg-active' : ''; ?>"
+                        <li class="list-group-item lg my-2 <?php echo ($current_page == 'SystemReport.php') ? 'lg-active' : ''; echo isset($_SESSION['org_position']) && ($_SESSION['org_position'] == 2 || $_SESSION['org_position'] == 3) ? 'd-none' : ''; ?>"
                             <?php echo ($current_page != 'SystemReport.php') ? 'onclick="window.location.href = \'' . $SystemReport . '\'"' : ''; ?>
                             title="Messages">
                             <svg class="me-2" width="24" height="24">

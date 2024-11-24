@@ -14,9 +14,9 @@ if (!isset($_SESSION['UUID'])) {
     echo '<script>var UUID = "' . $_SESSION['UUID'] . '";</script>';
 }
 
-if ($_SESSION['role'] != 1) {
+if ($_SESSION['role'] != 1 && !($_SESSION['role'] == 2 && ($_SESSION['org_position'] == 1 || $_SESSION['org_position'] == 2 || $_SESSION['org_position'] == 3))) {
     header('Location: ../../../Pages/Feed.php');
-
+    exit();
 }
 
 $inactive = 1800; // 30 minutes inactivity
@@ -116,13 +116,25 @@ $_SESSION['last_activity'] = time();
                         </p>
                         <small class="text-secondary text-uppercase fw-bold">
                             <?php
-                            if ($_SESSION['role'] == 1) {
-                                $role = 'Administrator';
-                            } elseif ($_SESSION['role'] == 2) {
-                                $role = "CSG Officer";
+                            if ($_SESSION['role'] != 1) {
+                                $stmt = $conn->prepare("SELECT org_short_name FROM sysorganizations WHERE org_code = '" . $_SESSION['org_Code'] . "'");
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+                                $stmt->close();
+                                $org = $result->fetch_assoc();
+
+                                if ($_SESSION['org_position'] == 1) {
+                                    echo $org['org_short_name'] . ' President';
+                                } elseif ($_SESSION['org_position'] == 2) {
+                                    echo $org['org_short_name'] . ' Vice President Internal';
+                                } elseif ($_SESSION['org_position'] == 3) {
+                                    echo $org['org_short_name'] . ' Vice President External';
+                                } else {
+                                    echo $org['org_short_name'] . ' Secretary';
+                                }
                             } else {
-                                $role = 'Officer';
-                            }echo $role;?>
+                                echo 'Administrator';
+                            }?>
                         </small>
                     </div>
                 </div>

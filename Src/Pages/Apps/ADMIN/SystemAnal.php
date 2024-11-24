@@ -14,9 +14,9 @@ if (!isset($_SESSION['UUID'])) {
     echo '<script>var UUID = "' . $_SESSION['UUID'] . '";</script>';
 }
 
-if ($_SESSION['role'] != 1) {
+if ($_SESSION['role'] != 1 && !($_SESSION['role'] == 2 && ($_SESSION['org_position'] == 1 || $_SESSION['org_position'] == 2 || $_SESSION['org_position'] == 3))) {
     header('Location: ../../../Pages/Feed.php');
-
+    exit();
 }
 
 $inactive = 1800; // 30 minutes inactivity
@@ -56,6 +56,7 @@ $_SESSION['last_activity'] = time();
     <script src="../../../../Utilities/Third-party/JQuery/js/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script defer type="module" src="../../../../Utilities/Scripts/RS_DBScript.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <title>System Report</title>
 </head>
 <?php include_once "../../../../Assets/Icons/Icon_Assets.php"; ?>
@@ -74,34 +75,6 @@ $_SESSION['last_activity'] = time();
         </div>
     </div>
     <div class="container-fluid d-flex flex-row p-0 d-none d-lg-flex">
-        <div class="modal" id="AuditDetails" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
-                <div class="modal-content bg-transparent border-0 rounded-1">
-                    <div class="modal-body glass-default bg-opacity-10">
-                        <div class="hstack">
-                            <h4 class="modal-title text-center text-light">Audit Details</h4>
-                            <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" id="cococlose"
-                                aria-label="Close"></button>
-                        </div>
-                        <div class="my-3">
-                            <table class="table table-sm table-hover table-striped table-responsive table-borderless">
-                                <thead class="table-dark">
-                                    <tr class="rounded rounded-top rounded-3">
-                                        <th scope="col" class="text-nowrap">#</th>
-                                        <th scope="col" class="text-nowrap">Field</th>
-                                        <th scope="col" class="text-nowrap">Old Value</th>
-                                        <th scope="col" class="text-nowrap">New Value</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="audit_details_body" class="table-group-divider">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class="BS-Side d-none d-lg-block border-end glass-10 bg-opacity-50">
             <div class="d-flex flex-column justify-content-between h-100">
                 <div class="container text-center my-2">
@@ -184,32 +157,36 @@ $_SESSION['last_activity'] = time();
                         <div class="col-md-4">
                             <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1">
                                 <div class="card-body">
-                                    <ul class="list-group list-group-flush">
-                                        <?php
+                                    <div class="vstack gap-3">
+                                        <ul class="list-group list-group-flush">
+                                            <?php
                                         usort($data, function ($a, $b) {
                                             return $b['count'] - $a['count'];
                                         });foreach ($data as $row) {?>
-                                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                                            <div class="ms-2 me-auto">
-                                                <div class="fw-bold">
-                                                    <?php echo $row['eventType']; ?>
+                                            <li
+                                                class="list-group-item d-flex justify-content-between align-items-start">
+                                                <div class="ms-2 me-auto">
+                                                    <div class="fw-bold">
+                                                        <?php echo $row['eventType']; ?>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <span><?php echo $row['count']; ?></span>
-                                        </li>
-                                        <?php }?>
-                                        <li
-                                            class="list-group-item d-flex justify-content-between align-items-start border-0 border-top border-3">
-                                            <div class="ms-2 me-auto">
-                                                <div class="fw-bold">Total Events</div>
-                                            </div>
-                                            <span><?php echo $total; ?></span>
-                                        </li>
-                                    </ul>
-                                    <div class="d-flex align-items-end mt-3">
-                                        <button class="btn btn-sm btn-outline-success ms-auto"
-                                            onclick="window.location.href='./SystemReport.php#SystemReport-1'">View more
-                                            Details</button>
+                                                <span><?php echo $row['count']; ?></span>
+                                            </li>
+                                            <?php }?>
+                                            <li
+                                                class="list-group-item d-flex justify-content-between align-items-start border-0 border-top border-3">
+                                                <div class="ms-2 me-auto">
+                                                    <div class="fw-bold">Total Events</div>
+                                                </div>
+                                                <span><?php echo $total; ?></span>
+                                            </li>
+                                        </ul>
+                                        <div class="d-flex align-items-end mt-3">
+                                            <button class="btn btn-sm btn-outline-success ms-auto"
+                                                onclick="window.location.href='./SystemReport.php#SystemReport-1'">
+                                                View more Details
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -220,7 +197,7 @@ $_SESSION['last_activity'] = time();
                                     <div class="hstack gap-2">
                                         <p class="fw-bold">Account Status</p>
                                         <a class="text-decoration-none text-success ms-auto"
-                                            href="./SystemReport.php?status=active"><small>View More</small></a>
+                                            href="./SystemReport.php#SystemReport-2"><small>View More</small></a>
                                     </div>
                                     <?php include_once "./Chart-data-2.php"; ?>
                                     <canvas id="User"></canvas>
@@ -229,10 +206,10 @@ $_SESSION['last_activity'] = time();
                                         var myChart = new Chart(ctx, {
                                             type: 'doughnut',
                                             data: {
-                                                labels: <?php echo json_encode($labels); ?> ,
+                                                labels: <?php echo json_encode($labels1); ?> ,
                                                 datasets: [{
                                                     label: 'User Count',
-                                                    data: <?php echo json_encode($values); ?> ,
+                                                    data: <?php echo json_encode($values1); ?> ,
                                                     backgroundColor: [
                                                         'rgba(75, 192, 192, 0.2)',
                                                         'rgba(153, 102, 255, 0.2)'
@@ -296,11 +273,15 @@ $_SESSION['last_activity'] = time();
                                             },
                                             options: {
                                                 responsive: true,
+
                                                 scales: {
                                                     r: {
                                                         beginAtZero: true,
                                                         suggestedMax: <?php echo max(array_merge($values_theme1, $values_theme2)); ?>
-                                                    }
+                                                    },
+                                                    x: {
+                                                        stacked: true,
+                                                    },
                                                 },
                                                 plugins: {
                                                     legend: {
@@ -315,49 +296,80 @@ $_SESSION['last_activity'] = time();
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1">
+                            <div class="card glass-default bg-opacity-10 border-0 h-100 rounded-1">
                                 <div class="card-body">
                                     <div class="hstack gap-2">
-                                        <p class="fw-bold">Device Used</p>
+                                        <p class="fw-bold">Sessions by OS</p>
                                         <a class="text-decoration-none text-success ms-auto"
                                             href="./SystemReport.php?status=active"><small>View More</small></a>
                                     </div>
                                     <?php include_once "./Chart-data-4.php"; ?>
-                                    <canvas id="Device"></canvas>
+                                    <div id="Device"></div>
                                     <script>
-                                        var ctx3 = document.getElementById('Device').getContext('2d');
-                                        var myChart3 = new Chart(ctx3, {
-                                            type: 'pie',
-                                            data: {
-                                                labels: <?php echo json_encode($labels_device); ?> ,
-                                                datasets: [{
-                                                    label: 'Device Count',
-                                                    data: <?php echo json_encode($values_device); ?> ,
-                                                    backgroundColor: [
-                                                        'rgba(255, 206, 86, 0.2)',
-                                                        'rgba(75, 192, 192, 0.2)',
-                                                        'rgba(255, 99, 132, 0.2)',
-                                                        'rgba(54, 162, 235, 0.2)',
-                                                    ],
-                                                    borderColor: [
-                                                        'rgba(255, 206, 86, 1)',
-                                                        'rgba(75, 192, 192, 1)',
-                                                        'rgba(255, 99, 132, 1)',
-                                                        'rgba(54, 162, 235, 1)',
-                                                    ],
-                                                    borderWidth: 1
-                                                }]
+                                        var theme =
+                                            '<?php echo $_SESSION['theme']; ?>';
+
+                                        if (theme == 'dark') {
+                                            textColor = '#fff';
+                                        } else {
+                                            textColor = '#000';
+                                        }
+
+                                        var options = {
+                                            chart: {
+                                                type: "radialBar",
+                                                height: 350,
+                                                width: 380,
                                             },
-                                            options: {
-                                                responsive: true,
-                                                plugins: {
-                                                    legend: {
-                                                        display: true,
-                                                        position: 'bottom',
-                                                    }
-                                                }
-                                            }
-                                        });
+                                            plotOptions: {
+                                                radialBar: {
+                                                    size: undefined,
+                                                    inverseOrder: true,
+                                                    hollow: {
+                                                        margin: 5,
+                                                        size: "48%",
+                                                        background: "transparent",
+                                                    },
+                                                    track: {
+                                                        show: false,
+                                                    },
+                                                    startAngle: -180,
+                                                    endAngle: 180,
+                                                    dataLabels: {
+                                                        value: {
+                                                            fontSize: '16px',
+                                                            color: textColor,
+                                                        },
+                                                        total: {
+                                                            show: true,
+                                                            label: 'OS Count',
+                                                            formatter: function(w) {
+                                                                return <?php echo json_encode($total_device); ?>;
+                                                            },
+                                                            color: textColor,
+                                                        }
+                                                    },
+                                                },
+                                            },
+                                            stroke: {
+                                                lineCap: "round",
+                                            },
+                                            series: <?php echo json_encode($values_device); ?> ,
+                                            labels: <?php echo json_encode($labels_device); ?> ,
+                                            legend: {
+                                                show: true,
+                                                floating: true,
+                                                position: "right",
+                                                offsetX: 70,
+                                                offsetY: 200,
+                                                labels: {
+                                                    useSeriesColors: true,
+                                                },
+                                            },
+                                        };
+
+                                        var chart = new ApexCharts(document.querySelector("#Device"), options);
+                                        chart.render();
                                     </script>
                                 </div>
                             </div>
@@ -366,29 +378,59 @@ $_SESSION['last_activity'] = time();
                             <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1">
                                 <div class="card-body">
                                     <div class="hstack gap-2">
-                                        <p class="fw-bold">Organization Officers</p>
+                                        <p class="fw-bold">Organization Generated Files</p>
                                         <a class="text-decoration-none text-success ms-auto"
                                             href="./SystemReport.php?status=active"><small>View More</small></a>
                                         <?php include_once "./Chart-data-5.php"; ?>
                                     </div>
                                     <canvas id="Org"></canvas>
-                                    <script>
-
-                                    </script>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1">
+                            <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1"
+                                style="max-height: 600px;">
                                 <div class="card-body">
                                     <div class="hstack gap-2">
-                                        <p class="fw-bold">Students by Course</p>
+                                        <p class="fw-bold">Course Enrolled</p>
                                         <a class="text-decoration-none text-success ms-auto"
                                             href="./SystemReport.php?status=active"><small>View More</small></a>
                                         <?php include_once "./Chart-data-6.php"; ?>
                                     </div>
                                     <canvas id="Course"></canvas>
-                                    <script></script>
+                                    <script>
+                                        var ctx5 = document.getElementById('Course').getContext('2d');
+                                        var myChart5 = new Chart(ctx5, {
+                                            type: 'bar',
+                                            data: {
+                                                labels: <?php echo json_encode($labels_course); ?> ,
+                                                datasets: [{
+                                                    label: 'Course Count',
+                                                    data: <?php echo json_encode($values_course); ?> ,
+                                                    backgroundColor: <?php echo json_encode($RandomBGcolor_course); ?> ,
+                                                    borderColor: <?php echo json_encode($RandomBRcolor_course); ?> ,
+                                                    borderWidth: 1
+                                                }]
+                                            },
+                                            options: {
+                                                responsive: true,
+                                                maintainAspectRatio: true,
+                                                scales: {
+                                                    y: {
+                                                        beginAtZero: true,
+                                                        suggestedMax: <?php echo max($values_course); ?>
+                                                    }
+                                                },
+                                                plugins: {
+                                                    legend: {
+                                                        display: false,
+                                                        position: 'bottom',
+                                                    }
+                                                },
+                                                indexAxis: 'y'
+                                            }
+                                        });
+                                    </script>
                                 </div>
                             </div>
                         </div>

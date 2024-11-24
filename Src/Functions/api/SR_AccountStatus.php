@@ -23,50 +23,49 @@ try {
         $date = $_GET['date'];
         $event = $_GET['event'];
         $stmtDate = "";
-        $stmtEvent = "";
 
         if ($date == "Today") {
-            $stmtDate = "dateCreate = CURDATE()";
+            $stmtDate = "access_date = CURDATE()";
         } else if ($date == "Yesterday") {
-            $stmtDate = "dateCreate = CURDATE() - INTERVAL 1 DAY";
+            $stmtDate = "access_date = CURDATE() - INTERVAL 1 DAY";
         } else if ($date == "This Week") {
-            $stmtDate = "YEARWEEK(dateCreate) = YEARWEEK(CURDATE())";
+            $stmtDate = "YEARWEEK(access_date) = YEARWEEK(CURDATE())";
         } else if ($date == "This Month") {
-            $stmtDate = "MONTH(dateCreate) = MONTH(CURDATE()) AND YEAR(dateCreate) = YEAR(CURDATE())";
+            $stmtDate = "MONTH(access_date) = MONTH(CURDATE()) AND YEAR(access_date) = YEAR(CURDATE())";
         } else if ($date == "This Year") {
-            $stmtDate = "YEAR(dateCreate) = YEAR(CURDATE())";
+            $stmtDate = "YEAR(access_date) = YEAR(CURDATE())";
         } else {
             $stmtDate = "1=1";
         }
-        $stmtEvent = "eventType = '$event'";
 
+        $stmtEvent = "LoginStat = '$event'";
 
-        $stmt = $conn->prepare("SELECT * FROM systemaudit WHERE $stmtDate AND $stmtEvent ORDER BY dateCreate DESC");
+        $stmt = $conn->prepare("SELECT * FROM accounts WHERE $stmtDate AND $stmtEvent ORDER BY access_date DESC");
     } else if (isset($_GET['date']) && !isset($_GET['event'])){
         $date = $_GET['date'];
         $stmtDate = "";
 
         if ($date == "Today") {
-            $stmtDate = "dateCreate = CURDATE()";
+            $stmtDate = "access_date = CURDATE()";
         } else if ($date == "Yesterday") {
-            $stmtDate = "dateCreate = CURDATE() - INTERVAL 1 DAY";
+            $stmtDate = "access_date = CURDATE() - INTERVAL 1 DAY";
         } else if ($date == "This Week") {
-            $stmtDate = "YEARWEEK(dateCreate) = YEARWEEK(CURDATE())";
+            $stmtDate = "YEARWEEK(access_date) = YEARWEEK(CURDATE())";
         } else if ($date == "This Month") {
-            $stmtDate = "MONTH(dateCreate) = MONTH(CURDATE()) AND YEAR(dateCreate) = YEAR(CURDATE())";
+            $stmtDate = "MONTH(access_date) = MONTH(CURDATE()) AND YEAR(access_date) = YEAR(CURDATE())";
         } else if ($date == "This Year") {
-            $stmtDate = "YEAR(dateCreate) = YEAR(CURDATE())";
+            $stmtDate = "YEAR(access_date) = YEAR(CURDATE())";
         } else {
             $stmtDate = "1=1";
         }
 
-        $stmt = $conn->prepare("SELECT * FROM systemaudit WHERE $stmtDate ORDER BY dateCreate DESC");
+        $stmt = $conn->prepare("SELECT * FROM accounts WHERE $stmtDate ORDER BY access_date DESC");
     } else if (!isset($_GET['date']) && isset($_GET['event'])){
         $event = $_GET['event'];
-        $stmtEvent = "eventType = '$event'";
-        $stmt = $conn->prepare("SELECT * FROM systemaudit WHERE $stmtEvent ORDER BY dateCreate DESC");
+        $stmtEvent = "LoginStat = '$event'";
+        $stmt = $conn->prepare("SELECT * FROM accounts WHERE $stmtEvent ORDER BY access_date DESC");
     } else {
-        $stmt = $conn->prepare("SELECT * FROM systemaudit ORDER BY dateCreate DESC");
+        $stmt = $conn->prepare("SELECT * FROM accounts ORDER BY access_date DESC");
     }
 
     $stmt->execute();
@@ -79,17 +78,16 @@ try {
     $total = 0;
 
     while ($row = $result->fetch_assoc()) {
-        $row['dateCreate'] = $row['dateCreate'] ? date('M d, Y', strtotime($row['dateCreate'])) : null;
-        $row['timestamp'] = $row['timestamp'] ? date('h:i A', strtotime($row['timestamp'])) : null;
+        $row['access_date'] = $row['access_date'] ? date('M d, Y h:i A', strtotime($row['access_date'])) : null;
         $stmt = $conn->prepare("SELECT * FROM usercredentials WHERE UUID = ?");
-        $stmt->bind_param('s', $row['userID']);
+        $stmt->bind_param('s', $row['UUID']);
         $stmt->execute();
         $result2 = $stmt->get_result();
         $stmt->close();
         $user = $result2->fetch_assoc();
 
         if ($user) {
-            $row['userID'] = $user['fullName'];
+            $row['UUID'] = $user['fullName'];
         } else {
             continue;
         }

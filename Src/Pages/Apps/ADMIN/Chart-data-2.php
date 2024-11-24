@@ -1,19 +1,23 @@
 <?php
 
-$stmt = $conn->prepare("SELECT LoginStat, COUNT(*) as count FROM Accounts GROUP BY LoginStat");
-$stmt->execute();
-$result = $stmt->get_result();
-$stmt->close();
-$data = array();
+try {
+    $stmt = $conn->prepare("SELECT LoginStat, COUNT(*) as count0 FROM accounts GROUP BY LoginStat");
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $stmt->close();
+    $data1 = array();
 
-while ($row = $result->fetch_assoc()) {
-    $data[] = $row;
-}
+    while ($row = $result->fetch_assoc()) {
+        $data1[] = $row;
+    }
 
-$labels = array();
-$values = array();
+    $labels1 = array();
+    $values1 = array();
 
-foreach ($data as $row) {
-    $labels[] = $row['LoginStat'];
-    $values[] = $row['count'];
+    foreach ($data1 as $row) {
+        $labels1[] = $row['LoginStat'];
+        $values1[] = $row['count0'];
+    }
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage() . " at line " . $e->getLine() . " in " . $e->getFile();
 }

@@ -42,6 +42,7 @@ $(document).ready(function () {
     autoWidth: true,
     ordering: false,
     order: [[1, "desc"]],
+    pageLength: 5,
     layout: {
       topStart: {
         search: {

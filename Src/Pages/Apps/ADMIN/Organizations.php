@@ -5,16 +5,16 @@ if (session_status() == PHP_SESSION_NONE) {
     require_once '../../../Debug/GenLog.php';
 }
 
-if ($_SESSION['role'] != 1) {
+if ($_SESSION['role'] != 1 && !($_SESSION['role'] == 2 && ($_SESSION['org_position'] == 1 || $_SESSION['org_position'] == 2 || $_SESSION['org_position'] == 3))) {
     header('Location: ../../../Pages/Feed.php');
-} else {
-    echo '<script>var UUID = "' . $_SESSION['UUID'] . '";</script>';
+    exit();
 }
 
 if (!isset($_SESSION['UUID'])) {
     header('Location: ../../Accesspage.php?error=001');
 } else {
     $logPath = "../../../Debug/Users/UUID.log";
+    echo '<script>var UUID = "' . $_SESSION['UUID'] . '";</script>';
 }
 
 $inactive = 1800; // 30 minutes inactivity

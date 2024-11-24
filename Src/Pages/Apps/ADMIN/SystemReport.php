@@ -14,9 +14,9 @@ if (!isset($_SESSION['UUID'])) {
     echo '<script>var UUID = "' . $_SESSION['UUID'] . '";</script>';
 }
 
-if ($_SESSION['role'] != 1) {
+if ($_SESSION['role'] != 1 && !($_SESSION['role'] == 2 && ($_SESSION['org_position'] == 1 || $_SESSION['org_position'] == 2 || $_SESSION['org_position'] == 3))) {
     header('Location: ../../../Pages/Feed.php');
-
+    exit();
 }
 
 $inactive = 1800; // 30 minutes inactivity
@@ -151,7 +151,7 @@ $_SESSION['last_activity'] = time();
                     </div>
                 </div>
                 <div class="container-fluid">
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-12">
                             <div class="card glass-default bg-opacity-10 border-0">
                                 <div class="card-body">
@@ -167,6 +167,29 @@ $_SESSION['last_activity'] = time();
                                                 <th scope="col" class="text-nowrap">Status</th>
                                                 <th scope="col" class="text-nowrap">Date</th>
                                                 <th scope="col" class="text-nowrap">Timestamp</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="card glass-default bg-opacity-10 border-0">
+                                <div class="card-body">
+                                    <h5 class="card-title" id="SystemReport-2">Account Status Logs</h5>
+                                    <table class="table table-hover table-striped table-responsive" id="AccountAudit">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="text-nowrap">ID</th>
+                                                <th scope="col" class="text-nowrap">Name</th>
+                                                <th scope="col" class="text-nowrap">Student Number</th>
+                                                <th scope="col" class="text-nowrap">Password</th>
+                                                <th scope="col" class="text-nowrap">Login Status</th>
+                                                <th scope="col" class="text-nowrap">Status</th>
+                                                <th scope="col" class="text-nowrap">IP Address</th>
+                                                <th scope="col" class="text-nowrap">Last Access</th>
                                             </tr>
                                         </thead>
                                         <tbody>

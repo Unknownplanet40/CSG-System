@@ -3,16 +3,18 @@ $stmt = $conn->prepare("SELECT Device, COUNT(*) as count FROM auditdevice GROUP 
 $stmt->execute();
 $result = $stmt->get_result();
 $stmt->close();
-$data = array();
+$data3 = array();
 
 while ($row = $result->fetch_assoc()) {
-    $data[] = $row;
+    $data3[] = $row;
 }
 
 $labels_device = array();
 $values_device = array();
+$total_device = 0;
 
-foreach ($data as $row) {
+foreach ($data3 as $row) {
     $labels_device[] = $row['Device'];
     $values_device[] = $row['count'];
+    $total_device += $row['count'];
 }
