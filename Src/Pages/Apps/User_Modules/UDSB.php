@@ -2,9 +2,9 @@
 $current_page = basename($_SERVER['PHP_SELF']);
 $Dashboard = "../ADMIN/Dashboard.php";
 $OfficerDashboard = "./Dashboard.php";
-$DocumentHeader = "#DocumentHeader";
+$DocumentHeader = "./DocumentHeader.php";
 $Modules = "#Modules";
-$ActivityProposal = "#ActivityProposal";
+$ActivityProposal = "./ActivityProposal.php";
 $ExcuseLetter = "#ExcuseLetter";
 $MinutesOfTheMeeting = "#MinutesOfTheMeeting";
 $OfficeMemorandum = "#OfficeMemorandum";
@@ -15,7 +15,7 @@ $enableDocumentHeader = false;
 
 if ($_SESSION['role'] == 1) {
     $enableDocumentHeader = true;
-} else if ($_SESSION['role'] != 1) {
+} elseif ($_SESSION['role'] != 1) {
     if ($_SESSION['org_position'] == 1 || $_SESSION['org_position'] == 2 || $_SESSION['org_position'] == 3) {
         $enableDocumentHeader = true;
     }
@@ -91,14 +91,15 @@ if ($_SESSION['role'] == 1) {
             <span class="hr-divider-start text-secondary d-none"></span>
             <div class="accordion accordion-flush" id="Modules_Accord">
                 <div class="accordion-item bg-transparent border-0">
-                    <li class="list-group-item lg collapsed" type="button" data-bs-toggle="collapse"
+                    <li class="list-group-item lg <?php echo $current_page == 'ActivityProposal.php' || $current_page == 'ExcuseLetter.php' || $current_page == 'MinutesOfTheMeeting.php' || $current_page == 'OfficeMemorandum.php' || $current_page == 'ProjectProposal.php' ? 'collapsed' : ''; ?>" type="button" data-bs-toggle="collapse"
                         data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
                         <svg class="me-3" width="24" height="24">
                             <use xlink:href="#Folder" />
                         </svg>
                         Modules
                     </li>
-                    <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#Modules_Accord">
+                    <div id="flush-collapseOne" class="accordion-collapse collapse <?php echo $current_page == 'ActivityProposal.php' || $current_page == 'ExcuseLetter.php' || $current_page == 'MinutesOfTheMeeting.php' || $current_page == 'OfficeMemorandum.php' || $current_page == 'ProjectProposal.php' ? 'show' : ''; ?>
+                    " data-bs-parent="#Modules_Accord">
                         <div class="accordion-body">
                             <li class="list-group-item lg mb-2 <?php echo $current_page == 'ActivityProposal.php' ? 'lg-active' : ''; ?>"
                                 <?php echo $current_page != 'ActivityProposal.php' ? "onclick='window.location.href = \"$ActivityProposal\"'" : ''; ?>>
