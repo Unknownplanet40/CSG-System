@@ -194,6 +194,12 @@ try {
     $ActivityOutcomes = $_POST['ActivityOutcomes'];
     $ActivitySignature = $_POST['ActivitySignature'];
 
+    $remove = '<p data-f-id="pbf" style="text-align: center; font-size: 14px; margin-top: 30px; opacity: 0.65; font-family: sans-serif;">Powered by <a href="https://www.froala.com/wysiwyg-editor?pb=1" title="Froala Editor">Froala Editor</a></p>';
+    $LetterBody = str_replace($remove, '', $LetterBody);
+    $ActivityObjective = str_replace($remove, '', $ActivityObjective);
+    $ActivityBudget = str_replace($remove, '', $ActivityBudget);
+    $ActivitySignature = str_replace($remove, '', $ActivitySignature);
+
     $data = [
         'ActivityTitle' => $ActivityTitle,
         'ActivityDateVenue' => $ActivityDateVenue,
