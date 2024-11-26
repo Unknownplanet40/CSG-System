@@ -30,6 +30,50 @@ if (isset($_SESSION['last_activity'])) {
 }
 
 $_SESSION['last_activity'] = time();
+
+    $stmt1 = $conn->prepare("SELECT SUM(file_Size) FROM activityproposaldocuments GROUP BY org_code");
+    $stmt1->execute();
+    $stmt1->bind_result($fileSize1);
+    $stmt1->fetch();
+    $stmt1->close();
+
+    /* $stmt2 = $conn->prepare("SELECT SUM(file_Size) FROM activityproposaldocuments GROUP BY org_code");
+    $stmt2->execute();
+    $stmt2->bind_result($fileSize2);
+    $stmt2->fetch();
+    $stmt2->close();
+
+    $fileSize = $fileSize1 + $fileSize2; */
+    $fileSize = $fileSize1;
+
+if ($fileSize !== null) {
+    if ($fileSize < 1024) {
+        $Size = $fileSize;
+        $SizeFormat = "B";
+        $formattedFileSize = $fileSize . " B";
+    } else if ($fileSize < 1048576) {
+        $Size = round($fileSize / 1024, 2);
+        $SizeFormat = "KB";
+        $formattedFileSize = $Size . " KB";
+    } else if ($fileSize < 1073741824) {
+        $Size = round($fileSize / 1024 / 1024, 2);
+        $SizeFormat = "MB";
+        $formattedFileSize = $Size . " MB";
+    } else {
+        $Size = round($fileSize / 1024 / 1024 / 1024, 2);
+        $SizeFormat = "GB";
+        $formattedFileSize = $Size . " GB";
+    }
+} else {
+    $Size = 0;
+    $SizeFormat = "KB";
+    $formattedFileSize = "0 KB";
+}
+
+$storage = disk_total_space("/");
+$percentage = round(($fileSize / $storage) * 100, 2);
+
+
 ?>
 
 <!DOCTYPE html>
@@ -121,41 +165,11 @@ $_SESSION['last_activity'] = time();
                                 <div class="card-body">
                                     <canvas id="myChart"></canvas>
                                     <?php include_once "./Chart-data-1.php" ?>
-                                    <script>
-                                        var ctx = document.getElementById('myChart').getContext('2d');
-                                        var myChart = new Chart(ctx, {
-                                            type: 'radar',
-                                            data: {
-                                                labels: <?php echo json_encode($labels); ?> ,
-                                                datasets: [{
-                                                    label: 'Event Count',
-                                                    data: <?php echo json_encode($values); ?> ,
-                                                    backgroundColor: <?php echo json_encode($RandomBGcolor); ?> ,
-                                                    borderColor: <?php echo json_encode($RandomBRcolor); ?> ,
-                                                }]
-                                            },
-                                            options: {
-                                                responsive: true,
-                                                scales: {
-                                                    r: {
-                                                        beginAtZero: true,
-                                                        suggestedMax: <?php echo max($values); ?>
-                                                    }
-                                                },
-                                                plugins: {
-                                                    legend: {
-                                                        display: false,
-                                                        position: 'top',
-                                                    }
-                                                }
-                                            }
-                                        });
-                                    </script>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1">
+                            <div class="card glass-default bg-opacity-25 border-0 rounded-1">
                                 <div class="card-body">
                                     <div class="vstack gap-3">
                                         <ul class="list-group list-group-flush">
@@ -189,6 +203,13 @@ $_SESSION['last_activity'] = time();
                                         </div>
                                     </div>
                                 </div>
+                                <div class="card-body border m-3 rounded-1">
+                                    <p class="fw-bold">Storage Usage</p>
+                                    <h5 class="text-success"><?php echo $formattedFileSize; ?> / <?php echo round($storage / 1024 / 1024 / 1024 / 1024, 2); ?> TB</h5>
+                                    <div class="progress" style="height: 10px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: <?php echo $percentage; ?>%;" aria-valuenow="<?php echo $percentage; ?>" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -199,39 +220,8 @@ $_SESSION['last_activity'] = time();
                                         <a class="text-decoration-none text-success ms-auto"
                                             href="./SystemReport.php#SystemReport-2"><small>View More</small></a>
                                     </div>
-                                    <?php include_once "./Chart-data-2.php"; ?>
                                     <canvas id="User"></canvas>
-                                    <script>
-                                        var ctx = document.getElementById('User').getContext('2d');
-                                        var myChart = new Chart(ctx, {
-                                            type: 'doughnut',
-                                            data: {
-                                                labels: <?php echo json_encode($labels1); ?> ,
-                                                datasets: [{
-                                                    label: 'User Count',
-                                                    data: <?php echo json_encode($values1); ?> ,
-                                                    backgroundColor: [
-                                                        'rgba(75, 192, 192, 0.2)',
-                                                        'rgba(153, 102, 255, 0.2)'
-                                                    ],
-                                                    borderColor: [
-                                                        'rgba(75, 192, 192, 1)',
-                                                        'rgba(153, 102, 255, 1)'
-                                                    ],
-                                                    borderWidth: 1
-                                                }]
-                                            },
-                                            options: {
-                                                responsive: true,
-                                                plugins: {
-                                                    legend: {
-                                                        display: true,
-                                                        position: 'bottom',
-                                                    }
-                                                }
-                                            }
-                                        });
-                                    </script>
+                                    <?php include_once "./Chart-data-2.php"; ?>
                                 </div>
                             </div>
                         </div>
@@ -241,57 +231,12 @@ $_SESSION['last_activity'] = time();
                                     <div class="hstack gap-2">
                                         <p class="fw-bold">Preferred Theme</p>
                                         <a class="text-decoration-none text-success ms-auto"
-                                            href="./SystemReport.php?status=active"><small>View More</small></a>
+                                            href="./SystemReport.php"><small>View More</small></a>
                                     </div>
-                                    <?php include_once "./Chart-data-3.php"; ?>
                                     <div class="hstack h-100">
                                         <canvas id="Theme" style="width: 100%; height: 100%;"></canvas>
                                     </div>
-                                    <script>
-                                        var ctx = document.getElementById('Theme').getContext('2d');
-                                        var myChart = new Chart(ctx, {
-                                            type: 'bar',
-                                            data: {
-                                                labels: <?php echo json_encode(array_merge($labels_theme1, $labels_theme2)); ?> ,
-                                                datasets: [{
-                                                    label: 'Theme Count',
-                                                    data: <?php echo json_encode(array_merge($values_theme1, $values_theme2)); ?> ,
-                                                    backgroundColor: [
-                                                        'rgba(255, 206, 86, 0.2)',
-                                                        'rgba(75, 192, 192, 0.2)',
-                                                        'rgba(255, 99, 132, 0.2)',
-                                                        'rgba(54, 162, 235, 0.2)',
-                                                    ],
-                                                    borderColor: [
-                                                        'rgba(255, 206, 86, 1)',
-                                                        'rgba(75, 192, 192, 1)',
-                                                        'rgba(255, 99, 132, 1)',
-                                                        'rgba(54, 162, 235, 1)',
-                                                    ],
-                                                    borderWidth: 1
-                                                }],
-                                            },
-                                            options: {
-                                                responsive: true,
-
-                                                scales: {
-                                                    r: {
-                                                        beginAtZero: true,
-                                                        suggestedMax: <?php echo max(array_merge($values_theme1, $values_theme2)); ?>
-                                                    },
-                                                    x: {
-                                                        stacked: true,
-                                                    },
-                                                },
-                                                plugins: {
-                                                    legend: {
-                                                        display: false,
-                                                        position: 'bottom',
-                                                    }
-                                                }
-                                            }
-                                        });
-                                    </script>
+                                    <?php include_once "./Chart-data-3.php"; ?>
                                 </div>
                             </div>
                         </div>
@@ -301,76 +246,10 @@ $_SESSION['last_activity'] = time();
                                     <div class="hstack gap-2">
                                         <p class="fw-bold">Sessions by OS</p>
                                         <a class="text-decoration-none text-success ms-auto"
-                                            href="./SystemReport.php?status=active"><small>View More</small></a>
+                                            href="./SystemReport.php#SystemReport-3"><small>View More</small></a>
                                     </div>
-                                    <?php include_once "./Chart-data-4.php"; ?>
                                     <div id="Device"></div>
-                                    <script>
-                                        var theme =
-                                            '<?php echo $_SESSION['theme']; ?>';
-
-                                        if (theme == 'dark') {
-                                            textColor = '#fff';
-                                        } else {
-                                            textColor = '#000';
-                                        }
-
-                                        var options = {
-                                            chart: {
-                                                type: "radialBar",
-                                                height: 350,
-                                                width: 380,
-                                            },
-                                            plotOptions: {
-                                                radialBar: {
-                                                    size: undefined,
-                                                    inverseOrder: true,
-                                                    hollow: {
-                                                        margin: 5,
-                                                        size: "48%",
-                                                        background: "transparent",
-                                                    },
-                                                    track: {
-                                                        show: false,
-                                                    },
-                                                    startAngle: -180,
-                                                    endAngle: 180,
-                                                    dataLabels: {
-                                                        value: {
-                                                            fontSize: '16px',
-                                                            color: textColor,
-                                                        },
-                                                        total: {
-                                                            show: true,
-                                                            label: 'OS Count',
-                                                            formatter: function(w) {
-                                                                return <?php echo json_encode($total_device); ?>;
-                                                            },
-                                                            color: textColor,
-                                                        }
-                                                    },
-                                                },
-                                            },
-                                            stroke: {
-                                                lineCap: "round",
-                                            },
-                                            series: <?php echo json_encode($values_device); ?> ,
-                                            labels: <?php echo json_encode($labels_device); ?> ,
-                                            legend: {
-                                                show: true,
-                                                floating: true,
-                                                position: "right",
-                                                offsetX: 70,
-                                                offsetY: 200,
-                                                labels: {
-                                                    useSeriesColors: true,
-                                                },
-                                            },
-                                        };
-
-                                        var chart = new ApexCharts(document.querySelector("#Device"), options);
-                                        chart.render();
-                                    </script>
+                                    <?php include_once "./Chart-data-4.php"; ?>
                                 </div>
                             </div>
                         </div>
@@ -378,12 +257,12 @@ $_SESSION['last_activity'] = time();
                             <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1">
                                 <div class="card-body">
                                     <div class="hstack gap-2">
-                                        <p class="fw-bold">Organization Generated Files</p>
+                                        <p class="fw-bold">Generated Activity Proposals by Organization</p>
                                         <a class="text-decoration-none text-success ms-auto"
                                             href="./SystemReport.php?status=active"><small>View More</small></a>
-                                        <?php include_once "./Chart-data-5.php"; ?>
                                     </div>
-                                    <canvas id="Org"></canvas>
+                                    <canvas id="Organization"></canvas>
+                                    <?php include_once "./Chart-data-5.php"; ?>
                                 </div>
                             </div>
                         </div>
@@ -395,42 +274,9 @@ $_SESSION['last_activity'] = time();
                                         <p class="fw-bold">Course Enrolled</p>
                                         <a class="text-decoration-none text-success ms-auto"
                                             href="./SystemReport.php?status=active"><small>View More</small></a>
-                                        <?php include_once "./Chart-data-6.php"; ?>
                                     </div>
                                     <canvas id="Course"></canvas>
-                                    <script>
-                                        var ctx5 = document.getElementById('Course').getContext('2d');
-                                        var myChart5 = new Chart(ctx5, {
-                                            type: 'bar',
-                                            data: {
-                                                labels: <?php echo json_encode($labels_course); ?> ,
-                                                datasets: [{
-                                                    label: 'Course Count',
-                                                    data: <?php echo json_encode($values_course); ?> ,
-                                                    backgroundColor: <?php echo json_encode($RandomBGcolor_course); ?> ,
-                                                    borderColor: <?php echo json_encode($RandomBRcolor_course); ?> ,
-                                                    borderWidth: 1
-                                                }]
-                                            },
-                                            options: {
-                                                responsive: true,
-                                                maintainAspectRatio: true,
-                                                scales: {
-                                                    y: {
-                                                        beginAtZero: true,
-                                                        suggestedMax: <?php echo max($values_course); ?>
-                                                    }
-                                                },
-                                                plugins: {
-                                                    legend: {
-                                                        display: false,
-                                                        position: 'bottom',
-                                                    }
-                                                },
-                                                indexAxis: 'y'
-                                            }
-                                        });
-                                    </script>
+                                    <?php include_once "./Chart-data-6.php"; ?>
                                 </div>
                             </div>
                         </div>

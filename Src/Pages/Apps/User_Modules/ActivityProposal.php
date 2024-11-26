@@ -572,7 +572,7 @@ $_SESSION['last_activity'] = time();
             if (froalaLicense) {
             froalaLicense.remove();
             }
-        }, 1000);
+        }, 500);
     </script>
 </body>
 

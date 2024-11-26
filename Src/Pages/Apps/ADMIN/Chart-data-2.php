@@ -21,3 +21,36 @@ try {
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage() . " at line " . $e->getLine() . " in " . $e->getFile();
 }
+?>
+
+<script>
+    var ctx = document.getElementById('User').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: <?php echo json_encode($labels1); ?> ,
+            datasets: [{
+                label: 'User Count',
+                data: <?php echo json_encode($values1); ?> ,
+                backgroundColor: [
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+</script>

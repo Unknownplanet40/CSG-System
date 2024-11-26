@@ -148,6 +148,15 @@ $_SESSION['last_activity'] = time();
                             </svg>
                             Refresh
                         </button>
+                        <button class="d-none btn btn-sm btn-outline-secondary rounded-0" onclick="window.location.href='./SystemReport.php#SystemReport-1'">
+                            System Logs
+                        </button>
+                        <button class="d-none btn btn-sm btn-outline-secondary rounded-0" onclick="window.location.href='./SystemReport.php#SystemReport-2'">
+                            Account Logs
+                        </button>
+                        <button class="d-none btn btn-sm btn-outline-secondary rounded-0" onclick="window.location.href='./SystemReport.php#SystemReport-3'">
+                            Device Logs
+                        </button>
                     </div>
                 </div>
                 <div class="container-fluid">
@@ -187,9 +196,31 @@ $_SESSION['last_activity'] = time();
                                                 <th scope="col" class="text-nowrap">Student Number</th>
                                                 <th scope="col" class="text-nowrap">Password</th>
                                                 <th scope="col" class="text-nowrap">Login Status</th>
-                                                <th scope="col" class="text-nowrap">Status</th>
                                                 <th scope="col" class="text-nowrap">IP Address</th>
+                                                <th scope="col" class="text-nowrap">Status</th>
                                                 <th scope="col" class="text-nowrap">Last Access</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="card glass-default bg-opacity-10 border-0">
+                                <div class="card-body">
+                                    <h5 class="card-title" id="SystemReport-3">Device Status Logs</h5>
+                                    <table class="table table-hover table-striped table-responsive" id="DeviceAudit">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="text-nowrap">ID</th>
+                                                <th scope="col" class="text-nowrap">Name</th>
+                                                <th scope="col" class="text-nowrap">Device</th>
+                                                <th scope="col" class="text-nowrap">Device Info</th>
+                                                <th scope="col" class="text-nowrap">IP Address</th>
+                                                <th scope="col" class="text-nowrap">Details</th>
+                                                <th scope="col" class="text-nowrap">Date</th>
                                             </tr>
                                         </thead>
                                         <tbody>

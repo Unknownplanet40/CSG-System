@@ -203,6 +203,7 @@ export function openChat(
 
       return;
     } else {
+      chatSend.prop("disabled", true);
       $.ajax({
         url: "../Functions/api/sendMessage.php",
         type: "POST",
@@ -225,6 +226,9 @@ export function openChat(
             );
           }
         },
+        complete: function () {
+          chatSend.prop("disabled", false);
+        }
       });
     }
   });

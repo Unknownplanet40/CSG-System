@@ -36,3 +36,37 @@ try {
     echo $e->getMessage() . " Line: " . $e->getLine();
 }
 ?>
+
+<script>
+    var ctx5 = document.getElementById('Course').getContext('2d');
+    var myChart5 = new Chart(ctx5, {
+        type: 'bar',
+        data: {
+            labels: <?php echo json_encode($labels_course); ?> ,
+            datasets: [{
+                label: 'Course Count',
+                data: <?php echo json_encode($values_course); ?> ,
+                backgroundColor: <?php echo json_encode($RandomBGcolor_course); ?> ,
+                borderColor: <?php echo json_encode($RandomBRcolor_course); ?> ,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    suggestedMax: <?php echo max($values_course); ?>
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false,
+                    position: 'bottom',
+                }
+            },
+            indexAxis: 'y'
+        }
+    });
+</script>

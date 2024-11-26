@@ -411,3 +411,7 @@
 11/26/2024 04:04:00 PM - [INFO] - User: f36754bc-8936-4fbc-b6f1-c255d3ac6228 - Action: Login - IP: 49.144.133.111 - Status: Success
 11/26/2024 09:24:08 AM - [INFO] - User: f36754bc-8936-4fbc-b6f1-c255d3ac6228 - Action: logout - IP: 49.144.133.111 - Status: Success
 11/26/2024 05:21:43 PM - [INFO] - User: f36754bc-8936-4fbc-b6f1-c255d3ac6228 - Action: Login - IP: 49.144.133.111 - Status: Success
+11/26/2024 02:02:41 PM - [INFO] - User: f36754bc-8936-4fbc-b6f1-c255d3ac6228 - Action: logout - IP: 49.144.133.111 - Status: Success
+11/26/2024 09:50:09 PM - [INFO] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: Login - IP: 49.144.133.111 - Status: Success
+11/26/2024 10:34:51 PM - [WARN] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: Session Timeout - IP: 49.144.133.111 - Status: User Logged Out
+11/26/2024 10:47:56 PM - [INFO] - User: 22a6c91e-65e8-11ef-93a7-14b31f13ae97 - Action: Login - IP: 49.144.133.111 - Status: Success

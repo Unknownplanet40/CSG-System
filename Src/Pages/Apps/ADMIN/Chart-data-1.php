@@ -32,3 +32,35 @@ foreach ($data as $row) {
     $RandomBRcolor[] = 'rgba(' . $r . ',' . $g . ',' . $b . ', 1)';
 }
 $total = array_sum($values);
+?>
+
+<script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: <?php echo json_encode($labels); ?> ,
+            datasets: [{
+                label: 'Event Count',
+                data: <?php echo json_encode($values); ?> ,
+                backgroundColor: <?php echo json_encode($RandomBGcolor); ?> ,
+                borderColor: <?php echo json_encode($RandomBRcolor); ?> ,
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    suggestedMax: <?php echo max($values); ?>
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false,
+                    position: 'top',
+                }
+            }
+        }
+    });
+</script>
