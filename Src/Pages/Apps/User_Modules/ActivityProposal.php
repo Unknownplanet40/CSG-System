@@ -54,7 +54,6 @@ $_SESSION['last_activity'] = time();
     <script src="../../../../Utilities/Third-party/JQuery/js/jquery.min.js"></script>
     <script defer type="module" src="../../../../Utilities/Scripts/BS_DBScript.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
     <title>Dashboard</title>
     <style>
         .table-border {
@@ -89,6 +88,8 @@ $_SESSION['last_activity'] = time();
                             <div class="card-body">
                                 <h4 class="text-center fw-bold text-uppercase">Activity Proposal</h4>
                                 <input type="hidden" id="ID" value="">
+                                <input type="hidden" id="OrgCode" value="">
+                                <input type="hidden" id="Created_By" value="">
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <div class="mb-3">
@@ -212,7 +213,7 @@ $_SESSION['last_activity'] = time();
                                         </thead>
                                         <tbody id="PreviousDocuments">
                                             <tr>
-                                                <td colspan="2" class="text-center">No documents found</td>
+                                                <td colspan="3" class="text-center">Loading...</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -233,9 +234,10 @@ $_SESSION['last_activity'] = time();
                 success: function(response) {
                     if (response.status == 'success') {
                         $('#PreviousDocuments').empty();
-                        response.data.forEach(doc => {
-                            var link = "../../../../" + doc.file_path;
-                            $('#PreviousDocuments').append(`
+                        if (response.data.length > 0) {
+                            response.data.forEach(doc => {
+                                var link = "../../../../" + doc.file_path;
+                                $('#PreviousDocuments').append(`
                             <tr>
                                 <td><a href="${link}" target="_blank" title="${doc.act_title}" class="text-decoration-none"><i class="fa fa-file-pdf-o"></i> View</a></td>
                                 <td>${doc.date_Created}</td>
@@ -243,32 +245,49 @@ $_SESSION['last_activity'] = time();
                             </tr>
                         `);
 
-                            $(`#EditDocument_${doc.id}`).on('click', function() {
-                                $('#AdminName').val(doc.admin_name);
-                                $('#LetterTo').val(doc.dear_title);
-                                letterBodyEditor.html.set(doc.LetterBody);
-                                $('#ActivityTitle').val(doc.act_title);
-                                $('#ActivityDateVenue').val(doc.act_date_ven);
-                                $('#ActivityHead').val(doc.act_head);
-                                activityObjectiveEditor.html.set(doc.act_obj);
-                                $('#ActivityTarget').val(doc.act_participate);
-                                $('#ActivityMechanics').val(doc.act_mech);
-                                activityBudgetEditor.html.set(doc.act_budget);
-                                $('#ActivitySourceFunds').val(doc.act_funds);
-                                $('#ActivityOutcomes').val(doc.act_expectOut);
-                                $('#ID').val(doc.ID);
+                                $(`#EditDocument_${doc.id}`).on('click', function() {
+                                    $('#AdminName').val(doc.admin_name);
+                                    $('#LetterTo').val(doc.dear_title);
+                                    letterBodyEditor.html.set(doc.LetterBody);
+                                    $('#ActivityTitle').val(doc.act_title);
+                                    $('#ActivityDateVenue').val(doc.act_date_ven);
+                                    $('#ActivityHead').val(doc.act_head);
+                                    activityObjectiveEditor.html.set(doc.act_obj);
+                                    $('#ActivityTarget').val(doc.act_participate);
+                                    $('#ActivityMechanics').val(doc.act_mech);
+                                    activityBudgetEditor.html.set(doc.act_budget);
+                                    $('#ActivitySourceFunds').val(doc.act_funds);
+                                    $('#ActivityOutcomes').val(doc.act_expectOut);
+                                    $('#ID').val(doc.ID);
+                                    $('#OrgCode').val(doc.org_code);
+                                    $('#Created_By').val(doc.Created_By);
+                                });
                             });
-                        });
+                        } else {
+                            $('#PreviousDocuments').empty();
+                            $('#PreviousDocuments').append(`
+                            <tr>
+                                <td colspan="3" class="text-center">No documents found</td>
+                            </tr>
+                        `);
+                        }
                     } else {
                         $('#PreviousDocuments').empty();
                         $('#PreviousDocuments').append(`
                         <tr>
-                            <td colspan="2" class="text-center">No documents found</td>
+                            <td colspan="3" class="text-center">Nothing to show</td>
                         </tr>
                     `);
                     }
                 },
                 error: function(xhr, status, error) {
+                    $('#PreviousDocuments').empty();
+                    $('#PreviousDocuments').append(`
+                    <tr>
+                        <td colspan="3" class="text-center">Not available</td>
+                    </tr>
+                `);
+
                     console.error(xhr.responseText);
                 }
             });
@@ -408,6 +427,8 @@ $_SESSION['last_activity'] = time();
 
         $('#GenerateLetter').on('click', function() {
             var ID = $('#ID').val();
+            var OrgCode = $('#OrgCode').val();
+            var Created_By = $('#Created_By').val();
             var AdminName = $('#AdminName').val();
             var LetterTo = $('#LetterTo').val();
             var LetterBody = letterBodyEditor.html.get();
@@ -440,6 +461,8 @@ $_SESSION['last_activity'] = time();
 
             var data = {
                 ID: ID,
+                OrgCode: OrgCode,
+                Created_By: Created_By,
                 AdminName: AdminName,
                 LetterTo: LetterTo,
                 LetterBody: LetterBody,

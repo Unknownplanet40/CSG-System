@@ -31,14 +31,14 @@ if (isset($_SESSION['last_activity'])) {
 $_SESSION['last_activity'] = time();
 
 if ($_SESSION['org_Code'] == null) {
-    $LeftLogoSrc = "../../../../Assets/Images/pdf-Resource/L_Logo.png";
-        $RightLogoSrc = "../../../../Assets/Images/pdf-Resource/R_Logo.png";
-        $FirstLine = "Republic of the Philippines";
-        $SecondLine = "Cavite State University";
-        $ThirdLine = "Imus, Cavite";
-        $FourthLine = "Student Development Services";
-        $FifthLine = "No Organization";
-        $SixthLine = "csg.syste@cvsu.edu.ph";
+    $LeftLogoSrc = " ";
+    $RightLogoSrc = " ";
+    $FirstLine = " ";
+    $SecondLine = " ";
+    $ThirdLine = " ";
+    $FourthLine = " ";
+    $FifthLine = " ";
+    $SixthLine = " ";
 } else {
     $stmt = $conn->prepare("SELECT * FROM orgdocumetheader WHERE org_code = '" . $_SESSION['org_Code'] . "'");
     $stmt->execute();
@@ -126,17 +126,23 @@ if ($_SESSION['org_Code'] == null) {
                             </div>
                             <div class="col-4 mx-auto">
                                 <h6 id="fline" class="text-center">
-                                    <?php echo $FirstLine; ?></h6>
+                                    <?php echo $FirstLine; ?>
+                                </h6>
                                 <h4 id="sline" class="text-center fw-bold">
-                                    <?php echo $SecondLine; ?></h4>
+                                    <?php echo $SecondLine; ?>
+                                </h4>
                                 <h6 id="tline" class="text-center">
-                                    <?php echo $ThirdLine; ?></h6>
+                                    <?php echo $ThirdLine; ?>
+                                </h6>
                                 <h6 id="frline" class="text-center">
-                                    <?php echo $FourthLine; ?></h6>
+                                    <?php echo $FourthLine; ?>
+                                </h6>
                                 <h4 id="siline" class="text-center text-nowrap fw-bold">
-                                    <?php echo $FifthLine; ?></h4>
+                                    <?php echo $FifthLine; ?>
+                                </h4>
                                 <h6 id="seline" class="text-center text-center fw-bold">
-                                    <?php echo $SixthLine; ?></h6>
+                                    <?php echo $SixthLine; ?>
+                                </h6>
                             </div>
 
                             <div class="col-4 d-flex justify-content-center align-items-center">
@@ -201,9 +207,10 @@ if ($_SESSION['org_Code'] == null) {
                             placeholder="<?php echo $SixthLine; ?>"
                             value="<?php echo $SixthLine; ?>">
                     </div>
-                    <div class="col-12 d-flex justify-content-center align-items-center mt-5 <?php echo $_SESSION['role'] != 1 ? 'd-none' : ''; ?>">
+                    <div
+                        class="col-12 d-flex justify-content-center align-items-center mt-5 <?php echo $_SESSION['role'] != 1 ? 'd-none' : ''; ?>">
                         <select class="form-select w-25 me-3" id="OrgSelect">
-                            <option value="0" hidden selected >Select Organization</option>
+                            <option value="0" hidden selected>Select Organization</option>
                             <?php
                             $stmt = $conn->prepare("SELECT * FROM sysorganizations");
                             $stmt->execute();
@@ -214,14 +221,92 @@ if ($_SESSION['org_Code'] == null) {
                                 while ($row = $result->fetch_assoc()) {
                                     echo '<option value="' . $row['org_code'] . '">' . ucwords($row['org_name']) . '</option>';
                                 }
-                            }
-                            ?>
+                            } else {
+                                echo '<option value="0" disabled>No Organization Found</option>';
+                            }?>
                         </select>
                         <button class="btn btn-sm btn-success w-25" id="SaveDocHeader">Save</button>
                     </div>
                 </div>
                 <script>
                     $(document).ready(function() {
+
+                        $("#OrgSelect").change(function() {
+                            var OrgCode = $(this).val();
+                            $.ajax({
+                                type: "GET",
+                                url: "../../../Functions/api/GetOrgDocHeader.php",
+                                data: {
+                                    OrgCode: OrgCode
+                                },
+                                success: function(response) {
+                                    if (response.status == "success") {
+                                        if (response.data.length > 0) {
+                                            var data = response.data[0];
+                                            $("#LeftLogo").attr("src", "../" + data.left_Image);
+                                            $("#RightLogo").attr("src", "../" + data.right_Image);
+                                            $("#FirstLine").val(data.firstLine);
+                                            $("#SecondLine").val(data.secondLine);
+                                            $("#ThirdLine").val(data.thirdLine);
+                                            $("#FourthLine").val(data.fourthLine);
+                                            $("#FifthLine").val(data.fifthLine);
+                                            $("#SixthLine").val(data.sixthLine);
+
+                                            $("#fline").text(data.firstLine);
+                                            $("#sline").text(data.secondLine);
+                                            $("#tline").text(data.thirdLine);
+                                            $("#frline").text(data.fourthLine);
+                                            $("#siline").text(data.fifthLine);
+                                            $("#seline").text(data.sixthLine);
+                                        } else {
+                                            $("#LeftLogo").attr("src", "../../../../Assets/Images/pdf-Resource/L_Logo.png");
+                                            $("#RightLogo").attr("src","../../../../Assets/Images/pdf-Resource/R_Logo.png");
+                                            $("#FirstLine").val("Republic of the Philippines");
+                                            $("#SecondLine").val("Cavite State University");
+                                            $("#ThirdLine").val("Imus, Cavite");
+                                            $("#FourthLine").val("Student Development Services");
+                                            $("#FifthLine").val("Not yet Configured");
+                                            $("#SixthLine").val("Orgaization Email");
+
+                                            $("#fline").text("Republic of the Philippines");
+                                            $("#sline").text("Cavite State University");
+                                            $("#tline").text("Imus, Cavite");
+                                            $("#frline").text("Student Development Services");
+                                            $("#siline").text("Not yet Configured");
+                                            $("#seline").text("Orgaization Email");
+                                        }
+                                    } else {
+                                        Swal.mixin({
+                                            toast: true,
+                                            position: 'top-end',
+                                            showConfirmButton: false,
+                                            timer: 3000,
+                                            timerProgressBar: true,
+                                        }).fire({
+                                            icon: 'error',
+                                            title: 'Something went wrong'
+                                        });
+                                        console.log(response);
+                                    }
+                                },
+
+                                error: function() {
+                                    Swal.mixin({
+                                        toast: true,
+                                        position: 'top-end',
+                                        showConfirmButton: false,
+                                        timer: 3000,
+                                        timerProgressBar: true,
+                                    }).fire({
+                                        icon: 'error',
+                                        title: 'Something went wrong'
+                                    });
+                                    console.log(response);
+                                }
+                            });
+                        });
+
+
                         $("#LeftImage").change(function() {
                             var file = this.files[0];
                             var reader = new FileReader();
@@ -285,8 +370,8 @@ if ($_SESSION['org_Code'] == null) {
                         });
 
                         $("#SaveDocHeader").click(function() {
-                            var LeftLogo = $("#LeftLogo").attr("src");
-                            var RightLogo = $("#RightLogo").attr("src");
+                            var LeftLogo = $("#LeftImage").prop('files')[0];
+                            var RightLogo = $("#RightImage").prop('files')[0];
                             var FirstLine = $("#FirstLine").val();
                             var SecondLine = $("#SecondLine").val();
                             var ThirdLine = $("#ThirdLine").val();
@@ -296,35 +381,96 @@ if ($_SESSION['org_Code'] == null) {
                             <?php echo $_SESSION['role'] == 1 ? 'var OrgCode = $("#OrgSelect").val();' : ''; ?>
 
                             //validation
-                            if (LeftLogo == "" || RightLogo == "" || FirstLine == "" || SecondLine ==
+                            if (FirstLine == "" || SecondLine ==
                                 "" || ThirdLine == "" || FourthLine == "" || FifthLine == "" ||
-                                SixthLine == "" <?php echo $_SESSION['role'] == 1 ? '|| OrgCode == 0' : ''; ?>) {
+                                SixthLine ==
+                                "" <?php echo $_SESSION['role'] == 1 ? '|| OrgCode == 0' : ''; ?>
+                                ) {
                                 Swal.mixin({
-                                    customClass: {
-                                        confirmButton: 'btn btn-success',
-                                    },
-                                    buttonsStyling: false
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 3000,
+                                    timerProgressBar: true,
                                 }).fire({
-                                    title: 'Error!',
-                                    text: 'Please fill up all fields',
                                     icon: 'error',
-                                    confirmButtonText: 'Ok'
+                                    title: 'Please fill up all fields'
                                 });
                                 return;
                             }
 
-                            if ((LeftLogo == "../../../../Assets/Images/pdf-Resource/L_Logo.png") ||
-                                (RightLogo == "../../../../Assets/Images/pdf-Resource/R_Logo.png")) {
+                            if (LeftLogo || RightLogo) {
+
+                                // prevent mismatched logo size
+
+                                if (LeftLogo) {
+                                    var img = new Image();
+                                    img.src = URL.createObjectURL(LeftLogo);
+                                    img.onload = function() {
+                                        if (img.width != 162 || img.height != 84) {
+                                            Swal.mixin({
+                                                toast: true,
+                                                position: 'top-end',
+                                                showConfirmButton: false,
+                                                timer: 3000,
+                                                timerProgressBar: true,
+                                            }).fire({
+                                                icon: 'info',
+                                                title: 'Left Logo must be 162 x 84'
+                                            });
+                                            return;
+                                        }
+                                    }
+                                }
+
+                                if (RightLogo) {
+                                    var img = new Image();
+                                    img.src = URL.createObjectURL(RightLogo);
+                                    img.onload = function() {
+                                        if (img.width != 468 || img.height != 225) {
+                                            Swal.mixin({
+                                                toast: true,
+                                                position: 'top-end',
+                                                showConfirmButton: false,
+                                                timer: 3000,
+                                                timerProgressBar: true,
+                                            }).fire({
+                                                icon: 'info',
+                                                title: 'Right Logo must be 468 x 225'
+                                            });
+                                            return;
+                                        }
+                                    }
+                                }
+
+                                if (LeftLogo) {
+                                    if (!["image/png"].includes(LeftLogo.type)) {
+                                        Swal.mixin({
+                                            toast: true,
+                                            position: 'top-end',
+                                            showConfirmButton: false,
+                                            timer: 3000,
+                                            timerProgressBar: true,
+                                        }).fire({
+                                            icon: 'info',
+                                            title: 'Left Logo must be PNG'
+                                        });
+                                        return;
+                                    }
+                                }
+                            }
+
+                            if (($("#LeftLogo").attr("src") == "../../../../Assets/Images/pdf-Resource/L_Logo.png") ||
+                                ($("#RightLogo").attr("src") == "../../../../Assets/Images/pdf-Resource/R_Logo.png")) {
                                 Swal.mixin({
-                                    customClass: {
-                                        confirmButton: 'btn btn-success',
-                                    },
-                                    buttonsStyling: false
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 3000,
+                                    timerProgressBar: true,
                                 }).fire({
-                                    title: 'Error!',
-                                    text: 'Please upload the logo image',
-                                    icon: 'error',
-                                    confirmButtonText: 'Ok'
+                                    icon: 'info',
+                                    title: 'Please upload Left and Right Logo'
                                 });
                                 return;
                             }
@@ -348,15 +494,14 @@ if ($_SESSION['org_Code'] == null) {
                                 validateInput(ThirdLine) || !validateInput(FourthLine) || !
                                 validateInput(FifthLine) || !validateInput(SixthLine, true)) {
                                 Swal.mixin({
-                                    customClass: {
-                                        confirmButton: 'btn btn-success',
-                                    },
-                                    buttonsStyling: false
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 3000,
+                                    timerProgressBar: true,
                                 }).fire({
-                                    title: 'Error!',
-                                    text: 'Invalid input detected',
                                     icon: 'error',
-                                    confirmButtonText: 'Ok'
+                                    title: 'Please fill up all fields'
                                 });
                                 return;
                             }
@@ -387,54 +532,44 @@ if ($_SESSION['org_Code'] == null) {
                                 success: function(response) {
                                     if (response.status == "success") {
                                         Swal.mixin({
-                                            customClass: {
-                                                confirmButton: 'btn btn-success',
-                                            },
-                                            buttonsStyling: false
+                                            toast: true,
+                                            position: 'top-end',
+                                            showConfirmButton: false,
+                                            timer: 3000,
+                                            timerProgressBar: true,
                                         }).fire({
-                                            title: 'Success!',
-                                            text: 'Document Header Updated',
                                             icon: 'success',
-                                            confirmButtonText: 'Ok'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                location.reload();
-                                            }
+                                            title: 'Document Header Saved'
                                         });
                                     } else {
                                         Swal.mixin({
-                                            customClass: {
-                                                confirmButton: 'btn btn-success',
-                                            },
-                                            buttonsStyling: false
+                                            toast: true,
+                                            position: 'top-end',
+                                            showConfirmButton: false,
+                                            timer: 3000,
+                                            timerProgressBar: true,
                                         }).fire({
-                                            title: 'Error!',
-                                            text: 'Something went wrong',
                                             icon: 'error',
-                                            confirmButtonText: 'Ok'
+                                            title: 'Opps! Something went wrong'
                                         });
+                                        console.log(response);
                                     }
                                 },
 
                                 error: function() {
                                     Swal.mixin({
-                                        customClass: {
-                                            confirmButton: 'btn btn-success',
-                                        },
-                                        buttonsStyling: false
+                                        toast: true,
+                                        position: 'top-end',
+                                        showConfirmButton: false,
+                                        timer: 3000,
+                                        timerProgressBar: true,
                                     }).fire({
-                                        title: 'Error!',
-                                        text: 'Something went wrong',
                                         icon: 'error',
-                                        confirmButtonText: 'Ok'
+                                        title: 'Opps! Something went wrong'
                                     });
-                                }
+                                },
                             });
-
-
-
                         });
-
                     });
                 </script>
             </div>

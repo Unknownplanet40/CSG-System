@@ -17,13 +17,26 @@ function response($data)
 
 class PDF extends TCPDF
 {
-    public function CustomHeader($conn, $ActivityTitle)
+    public function CustomHeader($conn, $ActivityTitle, $OrgCode)
     {
-        $stmt = $conn->prepare("SELECT * FROM orgdocumetheader WHERE org_code = ?");
-        $stmt->bind_param("s", $_SESSION['org_Code']);
-        $stmt->execute();
-        $result = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
+
+        if ($OrgCode === '') {
+            $stmt = $conn->prepare("SELECT * FROM orgdocumetheader WHERE org_code = ?");
+            $stmt->bind_param("s", $_SESSION['org_Code']);
+            $stmt->execute();
+            $result = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+        } else {
+            $stmt = $conn->prepare("SELECT * FROM orgdocumetheader WHERE org_code = ?");
+            $stmt->bind_param("s", $OrgCode);
+            $stmt->execute();
+            $result = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+        }
+
+        if (!$result) {
+            response(['status' => 'error', 'message' => 'Document header not found']);
+        }
 
         $LeftLogo = $result['left_Image'] ? substr($result['left_Image'], 35) : '';
         $RightLogo = $result['right_Image'] ? substr($result['right_Image'], 35) : '';
@@ -158,6 +171,8 @@ try {
     }
 
     $ID = $_POST['ID'] ?? '';
+    $OrgCode = $_POST['OrgCode'] ?? '';
+    $Created_By = $_POST['Created_By'] ?? '';
     $AdminName = $_POST['AdminName'];
     $LetterTo = $_POST['LetterTo'];
     $ActivityHead = $_POST['ActivityHead'];
@@ -185,19 +200,19 @@ try {
 
     $pdf = new PDF('P', 'mm', 'Letter', true, 'UTF-8', false);
     $pdf->SetCreator(PDF_CREATOR);
-    $pdf->SetAuthor($_SESSION['FullName']);
+    $pdf->SetAuthor($ID !== '' ? $Created_By : $_SESSION['FullName']);
     $pdf->SetTitle('Activity Proposal');
     $pdf->SetSubject('Activity Proposal for ' . $ActivityTitle);
-    $pdf->SetKeywords('Activity Proposal, ' . $ActivityTitle);
+    $pdf->SetKeywords('Activity Proposal, ' . $ActivityTitle, $ID !== '' ? 'Updated ' . date('Y-m-d H:i:s') : 'Created ' . date('Y-m-d H:i:s'));
     $pdf->SetPrintHeader(false);
     $pdf->AddPage();
-    $pdf->CustomHeader($conn, $ActivityTitle);
+    $pdf->CustomHeader($conn, $ActivityTitle, $OrgCode);
     $pdf->Content($conn, $AdminName, $LetterBody, $LetterTo);
     $pdf->AddPage();
-    $pdf->CustomHeader($conn, $ActivityTitle);
+    $pdf->CustomHeader($conn, $ActivityTitle, $OrgCode);
     $pdf->Proposal($data);
     $pdf->AddPage();
-    $pdf->CustomHeader($conn, $ActivityTitle);
+    $pdf->CustomHeader($conn, $ActivityTitle, $OrgCode);
 
     if ($ID !== '') {
         $stmt = $conn->prepare("SELECT file_path FROM activityproposaldocuments WHERE ID = ?");
@@ -210,7 +225,7 @@ try {
 
         $basePath = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'DocumentsStorage';
         $filePath = realpath($row['file_path']);
-        
+
         if (!empty($filePath) && strpos($filePath, $basePath) === 0 && is_file($filePath)) {
             unlink($filePath);
         }

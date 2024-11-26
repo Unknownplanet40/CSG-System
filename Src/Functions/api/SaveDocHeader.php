@@ -18,8 +18,8 @@ try {
         response(['status' => 'error', 'message' => 'Invalid request method']);
     }
 
-    $LeftLogo = $_FILES['LeftLogo'];
-    $RightLogo = $_FILES['RightLogo'];
+    $LeftLogo = $_FILES['LeftLogo'] ?? null;
+    $RightLogo = $_FILES['RightLogo'] ?? null;
     $FirstLine = $_POST['FirstLine'];
     $SecondLine = $_POST['SecondLine'];
     $ThirdLine = $_POST['ThirdLine'];
@@ -28,7 +28,6 @@ try {
     $SixthLine = $_POST['SixthLine'];
     $orgCode = $_SESSION['org_Code'] ?? $_POST['OrgCode'];
 
-    // check if already exist
     $stmt  = $conn->prepare("SELECT * FROM orgdocumetheader WHERE org_code = ? ");
     $stmt->bind_param("s", $orgCode);
     $stmt->execute();
@@ -36,50 +35,52 @@ try {
     $stmt->close();
 
     if ($result->num_rows > 0) {
-        $folder = "../../../Assets/Images/pdf-Resource/OrgFolder/$orgCode/";
-        $LeftLogo = $_FILES['LeftLogo'];
-        $RightLogo = $_FILES['RightLogo'];
+        if (empty($LeftLogo) && empty($RightLogo)) {
+            $stmt = $conn->prepare("UPDATE orgdocumetheader SET firstLine = ?, secondLine = ?, thirdLine = ?, fourthLine = ?, fifthLine = ?, sixthLine = ? WHERE org_code = '" . $orgCode . "' ");
+            $stmt->bind_param("ssssss", $FirstLine, $SecondLine, $ThirdLine, $FourthLine, $FifthLine, $SixthLine);
+        } else {
+            $folder = "../../../Assets/Images/pdf-Resource/OrgFolder/$orgCode/";
+            $LeftLogo = $_FILES['LeftLogo'];
+            $RightLogo = $_FILES['RightLogo'];
 
-        if (!file_exists($folder)) {
-            if (!mkdir($folder, 0777, true)) {
-                throw new Exception("Failed to create directory");
+            if (!file_exists($folder)) {
+                if (!mkdir($folder, 0777, true)) {
+                    throw new Exception("Failed to create directory");
+                }
             }
+            $LeftLogoName = $folder . "LeftLogo.png";
+            $RightLogoName = $folder . "RightLogo.png";
+
+            if (!empty($LeftLogo['tmp_name'])) {
+                if (!in_array($LeftLogo['type'], ['image/png'])) {
+                    throw new Exception("Left logo must be PNG");
+                }
+                if (file_exists($LeftLogoName)) {
+                    unlink($LeftLogoName);
+                }
+                if (!move_uploaded_file($LeftLogo['tmp_name'], $LeftLogoName)) {
+                    throw new Exception("Failed to upload left logo");
+                }
+            }
+
+            if (!empty($RightLogo['tmp_name'])) {
+                if (!in_array($RightLogo['type'], ['image/png'])) {
+                    throw new Exception("Right logo must be PNG");
+                }
+                if (file_exists($RightLogoName)) {
+                    unlink($RightLogoName);
+                }
+                if (!move_uploaded_file($RightLogo['tmp_name'], $RightLogoName)) {
+                    throw new Exception("Failed to upload right logo");
+                }
+            }
+
+            $stmt = $conn->prepare("UPDATE orgdocumetheader SET left_Image = ?, right_Image = ?, firstLine = ?, secondLine = ?, thirdLine = ?, fourthLine = ?, fifthLine = ?, sixthLine = ? WHERE org_code = '" . $orgCode . "' ");
+            $stmt->bind_param("ssssssss", $LeftLogoName, $RightLogoName, $FirstLine, $SecondLine, $ThirdLine, $FourthLine, $FifthLine, $SixthLine);
         }
-        $LeftLogoName = $folder . "LeftLogo.png";
-        $RightLogoName = $folder . "RightLogo.png";
-
-        if (!empty($LeftLogo['tmp_name'])) {
-            if (!in_array($LeftLogo['type'], ['image/png'])) {
-                throw new Exception("Left logo must be PNG");
-            }
-            if (file_exists($LeftLogoName)) {
-                unlink($LeftLogoName);
-            }
-            if (!move_uploaded_file($LeftLogo['tmp_name'], $LeftLogoName)) {
-                throw new Exception("Failed to upload left logo");
-            }
-        }
-
-        if (!empty($RightLogo['tmp_name'])) {
-            if (!in_array($RightLogo['type'], ['image/png'])) {
-                throw new Exception("Right logo must be PNG");
-            }
-            if (file_exists($RightLogoName)) {
-                unlink($RightLogoName);
-            }
-            if (!move_uploaded_file($RightLogo['tmp_name'], $RightLogoName)) {
-                throw new Exception("Failed to upload right logo");
-            }
-        }
-        //ID	org_code	left_Image	right_Image	firstLine	secondLine	thirdLine	fourthLine	fifthLine	sixthLine	lastModifiedDate	
-
-
-        $stmt = $conn->prepare("UPDATE orgdocumetheader SET left_Image = ?, right_Image = ?, firstLine = ?, secondLine = ?, thirdLine = ?, fourthLine = ?, fifthLine = ?, sixthLine = ? WHERE org_code = '" . $orgCode . "' ");
-        $stmt->bind_param("ssssssss", $LeftLogoName, $RightLogoName, $FirstLine, $SecondLine, $ThirdLine, $FourthLine, $FifthLine, $SixthLine);
         $stmt->execute();
         $stmt->close();
 
-        response(['status' => 'success', 'message' => 'Document Header Updated Successfully']);
     } else {
         $folder = "../../../Assets/Images/pdf-Resource/OrgFolder/$orgCode/";
         $LeftLogo = $_FILES['LeftLogo'];
@@ -115,11 +116,9 @@ try {
         $stmt->bind_param("issssssss", $orgCode, $LeftLogoName, $RightLogoName, $FirstLine, $SecondLine, $ThirdLine, $FourthLine, $FifthLine, $SixthLine);
         $stmt->execute();
         $stmt->close();
-
-        response(['status' => 'success', 'message' => 'Document Header Saved Successfully']);
     }
 
-
+    response(['status' => 'success', 'message' => 'Document Header Updated Successfully']);
 } catch (Exception $e) {
     response(['status' => 'error', 'message' => $e->getMessage()]);
 }

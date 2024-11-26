@@ -394,3 +394,9 @@
 11/25/2024 06:17:09 PM - [INFO] - User: f36754bc-8936-4fbc-b6f1-c255d3ac6228 - Action: logout - IP: 49.144.133.111 - Status: Success
 11/26/2024 01:17:23 AM - [INFO] - User: f079e254-6b42-11ef-9d3d-14b31f13ae97 - Action: Login - IP: 49.144.133.111 - Status: Success
 11/25/2024 06:39:44 PM - [INFO] - User: f079e254-6b42-11ef-9d3d-14b31f13ae97 - Action: logout - IP: 49.144.133.111 - Status: Success
+11/26/2024 09:29:19 AM - [INFO] - User: f079e254-6b42-11ef-9d3d-14b31f13ae97 - Action: Login - IP: 49.144.133.111 - Status: Success
+11/26/2024 09:29:21 AM - [WARN] - User: f079e254-6b42-11ef-9d3d-14b31f13ae97 - Action: Session Timeout - IP: 49.144.133.111 - Status: User Logged Out
+11/26/2024 09:29:34 AM - [INFO] - User: f079e254-6b42-11ef-9d3d-14b31f13ae97 - Action: Login - IP: 49.144.133.111 - Status: Success
+11/26/2024 03:59:04 AM - [INFO] - User: f079e254-6b42-11ef-9d3d-14b31f13ae97 - Action: logout - IP: 49.144.133.111 - Status: Success
+11/26/2024 11:04:17 AM - [INFO] - User: a5dcd436-74fe-4405-9de9-4eaca56f432a - Action: Login - IP: 49.144.133.111 - Status: Success
+11/26/2024 04:10:21 AM - [INFO] - User: a5dcd436-74fe-4405-9de9-4eaca56f432a - Action: logout - IP: 49.144.133.111 - Status: Success
