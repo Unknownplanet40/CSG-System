@@ -176,6 +176,15 @@ $_SESSION['last_activity'] = time();
                                         </div>
                                     </div>
                                     <div class="col-md-12">
+                                        <div class="mb-3">
+                                            <label for="ActivitySignature" class="form-label">Signature</label>
+                                            <textarea class="form-control rounded-1" id="ActivitySignature"
+                                                placeholder="Type the signature template here"></textarea>
+                                            <div class="form-text">Please provide a Name and Position for the signature
+                                                template</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
                                         <div class="hstack gap-3">
                                             <div class="mb-3 d-flex justify-content-center">
                                                 <button class="btn btn-sm btn-outline-secondary rounded-1 d-none"
@@ -228,6 +237,9 @@ $_SESSION['last_activity'] = time();
     <script src="../../../../Utilities/Third-party/Froalaeditor/js/froala_editor.pkgd.min.js"></script>
     <script>
         function getAP_Documents() {
+            // this is a sample signature template
+            $('#ActivitySignature').val(`<h1 style="text-align: center;" id="isPasted"><strong><span style="font-size: 36px;">Please Change This Before Generating</span></strong></h1><p style="margin: 0in; line-height: 1.5; font-size: 15px; font-family: Arial, sans-serif; text-align: center;">Prepared by:</p><p style="margin: 0in; line-height: 1.5; font-size: 15px; font-family: Arial, sans-serif; text-align: center;"><br></p><p style="margin: 0in; line-height: normal; font-size: 15px; font-family: Arial, sans-serif; text-align: center;"><strong>NAME</strong></p><p style="margin: 0in; line-height: normal; font-size: 15px; font-family: Arial, sans-serif; text-align: center;">ORG Secretary</p><p style="margin: 0in; line-height: normal; font-size: 15px; font-family: Arial, sans-serif; text-align: center;"><br></p><p style="margin: 0in; line-height: normal; font-size: 15px; font-family: Arial, sans-serif; text-align: center;"><br></p><p style="margin: 0in; line-height: 1.5; font-size: 15px; font-family: Arial, sans-serif; text-align: center;">Checked by:</p><p style="margin: 0in; line-height: 1.5; font-size: 15px; font-family: Arial, sans-serif; text-align: center;"><br></p><p style="margin: 0in; line-height: normal; font-size: 15px; font-family: Arial, sans-serif; text-align: center;"><strong>NAME</strong></p><p style="margin: 0in; line-height: normal; font-size: 15px; font-family: Arial, sans-serif; text-align: center;">ORG President</p><p style='margin:0in;line-height:normal;font-size:15px;font-family:"Arial",sans-serif;'>&nbsp;</p><p style='margin:0in;line-height:normal;font-size:15px;font-family:"Arial",sans-serif;'>&nbsp;</p><p style="margin: 0in; line-height: normal; font-size: 15px; font-family: Arial, sans-serif; text-align: center;">Noted By:</p><p style='margin:0in;line-height:normal;font-size:15px;font-family:"Arial",sans-serif;'>&nbsp;</p><p style='margin:0in;line-height:normal;font-size:15px;font-family:"Arial",sans-serif;'><br></p><table style="width: 100%; margin-left: calc(0%);"><tbody><tr><td style="width: 50.0000%;"><strong>NAME</strong></td><td style="width: 50.0000%;"><strong>NAME</strong></td></tr><tr><td style="width: 50.0000%;">SAP ORG</td><td style="width: 50.0000%;">ORG Adviser</td></tr></tbody></table>`);
+            
             $.ajax({
                 type: 'GET',
                 url: '../../../Functions/api/getPreActivityProposal.php',
@@ -258,6 +270,7 @@ $_SESSION['last_activity'] = time();
                                     activityBudgetEditor.html.set(doc.act_budget);
                                     $('#ActivitySourceFunds').val(doc.act_funds);
                                     $('#ActivityOutcomes').val(doc.act_expectOut);
+                                    $('#ActivitySignature').val(doc.act_signature);
                                     $('#ID').val(doc.ID);
                                     $('#OrgCode').val(doc.org_code);
                                     $('#Created_By').val(doc.Created_By);
@@ -317,7 +330,7 @@ $_SESSION['last_activity'] = time();
             imagePaste: false,
             imageAllowedTypes: [],
             charCounterCount: true,
-            charCounterMax: 10000,
+            charCounterMax: 8000,
             toolbarSticky: true,
             quickInsertButtons: ['table', 'ul', 'ol', 'hr'],
             <?php echo $_SESSION['theme'] == 'dark' ? "theme: 'dark'," : ""; ?>
@@ -343,7 +356,7 @@ $_SESSION['last_activity'] = time();
             imagePaste: false,
             imageAllowedTypes: [],
             charCounterCount: true,
-            charCounterMax: 5000,
+            charCounterMax: 3000,
             toolbarSticky: true,
             quickInsertButtons: ['ul', 'ol', 'hr'],
             <?php echo $_SESSION['theme'] == 'dark' ? "theme: 'dark'," : ""; ?>
@@ -376,8 +389,6 @@ $_SESSION['last_activity'] = time();
             }
         });
 
-
-
         var activityBudgetEditor = new FroalaEditor('#ActivityBudget', {
             toolbarButtons: {
                 'moreText': {
@@ -398,12 +409,42 @@ $_SESSION['last_activity'] = time();
             imagePaste: false,
             imageAllowedTypes: [],
             charCounterCount: true,
-            charCounterMax: 5000,
+            charCounterMax: 3000,
             toolbarSticky: true,
             tableStyles: {
                 'table': 'table-border'
             },
 
+            quickInsertButtons: ['table', 'ul', 'ol', 'hr'],
+            <?php echo $_SESSION['theme'] == 'dark' ? "theme: 'dark'," : ""; ?>
+        });
+
+        var activitySignatureEditor = new FroalaEditor('#ActivitySignature', {
+            toolbarButtons: {
+                'moreText': {
+                    'buttons': ['bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript',
+                        'fontFamily', 'fontSize', 'textColor', 'backgroundColor', 'clearFormatting'
+                    ]
+                },
+                'moreParagraph': {
+                    'buttons': ['alignLeft', 'alignCenter', 'formatOLSimple', 'alignRight', 'alignJustify',
+                        'formatOL', 'formatUL', 'paragraphFormat', 'paragraphStyle', 'lineHeight'
+                    ]
+                },
+                'moreRich': {
+                    'buttons': ['insertLink', 'insertTable', 'insertHR']
+                },
+                'moreMisc': {
+                    'buttons': ['undo', 'redo', 'spellChecker', 'selectAll']
+                }
+            },
+            height: 400,
+            imageUpload: false,
+            imagePaste: false,
+            imageAllowedTypes: [],
+            charCounterCount: true,
+            charCounterMax: 3000,
+            toolbarSticky: true,
             quickInsertButtons: ['table', 'ul', 'ol', 'hr'],
             <?php echo $_SESSION['theme'] == 'dark' ? "theme: 'dark'," : ""; ?>
         });
@@ -421,6 +462,7 @@ $_SESSION['last_activity'] = time();
             $('#ActivitySourceFunds').val('');
             $('#ActivityOutcomes').val('');
             $('#ActivityHead').val('');
+            activitySignatureEditor.html.set('');
             $('#PrintPreview').addClass('d-none');
             $('#ID').val('');
         });
@@ -441,11 +483,12 @@ $_SESSION['last_activity'] = time();
             var ActivityHead = $('#ActivityHead').val();
             var ActivitySourceFunds = $('#ActivitySourceFunds').val();
             var ActivityOutcomes = $('#ActivityOutcomes').val();
+            var ActivitySignature = activitySignatureEditor.html.get();
 
             if (AdminName == '' || LetterTo == '' || LetterBody == '' || ActivityTitle == '' ||
                 ActivityDateVenue == '' || ActivityObjective == '' || ActivityTarget == '' ||
                 ActivityMechanics == '' || ActivityBudget == '' || ActivityHead == '' || ActivitySourceFunds ==
-                '' || ActivityOutcomes == '') {
+                '' || ActivityOutcomes == '' || ActivitySignature == '') {
                 Swal.mixin({
                     toast: true,
                     position: 'top',
@@ -474,12 +517,13 @@ $_SESSION['last_activity'] = time();
                 ActivityMechanics: ActivityMechanics,
                 ActivityBudget: ActivityBudget,
                 ActivitySourceFunds: ActivitySourceFunds,
-                ActivityOutcomes: ActivityOutcomes
+                ActivityOutcomes: ActivityOutcomes,
+                ActivitySignature: ActivitySignature
             };
 
             console.log(data);
 
-            $.ajax({
+            /* $.ajax({
                 type: 'POST',
                 url: '../../../Functions/api/postActivityProposal.php',
                 data: data,
@@ -519,7 +563,7 @@ $_SESSION['last_activity'] = time();
                 error: function(xhr, status, error) {
                     console.error(xhr.responseText);
                 }
-            });
+            }); */
         });
     </script>
 </body>

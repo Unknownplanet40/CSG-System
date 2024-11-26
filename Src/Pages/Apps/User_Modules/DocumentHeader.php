@@ -120,11 +120,11 @@ if ($_SESSION['org_Code'] == null) {
                 <div class="card text-bg-light border-0">
                     <div class="card-body">
                         <div class="row g-2">
-                            <div class="col-4 d-flex justify-content-center align-items-center">
-                                <img src="<?php echo $LeftLogoSrc; ?>"
+                            <div class="col-2 d-flex justify-content-center align-items-center">
+                                <img src="<?php echo $LeftLogoSrc; ?>" style="margin-right: -25rem; margin-top: -1.8rem;"
                                     id="LeftLogo" alt="" height="92">
                             </div>
-                            <div class="col-4 mx-auto">
+                            <div class="col-8 mx-auto">
                                 <h6 id="fline" class="text-center">
                                     <?php echo $FirstLine; ?>
                                 </h6>
@@ -144,9 +144,8 @@ if ($_SESSION['org_Code'] == null) {
                                     <?php echo $SixthLine; ?>
                                 </h6>
                             </div>
-
-                            <div class="col-4 d-flex justify-content-center align-items-center">
-                                <img src="<?php echo $RightLogoSrc; ?>"
+                            <div class="col-2 d-flex justify-content-center align-items-center">
+                                <img src="<?php echo $RightLogoSrc; ?>" style="margin-left: -25rem; margin-top: -1.8rem;"
                                     id="RightLogo" alt="" height="92">
                             </div>
                         </div>
@@ -208,22 +207,21 @@ if ($_SESSION['org_Code'] == null) {
                             value="<?php echo $SixthLine; ?>">
                     </div>
                     <div
-                        class="col-12 d-flex justify-content-center align-items-center mt-5 <?php echo $_SESSION['role'] != 1 ? 'd-none' : ''; ?>">
-                        <select class="form-select w-25 me-3" id="OrgSelect">
+                        class="col-12 d-flex justify-content-center align-items-center mt-5">
+                        <select class="form-select w-25 me-3 <?php echo $_SESSION['role'] != 1 ? 'd-none' : ''; ?>" id="OrgSelect">
                             <option value="0" hidden selected>Select Organization</option>
                             <?php
                             $stmt = $conn->prepare("SELECT * FROM sysorganizations");
                             $stmt->execute();
                             $result = $stmt->get_result();
                             $stmt->close();
-
                             if ($result->num_rows > 0) {
                                 while ($row = $result->fetch_assoc()) {
                                     echo '<option value="' . $row['org_code'] . '">' . ucwords($row['org_name']) . '</option>';
                                 }
                             } else {
                                 echo '<option value="0" disabled>No Organization Found</option>';
-                            }?>
+                                }?>
                         </select>
                         <button class="btn btn-sm btn-success w-25" id="SaveDocHeader">Save</button>
                     </div>
@@ -243,8 +241,10 @@ if ($_SESSION['org_Code'] == null) {
                                     if (response.status == "success") {
                                         if (response.data.length > 0) {
                                             var data = response.data[0];
-                                            $("#LeftLogo").attr("src", "../" + data.left_Image);
-                                            $("#RightLogo").attr("src", "../" + data.right_Image);
+                                            $("#LeftLogo").attr("src", "../" + data
+                                                .left_Image);
+                                            $("#RightLogo").attr("src", "../" + data
+                                                .right_Image);
                                             $("#FirstLine").val(data.firstLine);
                                             $("#SecondLine").val(data.secondLine);
                                             $("#ThirdLine").val(data.thirdLine);
@@ -259,19 +259,26 @@ if ($_SESSION['org_Code'] == null) {
                                             $("#siline").text(data.fifthLine);
                                             $("#seline").text(data.sixthLine);
                                         } else {
-                                            $("#LeftLogo").attr("src", "../../../../Assets/Images/pdf-Resource/L_Logo.png");
-                                            $("#RightLogo").attr("src","../../../../Assets/Images/pdf-Resource/R_Logo.png");
-                                            $("#FirstLine").val("Republic of the Philippines");
+                                            $("#LeftLogo").attr("src",
+                                                "../../../../Assets/Images/pdf-Resource/L_Logo.png"
+                                            );
+                                            $("#RightLogo").attr("src",
+                                                "../../../../Assets/Images/pdf-Resource/R_Logo.png"
+                                            );
+                                            $("#FirstLine").val(
+                                                "Republic of the Philippines");
                                             $("#SecondLine").val("Cavite State University");
                                             $("#ThirdLine").val("Imus, Cavite");
-                                            $("#FourthLine").val("Student Development Services");
+                                            $("#FourthLine").val(
+                                                "Student Development Services");
                                             $("#FifthLine").val("Not yet Configured");
                                             $("#SixthLine").val("Orgaization Email");
 
                                             $("#fline").text("Republic of the Philippines");
                                             $("#sline").text("Cavite State University");
                                             $("#tline").text("Imus, Cavite");
-                                            $("#frline").text("Student Development Services");
+                                            $("#frline").text(
+                                                "Student Development Services");
                                             $("#siline").text("Not yet Configured");
                                             $("#seline").text("Orgaization Email");
                                         }
@@ -305,7 +312,6 @@ if ($_SESSION['org_Code'] == null) {
                                 }
                             });
                         });
-
 
                         $("#LeftImage").change(function() {
                             var file = this.files[0];
@@ -346,12 +352,12 @@ if ($_SESSION['org_Code'] == null) {
                         });
 
                         $("#FifthLine").on('input', function() {
-                            var text = $(this).val() || "Central Student Government";
+                            var text = $(this).val() || "<?php echo $FifthLine; ?>";
                             $("#siline").text(text);
                         });
 
                         $("#SixthLine").on('input', function() {
-                            var text = $(this).val() || "csg.system@cvsu.edu.ph";
+                            var text = $(this).val() || "<?php echo $SixthLine; ?>";
                             $("#seline").text(text);
                         });
 
@@ -380,12 +386,11 @@ if ($_SESSION['org_Code'] == null) {
                             var SixthLine = $("#SixthLine").val();
                             <?php echo $_SESSION['role'] == 1 ? 'var OrgCode = $("#OrgSelect").val();' : ''; ?>
 
-                            //validation
                             if (FirstLine == "" || SecondLine ==
                                 "" || ThirdLine == "" || FourthLine == "" || FifthLine == "" ||
                                 SixthLine ==
                                 "" <?php echo $_SESSION['role'] == 1 ? '|| OrgCode == 0' : ''; ?>
-                                ) {
+                            ) {
                                 Swal.mixin({
                                     toast: true,
                                     position: 'top-end',
@@ -400,14 +405,22 @@ if ($_SESSION['org_Code'] == null) {
                             }
 
                             if (LeftLogo || RightLogo) {
-
-                                // prevent mismatched logo size
-
                                 if (LeftLogo) {
                                     var img = new Image();
                                     img.src = URL.createObjectURL(LeftLogo);
                                     img.onload = function() {
-                                        if (img.width != 162 || img.height != 84) {
+                                        if (img.width == 468 || img.height == 225) {
+                                            Swal.mixin({
+                                                toast: true,
+                                                position: 'top-end',
+                                                showConfirmButton: false,
+                                                timer: 3000,
+                                                timerProgressBar: true,
+                                            }).fire({
+                                                icon: 'info',
+                                                title: 'Cannot use Right Logo size'
+                                            });
+                                        } else if (img.width != 162 || img.height != 84) {
                                             Swal.mixin({
                                                 toast: true,
                                                 position: 'top-end',
@@ -418,32 +431,9 @@ if ($_SESSION['org_Code'] == null) {
                                                 icon: 'info',
                                                 title: 'Left Logo must be 162 x 84'
                                             });
-                                            return;
                                         }
                                     }
-                                }
 
-                                if (RightLogo) {
-                                    var img = new Image();
-                                    img.src = URL.createObjectURL(RightLogo);
-                                    img.onload = function() {
-                                        if (img.width != 468 || img.height != 225) {
-                                            Swal.mixin({
-                                                toast: true,
-                                                position: 'top-end',
-                                                showConfirmButton: false,
-                                                timer: 3000,
-                                                timerProgressBar: true,
-                                            }).fire({
-                                                icon: 'info',
-                                                title: 'Right Logo must be 468 x 225'
-                                            });
-                                            return;
-                                        }
-                                    }
-                                }
-
-                                if (LeftLogo) {
                                     if (!["image/png"].includes(LeftLogo.type)) {
                                         Swal.mixin({
                                             toast: true,
@@ -455,13 +445,58 @@ if ($_SESSION['org_Code'] == null) {
                                             icon: 'info',
                                             title: 'Left Logo must be PNG'
                                         });
-                                        return;
                                     }
                                 }
+
+                                if (RightLogo) {
+                                    var img = new Image();
+                                    img.src = URL.createObjectURL(RightLogo);
+                                    img.onload = function() {
+                                        if (img.width == 162 || img.height == 84) {
+                                            Swal.mixin({
+                                                toast: true,
+                                                position: 'top-end',
+                                                showConfirmButton: false,
+                                                timer: 3000,
+                                                timerProgressBar: true,
+                                            }).fire({
+                                                icon: 'info',
+                                                title: 'Cannot use Left Logo size'
+                                            });
+                                        } else if (img.width != 468 || img.height != 225) {
+                                            Swal.mixin({
+                                                toast: true,
+                                                position: 'top-end',
+                                                showConfirmButton: false,
+                                                timer: 3000,
+                                                timerProgressBar: true,
+                                            }).fire({
+                                                icon: 'info',
+                                                title: 'Right Logo must be 468 x 225'
+                                            });
+                                        }
+                                    }
+
+                                    if (!["image/png"].includes(RightLogo.type)) {
+                                        Swal.mixin({
+                                            toast: true,
+                                            position: 'top-end',
+                                            showConfirmButton: false,
+                                            timer: 3000,
+                                            timerProgressBar: true,
+                                        }).fire({
+                                            icon: 'info',
+                                            title: 'Right Logo must be PNG'
+                                        });
+                                    }
+                                }
+                                return;
                             }
 
-                            if (($("#LeftLogo").attr("src") == "../../../../Assets/Images/pdf-Resource/L_Logo.png") ||
-                                ($("#RightLogo").attr("src") == "../../../../Assets/Images/pdf-Resource/R_Logo.png")) {
+                            if (($("#LeftLogo").attr("src") ==
+                                    "../../../../Assets/Images/pdf-Resource/L_Logo.png") ||
+                                ($("#RightLogo").attr("src") ==
+                                    "../../../../Assets/Images/pdf-Resource/R_Logo.png")) {
                                 Swal.mixin({
                                     toast: true,
                                     position: 'top-end',
@@ -476,17 +511,12 @@ if ($_SESSION['org_Code'] == null) {
                             }
 
                             function validateInput(input, isEmail = false) {
-                                // if empty or only whitespace
                                 if (!input.trim()) {
                                     return false;
                                 }
-
-                                // if email field
                                 if (isEmail) {
                                     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input);
                                 }
-
-                                // for regular text fields
                                 return input.length >= 2 && input.length <= 100;
                             }
 
@@ -541,6 +571,11 @@ if ($_SESSION['org_Code'] == null) {
                                             icon: 'success',
                                             title: 'Document Header Saved'
                                         });
+                                        $("#SaveDocHeader").text("Changes Saved");
+                                        setTimeout(() => {
+                                            $("#SaveDocHeader").attr("disabled", false);
+                                            $("#SaveDocHeader").text("Save");
+                                        }, 1500);
                                     } else {
                                         Swal.mixin({
                                             toast: true,

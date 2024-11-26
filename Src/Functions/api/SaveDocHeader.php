@@ -35,13 +35,8 @@ try {
     $stmt->close();
 
     if ($result->num_rows > 0) {
-        if (empty($LeftLogo) && empty($RightLogo)) {
-            $stmt = $conn->prepare("UPDATE orgdocumetheader SET firstLine = ?, secondLine = ?, thirdLine = ?, fourthLine = ?, fifthLine = ?, sixthLine = ? WHERE org_code = '" . $orgCode . "' ");
-            $stmt->bind_param("ssssss", $FirstLine, $SecondLine, $ThirdLine, $FourthLine, $FifthLine, $SixthLine);
-        } else {
+        if (!empty($LeftLogo) || !empty($RightLogo)) {
             $folder = "../../../Assets/Images/pdf-Resource/OrgFolder/$orgCode/";
-            $LeftLogo = $_FILES['LeftLogo'];
-            $RightLogo = $_FILES['RightLogo'];
 
             if (!file_exists($folder)) {
                 if (!mkdir($folder, 0777, true)) {
@@ -51,33 +46,47 @@ try {
             $LeftLogoName = $folder . "LeftLogo.png";
             $RightLogoName = $folder . "RightLogo.png";
 
-            if (!empty($LeftLogo['tmp_name'])) {
-                if (!in_array($LeftLogo['type'], ['image/png'])) {
-                    throw new Exception("Left logo must be PNG");
+            if (!empty($LeftLogo)) {
+                if (!empty($LeftLogo['tmp_name'])) {
+                    if (!empty($LeftLogo) && !empty($LeftLogo['tmp_name'])) {
+                        throw new Exception("Left logo must be PNG");
+                    }
+                    if (file_exists($LeftLogoName)) {
+                        unlink($LeftLogoName);
+                    }
+                    if (!move_uploaded_file($LeftLogo['tmp_name'], $LeftLogoName)) {
+                        throw new Exception("Failed to upload left logo");
+                    }
                 }
-                if (file_exists($LeftLogoName)) {
-                    unlink($LeftLogoName);
-                }
-                if (!move_uploaded_file($LeftLogo['tmp_name'], $LeftLogoName)) {
-                    throw new Exception("Failed to upload left logo");
-                }
+
+                $stmt = $conn->prepare("UPDATE orgdocumetheader SET left_Image = ? WHERE org_code = '" . $orgCode . "' ");
+                $stmt->bind_param("s", $LeftLogoName);
+                $stmt->execute();
+                $stmt->close();
             }
 
-            if (!empty($RightLogo['tmp_name'])) {
-                if (!in_array($RightLogo['type'], ['image/png'])) {
-                    throw new Exception("Right logo must be PNG");
+            if (!empty($RightLogo)) {
+                if (!empty($RightLogo['tmp_name'])) {
+                    if (!empty($RightLogo) && !empty($RightLogo['tmp_name'])) {
+                        throw new Exception("Right logo must be PNG");
+                    }
+                    if (file_exists($RightLogoName)) {
+                        unlink($RightLogoName);
+                    }
+                    if (!move_uploaded_file($RightLogo['tmp_name'], $RightLogoName)) {
+                        throw new Exception("Failed to upload right logo");
+                    }
                 }
-                if (file_exists($RightLogoName)) {
-                    unlink($RightLogoName);
-                }
-                if (!move_uploaded_file($RightLogo['tmp_name'], $RightLogoName)) {
-                    throw new Exception("Failed to upload right logo");
-                }
-            }
 
-            $stmt = $conn->prepare("UPDATE orgdocumetheader SET left_Image = ?, right_Image = ?, firstLine = ?, secondLine = ?, thirdLine = ?, fourthLine = ?, fifthLine = ?, sixthLine = ? WHERE org_code = '" . $orgCode . "' ");
-            $stmt->bind_param("ssssssss", $LeftLogoName, $RightLogoName, $FirstLine, $SecondLine, $ThirdLine, $FourthLine, $FifthLine, $SixthLine);
+                $stmt = $conn->prepare("UPDATE orgdocumetheader SET right_Image = ? WHERE org_code = '" . $orgCode . "' ");
+                $stmt->bind_param("s", $RightLogoName);
+                $stmt->execute();
+                $stmt->close();
+            }
         }
+
+        $stmt = $conn->prepare("UPDATE orgdocumetheader SET firstLine = ?, secondLine = ?, thirdLine = ?, fourthLine = ?, fifthLine = ?, sixthLine = ? WHERE org_code = '" . $orgCode . "' ");
+        $stmt->bind_param("ssssss", $FirstLine, $SecondLine, $ThirdLine, $FourthLine, $FifthLine, $SixthLine);
         $stmt->execute();
         $stmt->close();
 

@@ -58,6 +58,12 @@ if ($_SESSION['role'] == 1) {
                                 } else {
                                     echo $org['org_short_name'] . ' Secretary';
                                 }
+
+                                $stmt = $conn->prepare("SELECT isSubOrg FROM userpositions WHERE UUID = '" . $_SESSION['UUID'] . "'");
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+                                $stmt->close();
+                                $isSubOrg = $result->fetch_assoc();
                             } else {
                                 echo 'Administrator';
                             }?>
@@ -66,14 +72,15 @@ if ($_SESSION['role'] == 1) {
     </div>
     <div class="container">
         <ul class="list-group">
-            <li class="list-group-item lg my-2 <?php echo ($_SESSION['role'] == 1) ? '' : (($_SESSION['org_position'] == 1 || $_SESSION['org_position'] == 2 || $_SESSION['org_position'] == 3) ? '' : 'd-none'); ?>"
+            <li class="list-group-item lg my-2 <?php echo ($_SESSION['role'] == 1) ? '' : (($_SESSION['org_position'] == 1 || $_SESSION['org_position'] == 2 || $_SESSION['org_position'] == 3) ? '' : 'd-none'); ?>
+            <?php echo $isSubOrg['isSubOrg'] == 1 ? 'd-none' : ''; ?>"
                 onclick="window.location.href = '../ADMIN/Dashboard.php'">
                 <svg class="me-3" width="24" height="24">
                     <use xlink:href="#Dashboard" />
                 </svg>
                 Dashboard
             </li>
-            <span class="hr-divider-start text-secondary"></span>
+            <span class="hr-divider-start text-secondary <?php echo $isSubOrg['isSubOrg'] == 1 ? 'd-none' : ''; ?>"></span>
             <li class="list-group-item lg <?php echo $current_page == 'Dashboard.php' ? 'lg-active' : ''; ?>"
                 <?php echo $current_page != 'Dashboard.php' ? "onclick='window.location.href = \"$OfficerDashboard\"'" : ''; ?>>
                 <svg class="me-3" width="24" height="24">

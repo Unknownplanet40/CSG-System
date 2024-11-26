@@ -17,7 +17,7 @@ function response($data)
 
 class PDF extends TCPDF
 {
-    public function CustomHeader($conn, $ActivityTitle, $OrgCode)
+    public function CustomHeader($conn, $ActivityTitle, $OrgCode, $isDocHeaderHidden = false)
     {
 
         if ($OrgCode === '') {
@@ -51,30 +51,32 @@ class PDF extends TCPDF
         $this->Cell(0, 5, 'Cover Letter and Activity Proposal | ' . $ActivityTitle . ' | Page ' . $this->getAliasNumPage() . ' of ' . $this->getAliasNbPages(), 0, 1, 'R');
         $this->Ln(5);
 
-        $this->Image('../../../Assets/Images/pdf-Resource/' . $LeftLogo, 45, 20, 40);
-        $this->Image('../../../Assets/Images/pdf-Resource/' . $RightLogo, 155, 20, 40);
-
-        $this->setX(38.1);
-        $this->SetFont('helvetica', '', 10);
-        $this->Cell(0, 5, $FirstLine, 0, 1, 'C');
-
-        $this->setX(38.1);
-        $this->SetFont('helvetica', 'B', 12);
-        $this->Cell(0, 6, $SecondLine, 0, 1, 'C');
-        $this->SetFont('helvetica', 'B', 10);
-
-        $this->setX(38.1);
-        $this->Cell(0, 5, $ThirdLine, 0, 1, 'C');
-
-        $this->setX(38.1);
-        $this->Cell(0, 5, $FourthLine, 0, 1, 'C');
-
-        $this->SetFont('helvetica', 'B', 12);
-        $this->setX(38.1);
-        $this->Cell(0, 5, $FifthLine, 0, 1, 'C');
-        $this->setX(38.1);
-        $this->SetFont('helvetica', 'B', 11);
-        $this->Cell(0, 5, $SixthLine, 0, 1, 'C');
+        if (!$isDocHeaderHidden) {
+            $this->Image('../../../Assets/Images/pdf-Resource/' . $LeftLogo, 45, 20, 40);
+            $this->Image('../../../Assets/Images/pdf-Resource/' . $RightLogo, 155, 20, 40);
+    
+            $this->setX(38.1);
+            $this->SetFont('helvetica', '', 10);
+            $this->Cell(0, 5, $FirstLine, 0, 1, 'C');
+    
+            $this->setX(38.1);
+            $this->SetFont('helvetica', 'B', 12);
+            $this->Cell(0, 6, $SecondLine, 0, 1, 'C');
+            $this->SetFont('helvetica', 'B', 10);
+    
+            $this->setX(38.1);
+            $this->Cell(0, 5, $ThirdLine, 0, 1, 'C');
+    
+            $this->setX(38.1);
+            $this->Cell(0, 5, $FourthLine, 0, 1, 'C');
+    
+            $this->SetFont('helvetica', 'B', 12);
+            $this->setX(38.1);
+            $this->Cell(0, 5, $FifthLine, 0, 1, 'C');
+            $this->setX(38.1);
+            $this->SetFont('helvetica', 'B', 11);
+            $this->Cell(0, 5, $SixthLine, 0, 1, 'C');
+        }
     }
 
     public function Content($conn, $Admin, $Letter, $LetterTo)
@@ -121,47 +123,51 @@ class PDF extends TCPDF
         $htmlTable = '
     <table border="1" cellpadding="4">
         <tr>
-            <td width="175"><strong>ACTIVITY TITLE:</strong></td>
+            <td width="160"><strong>ACTIVITY TITLE:</strong></td>
             <td width="250" style="font-weight: bold;">' . $data['ActivityTitle'] . '</td>
         </tr>
         <tr>
-            <td width="175"><strong>DATE AND VENUE:</strong></td>
+            <td width="160"><strong>DATE AND VENUE:</strong></td>
             <td width="250">' . $data['ActivityDateVenue'] . '</td>
         </tr>
         <tr>
-            <td width="175"><strong>ACTIVITY HEAD:</strong></td>
+            <td width="160"><strong>ACTIVITY HEAD:</strong></td>
             <td width="250">' . $data['ActivityHead'] . '</td>
         </tr>
         <tr>
-            <td width="175"><strong>ACTIVITY OBJECTIVE:</strong></td>
+            <td width="160"><strong>ACTIVITY OBJECTIVE:</strong></td>
             <td width="250">' . $data['ActivityObjective'] . '</td>
         </tr>
         <tr>
-            <td width="175"><strong>TARGET PARTICIPANTS:</strong></td>
+            <td width="160"><strong>TARGET PARTICIPANTS:</strong></td>
             <td width="250">' . $data['ActivityTarget'] . '</td>
         </tr>
         <tr>
-            <td width="175"><strong>MECHANICS:</strong></td>
+            <td width="160"><strong>MECHANICS:</strong></td>
             <td width="250">' . $data['ActivityMechanics'] . '</td>
         </tr>
         <tr>
-            <td width="175"><strong>BUDGETARY REQUIREMENT:</strong></td>
+            <td width="160"><strong>BUDGETARY REQUIREMENT:</strong></td>
             <td width="250">' . $data['ActivityBudget'] . '</td>
         </tr>
         <tr>
-            <td width="175"><strong>SOURCE OF FUNDS:</strong></td>
+            <td width="160"><strong>SOURCE OF FUNDS:</strong></td>
             <td width="250">' . $data['ActivitySourceFunds'] . '</td>
         </tr>
         <tr>
-            <td width="175"><strong>EXPECTED OUTPUT:</strong></td>
+            <td width="160"><strong>EXPECTED OUTPUT:</strong></td>
             <td width="250">' . $data['ActivityOutcomes'] . '</td>
         </tr>
     </table>';
         $this->writeHTML($htmlTable, true, false, true, false, '');
     }
 
-
-
+    public function SignatureContent($ActivitySignature)
+    {
+        $this->setX(38.1);
+        $this->SetFont('helvetica', '', 12);
+        $this->writeHTMLCell(156, 0, '', '', $ActivitySignature, 0, 1, 0, true, 'J', true);
+    }
 }
 
 
@@ -185,6 +191,7 @@ try {
     $ActivityBudget = $_POST['ActivityBudget']; // html content
     $ActivitySourceFunds = $_POST['ActivitySourceFunds'];
     $ActivityOutcomes = $_POST['ActivityOutcomes'];
+    $ActivitySignature = $_POST['ActivitySignature'];
 
     $data = [
         'ActivityTitle' => $ActivityTitle,
@@ -204,6 +211,7 @@ try {
     $pdf->SetTitle('Activity Proposal');
     $pdf->SetSubject('Activity Proposal for ' . $ActivityTitle);
     $pdf->SetKeywords('Activity Proposal, ' . $ActivityTitle, $ID !== '' ? 'Updated ' . date('Y-m-d H:i:s') : 'Created ' . date('Y-m-d H:i:s'));
+    $pdf->SetApplication('CSG System');
     $pdf->SetPrintHeader(false);
     $pdf->AddPage();
     $pdf->CustomHeader($conn, $ActivityTitle, $OrgCode);
@@ -212,7 +220,8 @@ try {
     $pdf->CustomHeader($conn, $ActivityTitle, $OrgCode);
     $pdf->Proposal($data);
     $pdf->AddPage();
-    $pdf->CustomHeader($conn, $ActivityTitle, $OrgCode);
+    $pdf->CustomHeader($conn, $ActivityTitle, $OrgCode, true);
+    $pdf->SignatureContent($ActivitySignature);
 
     if ($ID !== '') {
         $stmt = $conn->prepare("SELECT file_path FROM activityproposaldocuments WHERE ID = ?");
@@ -232,7 +241,7 @@ try {
     }
 
 
-    $name = "Activity_Proposal_" . date('Y-m-d_H-i-s') . "_" . $_SESSION['org_Code'] . "_" . rand(1000, 9999) . ".pdf";
+    $name = "Activity_Proposal_" . date('Y-m-d_H-i-s') . "_" . ($ID !== '' ? $OrgCode : $_SESSION['org_Code']) . "_" . rand(1000, 9999) . ".pdf";
     $storageDir = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'DocumentsStorage' . DIRECTORY_SEPARATOR . $_SESSION['org_Code'];
     if (!file_exists($storageDir)) {
         mkdir($storageDir, 0777, true);
