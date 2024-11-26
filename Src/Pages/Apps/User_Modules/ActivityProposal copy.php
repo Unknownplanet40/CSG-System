@@ -43,7 +43,8 @@ $_SESSION['last_activity'] = time();
     <link rel="stylesheet" href="../../../../Utilities/Stylesheets/BGaniStyle.css">
     <link rel="stylesheet" href="../../../../Utilities/Stylesheets/CustomStyle.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="../../../../Utilities/Third-party/Froalaeditor/css/froala_editor.pkgd.min.css">
+    <!-- <link rel="stylesheet" href="../../../../Utilities/Third-party/Froalaeditor/css/froala_editor.pkgd.min.css"> -->
+    <link rel="stylesheet" href="../../../../Utilities/Third-party/summernote/summernote-bs5.css">
     <link rel="stylesheet" href="../../../../Utilities/Third-party/Froalaeditor/css/themes/dark.css">
 
     <link rel="stylesheet" href="../../../../Utilities/Stylesheets/AB_DBStyle.css">
@@ -52,6 +53,7 @@ $_SESSION['last_activity'] = time();
     <script defer src="../../../../Utilities/Third-party/Datatable/js/datatables.js"></script>
     <script src="../../../../Utilities/Third-party/Sweetalert2/js/sweetalert2.all.min.js"></script>
     <script src="../../../../Utilities/Third-party/JQuery/js/jquery.min.js"></script>
+    <script src="../../../../Utilities/Third-party/summernote/summernote-bs5.js"></script>
     <script defer type="module" src="../../../../Utilities/Scripts/BS_DBScript.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
     <title>Dashboard</title>
@@ -234,12 +236,12 @@ $_SESSION['last_activity'] = time();
             </div>
         </div>
     </div>
-    <script src="../../../../Utilities/Third-party/Froalaeditor/js/froala_editor.pkgd.min.js"></script>
     <script>
         function getAP_Documents() {
-            // this is a sample signature template
-            $('#ActivitySignature').val(`<h1 style="text-align: center;" id="isPasted"><strong><span style="font-size: 36px;">Please Change This Before Generating</span></strong></h1><p style="margin: 0in; line-height: 1.5; font-size: 15px; font-family: Arial, sans-serif; text-align: center;">Prepared by:</p><p style="margin: 0in; line-height: 1.5; font-size: 15px; font-family: Arial, sans-serif; text-align: center;"><br></p><p style="margin: 0in; line-height: normal; font-size: 15px; font-family: Arial, sans-serif; text-align: center;"><strong>NAME</strong></p><p style="margin: 0in; line-height: normal; font-size: 15px; font-family: Arial, sans-serif; text-align: center;">ORG Secretary</p><p style="margin: 0in; line-height: normal; font-size: 15px; font-family: Arial, sans-serif; text-align: center;"><br></p><p style="margin: 0in; line-height: normal; font-size: 15px; font-family: Arial, sans-serif; text-align: center;"><br></p><p style="margin: 0in; line-height: 1.5; font-size: 15px; font-family: Arial, sans-serif; text-align: center;">Checked by:</p><p style="margin: 0in; line-height: 1.5; font-size: 15px; font-family: Arial, sans-serif; text-align: center;"><br></p><p style="margin: 0in; line-height: normal; font-size: 15px; font-family: Arial, sans-serif; text-align: center;"><strong>NAME</strong></p><p style="margin: 0in; line-height: normal; font-size: 15px; font-family: Arial, sans-serif; text-align: center;">ORG President</p><p style='margin:0in;line-height:normal;font-size:15px;font-family:"Arial",sans-serif;'>&nbsp;</p><p style='margin:0in;line-height:normal;font-size:15px;font-family:"Arial",sans-serif;'>&nbsp;</p><p style="margin: 0in; line-height: normal; font-size: 15px; font-family: Arial, sans-serif; text-align: center;">Noted By:</p><p style='margin:0in;line-height:normal;font-size:15px;font-family:"Arial",sans-serif;'>&nbsp;</p><p style='margin:0in;line-height:normal;font-size:15px;font-family:"Arial",sans-serif;'><br></p><table style="width: 100%; margin-left: calc(0%);"><tbody><tr><td style="width: 50.0000%;"><strong>NAME</strong></td><td style="width: 50.0000%;"><strong>NAME</strong></td></tr><tr><td style="width: 50.0000%;">SAP ORG</td><td style="width: 50.0000%;">ORG Adviser</td></tr></tbody></table>`);
-            
+            var ACTSIG =
+                '<div style="text-align: center;"><span style="font-size: 18px;"><span style="font-weight: bolder;">PLEASE CHSNGE THIS BEFORE SUBMITTING</span></span></div><div style="text-align: center;"><span style="font-size: 18px;"><span style="font-weight: bolder;"><br></span></span></div><div style="text-align: center;">Prepared by</div><div style="text-align: center;"><br></div><div style="text-align: center;"><span style="font-weight: bolder;">NAME</span></div><div style="text-align: center;">ORG Secretary</div><div style="text-align: center;"><br></div><div style="text-align: center;">Checked by</div><div style="text-align: center;"><br></div><div style="text-align: center;"><span style="font-weight: bolder;">NAME</span></div><div style="text-align: center;">ORG President</div>';
+            $('#ActivitySignature').val(ACTSIG);
+
             $.ajax({
                 type: 'GET',
                 url: '../../../Functions/api/getPreActivityProposal.php',
@@ -258,19 +260,23 @@ $_SESSION['last_activity'] = time();
                         `);
 
                                 $(`#EditDocument_${doc.id}`).on('click', function() {
+                                    if (doc.act_signature == null) {
+                                        doc.act_signature = ACTSIG;
+                                    }
+
                                     $('#AdminName').val(doc.admin_name);
                                     $('#LetterTo').val(doc.dear_title);
-                                    letterBodyEditor.html.set(doc.LetterBody);
+                                    $('#LetterBody').summernote('code', doc.LetterBody);
                                     $('#ActivityTitle').val(doc.act_title);
                                     $('#ActivityDateVenue').val(doc.act_date_ven);
                                     $('#ActivityHead').val(doc.act_head);
-                                    activityObjectiveEditor.html.set(doc.act_obj);
+                                    $('#ActivityObjective').summernote('code', doc.act_obj);
                                     $('#ActivityTarget').val(doc.act_participate);
                                     $('#ActivityMechanics').val(doc.act_mech);
-                                    activityBudgetEditor.html.set(doc.act_budget);
+                                    $('#ActivityBudget').summernote('code', doc.act_budget);
                                     $('#ActivitySourceFunds').val(doc.act_funds);
                                     $('#ActivityOutcomes').val(doc.act_expectOut);
-                                    activitySignatureEditor.html.set(doc.act_signature);
+                                    $('#ActivitySignature').summernote('code', doc.act_signature);
                                     $('#ID').val(doc.ID);
                                     $('#OrgCode').val(doc.org_code);
                                     $('#Created_By').val(doc.Created_By);
@@ -300,153 +306,90 @@ $_SESSION['last_activity'] = time();
                         <td colspan="3" class="text-center">Not available</td>
                     </tr>
                 `);
-
                     console.error(xhr.responseText);
                 }
             });
         }
-        getAP_Documents();
-        var letterBodyEditor = new FroalaEditor('#LetterBody', {
-            toolbarButtons: {
-                'moreText': {
-                    'buttons': ['bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript',
-                        'fontFamily', 'fontSize', 'textColor', 'backgroundColor', 'clearFormatting'
-                    ]
-                },
-                'moreParagraph': {
-                    'buttons': ['alignLeft', 'alignCenter', 'formatOLSimple', 'alignRight', 'alignJustify',
-                        'formatOL', 'formatUL', 'paragraphFormat', 'paragraphStyle', 'lineHeight'
-                    ]
-                },
-                'moreRich': {
-                    'buttons': ['insertLink', 'insertTable', 'insertHR']
-                },
-                'moreMisc': {
-                    'buttons': ['undo', 'redo', 'spellChecker', 'selectAll']
-                }
-            },
-            height: 350,
-            imageUpload: false,
-            imagePaste: false,
-            imageAllowedTypes: [],
-            charCounterCount: true,
-            charCounterMax: 8000,
-            toolbarSticky: true,
-            quickInsertButtons: ['table', 'ul', 'ol', 'hr'],
-            <?php echo $_SESSION['theme'] == 'dark' ? "theme: 'dark'," : ""; ?>
-        });
 
-        var activityObjectiveEditor = new FroalaEditor('#ActivityObjective', {
-            toolbarButtons: {
-                'moreText': {
-                    'buttons': ['bold', 'italic', 'underline']
-                },
-                'moreParagraph': {
-                    'buttons': ['formatOLSimple', 'formatOL', 'formatUL']
-                },
-                'moreRich': {
-                    'buttons': ['insertLink', 'insertHR']
-                },
-                'moreMisc': {
-                    'buttons': ['undo', 'redo', 'spellChecker', 'selectAll']
-                }
-            },
-            height: 150,
-            imageUpload: false,
-            imagePaste: false,
-            imageAllowedTypes: [],
-            charCounterCount: true,
-            charCounterMax: 3000,
-            toolbarSticky: true,
-            quickInsertButtons: ['ul', 'ol', 'hr'],
-            <?php echo $_SESSION['theme'] == 'dark' ? "theme: 'dark'," : ""; ?>
-        });
+        $(document).ready(function() {
 
-        FroalaEditor.DefineIcon('setBorder', {
-            NAME: 'plus',
-            SVG_KEY: 'add'
-        });
+            getAP_Documents();
 
-        FroalaEditor.RegisterCommand('setBorder', {
-            title: 'Set Border',
-            focus: false,
-            undo: true,
-            refreshAfterCallback: true,
-            callback: function() {
-                this.selection.save();
-                const tables = this.$el.get(0).getElementsByTagName('table');
-                const cells = this.$el.get(0).getElementsByTagName('td');
+            $('#LetterBody').summernote({
+                placeholder: 'Type your letter here',
+                tabsize: 2,
+                width: 755,
+                height: 350,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'underline', 'clear', 'fontsize', 'fontname']],
+                    ['para', ['paragraph', 'ul', 'ol', 'height', 'hr']],
+                    ['undo', ['undo']],
+                    ['redo', ['redo']],
+                ],
+                maxCharCount: 8000,
+            });
 
-                Array.from(cells).forEach(cell => {
-                    cell.style.border = '1px solid black';
-                });
+            $('#ActivityObjective').summernote({
+                placeholder: 'Type the objective of the activity here',
+                tabsize: 2,
+                width: 755,
+                height: 350,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'underline', 'clear', 'fontsize', 'fontname']],
+                    ['para', ['paragraph', 'ul', 'ol', 'height', 'hr']],
+                    ['undo', ['undo']],
+                    ['redo', ['redo']],
+                ],
+                maxCharCount: 8000,
+            });
 
-                Array.from(tables).forEach(table => {
-                    table.style.border = '1px solid black';
-                    table.style.borderCollapse = 'collapse';
-                });
-                this.selection.restore();
-            }
-        });
+            $('#ActivityBudget').summernote({
+                placeholder: 'Type the budget requirement here',
+                tabsize: 2,
+                width: 755,
+                height: 350,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'underline', 'clear', 'fontsize', 'fontname']],
+                    ['para', ['paragraph', 'ul', 'ol', 'height', 'hr']],
+                    ['insert', ['table']],
+                    ['undo', ['undo']],
+                    ['redo', ['redo']],
+                ],
+                callbacks: {
+                    onInit: function() {
+                        $('#ActivityBudget').summernote('code', $('#ActivityBudget').summernote(
+                            'code').replace(/<table/g,
+                            '<table style="border: 1px solid black;"'));
+                    },
+                    onChange: function(contents, $editable) {
+                        $editable.find('table').css('border', '1px solid black');
+                        $editable.find('td, th').css('border', '1px solid black');
+                    }
+                },
+                maxCharCount: 8000,
+            });
 
-        var activityBudgetEditor = new FroalaEditor('#ActivityBudget', {
-            toolbarButtons: {
-                'moreText': {
-                    'buttons': ['bold', 'italic', 'underline', 'fontSize']
-                },
-                'moreParagraph': {
-                    'buttons': ['formatOLSimple', 'formatOL', 'formatUL']
-                },
-                'moreRich': {
-                    'buttons': ['insertLink', 'insertTable', 'setBorder']
-                },
-                'moreMisc': {
-                    'buttons': ['undo', 'redo', 'spellChecker', 'selectAll']
-                }
-            },
-            height: 150,
-            imageUpload: false,
-            imagePaste: false,
-            imageAllowedTypes: [],
-            charCounterCount: true,
-            charCounterMax: 3000,
-            toolbarSticky: true,
-            tableStyles: {
-                'table': 'table-border'
-            },
+            $('#ActivitySignature').summernote({
+                placeholder: 'Type your letter here',
+                tabsize: 2,
+                width: 755,
+                height: 350,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'underline', 'clear', 'fontsize']],
+                    ['para', ['paragraph', 'ul', 'ol', 'height', 'hr']],
+                    ['undo', ['undo']],
+                    ['redo', ['redo']],
+                ],
+                maxCharCount: 8000,
+            });
 
-            quickInsertButtons: ['table', 'ul', 'ol', 'hr'],
-            <?php echo $_SESSION['theme'] == 'dark' ? "theme: 'dark'," : ""; ?>
-        });
-
-        var activitySignatureEditor = new FroalaEditor('#ActivitySignature', {
-            toolbarButtons: {
-                'moreText': {
-                    'buttons': ['bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript',
-                        'fontFamily', 'fontSize', 'textColor', 'backgroundColor', 'clearFormatting'
-                    ]
-                },
-                'moreParagraph': {
-                    'buttons': ['alignLeft', 'alignCenter', 'formatOLSimple', 'alignRight', 'alignJustify',
-                        'formatOL', 'formatUL', 'paragraphFormat', 'paragraphStyle', 'lineHeight'
-                    ]
-                },
-                'moreRich': {
-                    'buttons': ['insertLink', 'insertTable', 'insertHR']
-                },
-                'moreMisc': {
-                    'buttons': ['undo', 'redo', 'spellChecker', 'selectAll']
-                }
-            },
-            height: 400,
-            imageUpload: false,
-            imagePaste: false,
-            imageAllowedTypes: [],
-            charCounterCount: true,
-            charCounterMax: 3000,
-            toolbarSticky: true,
-            quickInsertButtons: ['table', 'ul', 'ol', 'hr'],
-            <?php echo $_SESSION['theme'] == 'dark' ? "theme: 'dark'," : ""; ?>
+            $('.note-editable').css('font-family', 'Helvetica');
+            $('.note-editable').css('font-size', '12px');
+            $('.note-editable').css('line-height', '1.0');
         });
 
         $('#ClearFields').on('click', function() {
@@ -473,17 +416,17 @@ $_SESSION['last_activity'] = time();
             var Created_By = $('#Created_By').val();
             var AdminName = $('#AdminName').val();
             var LetterTo = $('#LetterTo').val();
-            var LetterBody = letterBodyEditor.html.get();
+            var LetterBody = $('#LetterBody').val();
             var ActivityTitle = $('#ActivityTitle').val();
             var ActivityDateVenue = $('#ActivityDateVenue').val();
-            var ActivityObjective = activityObjectiveEditor.html.get();
+            var ActivityObjective = $('#ActivityObjective').val();
             var ActivityTarget = $('#ActivityTarget').val();
             var ActivityMechanics = $('#ActivityMechanics').val();
-            var ActivityBudget = activityBudgetEditor.html.get();
+            var ActivityBudget = $('#ActivityBudget').val();
             var ActivityHead = $('#ActivityHead').val();
             var ActivitySourceFunds = $('#ActivitySourceFunds').val();
             var ActivityOutcomes = $('#ActivityOutcomes').val();
-            var ActivitySignature = activitySignatureEditor.html.get();
+            var ActivitySignature = $('#ActivitySignature').val();
 
             if (AdminName == '' || LetterTo == '' || LetterBody == '' || ActivityTitle == '' ||
                 ActivityDateVenue == '' || ActivityObjective == '' || ActivityTarget == '' ||
@@ -522,7 +465,6 @@ $_SESSION['last_activity'] = time();
             };
 
             console.log(data);
-            $('#PrintPreview').addClass('d-none');
 
             $.ajax({
                 type: 'POST',
@@ -544,7 +486,7 @@ $_SESSION['last_activity'] = time();
                                 //$('#ClearFields').click();
                                 getAP_Documents();
                                 $('#PrintPreview').removeClass('d-none');
-                                $('#PrintPreview').off('click').on('click', function() {
+                                $('#PrintPreview').on('click', function() {
                                     window.open("../../../../" + response.path,
                                         '_blank');
                                 });
@@ -566,13 +508,6 @@ $_SESSION['last_activity'] = time();
                 }
             });
         });
-        
-        setInterval(function() {
-            var froalaLicense = document.querySelector('div[style="z-index:9999;width:100%;position:relative"]');
-            if (froalaLicense) {
-            froalaLicense.remove();
-            }
-        }, 1000);
     </script>
 </body>
 

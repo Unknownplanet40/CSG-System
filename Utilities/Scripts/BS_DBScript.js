@@ -28,8 +28,29 @@ updateDateTime();
 setInterval(updateDateTime, 1000);
 
 $(document).ready(function () {
+  const observer = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+      $("div[style*='z-index:9999'][style*='position:relative']").each(
+        function () {
+          if (
+            $(this).text().includes("Unlicensed copy of the Froala Editor.")
+          ) {
+            $(this).remove();
+          }
+        }
+      );
+    });
+  });
+
   setInterval(() => {
-    checkifISLogin("../../../Functions/api/checkUserLogin.php", "../../../Functions/api/UserLogout.php?error=001");
+    observer.observe(document.body, { childList: true, subtree: true });
+  }, 1000);
+
+  setInterval(() => {
+    checkifISLogin(
+      "../../../Functions/api/checkUserLogin.php",
+      "../../../Functions/api/UserLogout.php?error=001"
+    );
     checkIfSessionChange("../../../Functions/api/checkSession.php");
   }, 5000);
 

@@ -164,6 +164,7 @@ class PDF extends TCPDF
 
     public function SignatureContent($ActivitySignature)
     {
+        $this->Ln(15);
         $this->setX(38.1);
         $this->SetFont('helvetica', '', 12);
         $this->writeHTMLCell(156, 0, '', '', $ActivitySignature, 0, 1, 0, true, 'J', true);
@@ -211,7 +212,6 @@ try {
     $pdf->SetTitle('Activity Proposal');
     $pdf->SetSubject('Activity Proposal for ' . $ActivityTitle);
     $pdf->SetKeywords('Activity Proposal, ' . $ActivityTitle, $ID !== '' ? 'Updated ' . date('Y-m-d H:i:s') : 'Created ' . date('Y-m-d H:i:s'));
-    $pdf->SetApplication('CSG System');
     $pdf->SetPrintHeader(false);
     $pdf->AddPage();
     $pdf->CustomHeader($conn, $ActivityTitle, $OrgCode);
@@ -255,13 +255,13 @@ try {
     $conn->begin_transaction();
 
     if ($ID !== '') {
-        $stmt = $conn->prepare("UPDATE activityproposaldocuments SET file_Size = ?, file_path = ?, admin_name = ?, dear_title = ?, LetterBody = ?, act_title = ?, act_date_ven = ?, act_head = ?, act_obj = ?, act_participate = ?, act_mech = ?, act_budget = ?, act_funds = ?, act_expectOut = ? WHERE ID = ?");
-        $stmt->bind_param("isssssssssssssi", $fileSize, $savePath, $AdminName, $LetterTo, $LetterBody, $ActivityTitle, $ActivityDateVenue, $ActivityHead, $ActivityObjective, $ActivityTarget, $ActivityMechanics, $ActivityBudget, $ActivitySourceFunds, $ActivityOutcomes, $ID);
+        $stmt = $conn->prepare("UPDATE activityproposaldocuments SET file_Size = ?, file_path = ?, admin_name = ?, dear_title = ?, LetterBody = ?, act_title = ?, act_date_ven = ?, act_head = ?, act_obj = ?, act_participate = ?, act_mech = ?, act_budget = ?, act_funds = ?, act_expectOut = ?, act_signature = ? WHERE ID = ?");
+        $stmt->bind_param("isssssssssssssss", $fileSize, $savePath, $AdminName, $LetterTo, $LetterBody, $ActivityTitle, $ActivityDateVenue, $ActivityHead, $ActivityObjective, $ActivityTarget, $ActivityMechanics, $ActivityBudget, $ActivitySourceFunds, $ActivityOutcomes, $ActivitySignature, $ID);
         $stmt->execute();
         $stmt->close();
     } else {
-        $stmt = $conn->prepare("INSERT INTO activityproposaldocuments (UUID, org_code, file_Size, file_path, admin_name, dear_title, LetterBody, act_title, act_date_ven, act_head, act_obj, act_participate, act_mech, act_budget, act_funds, act_expectOut) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-        $stmt->bind_param("ssisssssssssssss", $_SESSION['UUID'], $_SESSION['org_Code'], $fileSize, $savePath, $AdminName, $LetterTo, $LetterBody, $ActivityTitle, $ActivityDateVenue, $ActivityHead, $ActivityObjective, $ActivityTarget, $ActivityMechanics, $ActivityBudget, $ActivitySourceFunds, $ActivityOutcomes);
+        $stmt = $conn->prepare("INSERT INTO activityproposaldocuments (UUID, org_code, file_Size, file_path, admin_name, dear_title, LetterBody, act_title, act_date_ven, act_head, act_obj, act_participate, act_mech, act_budget, act_funds, act_expectOut, act_signature) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+        $stmt->bind_param("ssisssssssssssss", $_SESSION['UUID'], $_SESSION['org_Code'], $fileSize, $savePath, $AdminName, $LetterTo, $LetterBody, $ActivityTitle, $ActivityDateVenue, $ActivityHead, $ActivityObjective, $ActivityTarget, $ActivityMechanics, $ActivityBudget, $ActivitySourceFunds, $ActivityOutcomes, $ActivitySignature);
         $stmt->execute();
         $stmt->close();
     }

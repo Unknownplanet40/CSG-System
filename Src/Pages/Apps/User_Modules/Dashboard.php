@@ -147,7 +147,7 @@ $realDocPath = "../../../../" . $DocPath;
                         <div class="card bg-opacity-25 glass-default rounded-0 h-100">
                             <div class="card-body">
                                 <h5 class="card-title">Storage Usage <small>(<?php echo $percentage; ?>%)</small></h5>
-                                <h3 class="card-text"><?php echo $formattedFileSize; ?> / <?php echo round($storage / 1024 / 1024 / 1024, 2); ?> GB</h3>
+                                <h3 class="card-text"><?php echo $formattedFileSize; ?> / <?php echo round($storage / 1024 / 1024 / 1024 / 1024, 2); ?> GB</h3>
                                 <div class="progress" style="height: 10px;">
                                     <div class="progress-bar bg-success" role="progressbar" style="width: <?php echo $percentage; ?>%;" aria-valuenow="<?php echo $percentage; ?>" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
