@@ -42,7 +42,6 @@ try {
 
     while ($row = $result->fetch_assoc()) {
         $row['date_Created'] = date('F d, Y', strtotime($row['date_Created']));
-        $row['file_path'] = substr($row['file_path'], 27);
 
         $stmt = $conn->prepare("SELECT fullName FROM usercredentials WHERE UUID = ?");
         $stmt->bind_param("s", $row['UUID']);

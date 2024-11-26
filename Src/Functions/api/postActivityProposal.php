@@ -107,7 +107,7 @@ class PDF extends TCPDF
         $this->Ln(8);
         $this->setX(38.1);
         $this->SetFont('helvetica', '', 11);
-        $this->writeHTMLCell(156, 0, '', '', $LetterBody, 0, 1, 0, true, 'J', true); // make this html content
+        $this->writeHTMLCell(156, 0, '', '', $LetterBody, 0, 1, 0, true, 'J', true);
     }
 
     public function Proposal($data)
@@ -166,7 +166,7 @@ class PDF extends TCPDF
     {
         $this->Ln(15);
         $this->setX(38.1);
-        $this->SetFont('helvetica', '', 12);
+        $this->SetFont('helvetica', '', 11);
         $this->writeHTMLCell(156, 0, '', '', $ActivitySignature, 0, 1, 0, true, 'J', true);
     }
 }
@@ -248,6 +248,7 @@ try {
 
 
     $name = "Activity_Proposal_" . date('Y-m-d_H-i-s') . "_" . ($ID !== '' ? $OrgCode : $_SESSION['org_Code']) . "_" . rand(1000, 9999) . ".pdf";
+    $file_path = "DocumentsStorage/" . (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']) . "/" . $name;
     $storageDir = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'DocumentsStorage' . DIRECTORY_SEPARATOR . $_SESSION['org_Code'];
     if (!file_exists($storageDir)) {
         mkdir($storageDir, 0777, true);
@@ -262,18 +263,18 @@ try {
 
     if ($ID !== '') {
         $stmt = $conn->prepare("UPDATE activityproposaldocuments SET file_Size = ?, file_path = ?, admin_name = ?, dear_title = ?, LetterBody = ?, act_title = ?, act_date_ven = ?, act_head = ?, act_obj = ?, act_participate = ?, act_mech = ?, act_budget = ?, act_funds = ?, act_expectOut = ?, act_signature = ? WHERE ID = ?");
-        $stmt->bind_param("isssssssssssssss", $fileSize, $savePath, $AdminName, $LetterTo, $LetterBody, $ActivityTitle, $ActivityDateVenue, $ActivityHead, $ActivityObjective, $ActivityTarget, $ActivityMechanics, $ActivityBudget, $ActivitySourceFunds, $ActivityOutcomes, $ActivitySignature, $ID);
+        $stmt->bind_param("isssssssssssssss", $fileSize, $file_path, $AdminName, $LetterTo, $LetterBody, $ActivityTitle, $ActivityDateVenue, $ActivityHead, $ActivityObjective, $ActivityTarget, $ActivityMechanics, $ActivityBudget, $ActivitySourceFunds, $ActivityOutcomes, $ActivitySignature, $ID);
         $stmt->execute();
         $stmt->close();
     } else {
         $stmt = $conn->prepare("INSERT INTO activityproposaldocuments (UUID, org_code, file_Size, file_path, admin_name, dear_title, LetterBody, act_title, act_date_ven, act_head, act_obj, act_participate, act_mech, act_budget, act_funds, act_expectOut, act_signature) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-        $stmt->bind_param("ssisssssssssssss", $_SESSION['UUID'], $_SESSION['org_Code'], $fileSize, $savePath, $AdminName, $LetterTo, $LetterBody, $ActivityTitle, $ActivityDateVenue, $ActivityHead, $ActivityObjective, $ActivityTarget, $ActivityMechanics, $ActivityBudget, $ActivitySourceFunds, $ActivityOutcomes, $ActivitySignature);
+        $stmt->bind_param("ssisssssssssssss", $_SESSION['UUID'], $_SESSION['org_Code'], $fileSize, $file_path, $AdminName, $LetterTo, $LetterBody, $ActivityTitle, $ActivityDateVenue, $ActivityHead, $ActivityObjective, $ActivityTarget, $ActivityMechanics, $ActivityBudget, $ActivitySourceFunds, $ActivityOutcomes, $ActivitySignature);
         $stmt->execute();
         $stmt->close();
     }
 
     $stmt = $conn->prepare("INSERT INTO audit_apdoc (UUID, file_Size, file_name) VALUES (?,?,?)");
-    $stmt->bind_param("sis", $_SESSION['UUID'], $fileSize, $savePath);
+    $stmt->bind_param("sis", $_SESSION['UUID'], $fileSize, $file_path);
     $stmt->execute();
     $stmt->close();
 
