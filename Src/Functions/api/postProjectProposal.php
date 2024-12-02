@@ -48,7 +48,7 @@ class PDF extends TCPDF
         $SixthLine = $result['sixthLine'];
 
         $this->SetFont('helvetica', '', 10);
-        $this->Cell(0, 5, 'Cover Letter and Activity Proposal | ' . $ActivityTitle . ' | Page ' . $this->getAliasNumPage() . ' of ' . $this->getAliasNbPages(), 0, 1, 'R');
+        $this->Cell(0, 5, 'Cover Letter and Project Proposal | ' . $ActivityTitle . ' | Page ' . $this->getAliasNumPage() . ' of ' . $this->getAliasNbPages(), 0, 1, 'R');
         $this->Ln(5);
 
         if (!$isDocHeaderHidden) {
@@ -115,7 +115,7 @@ class PDF extends TCPDF
         $this->Ln(15);
         $this->setX(38.1);
         $this->SetFont('helvetica', 'B', 14);
-        $this->Cell(0, 5, 'ACTIVITY PROPOSAL', 0, 1, 'C');
+        $this->Cell(0, 5, 'PROJECT PROPOSAL', 0, 1, 'C');
         $this->Ln(8);
 
         $this->setX(38.1);
@@ -123,7 +123,7 @@ class PDF extends TCPDF
         $htmlTable = '
     <table border="1" cellpadding="4">
         <tr>
-            <td width="160"><strong>ACTIVITY TITLE:</strong></td>
+            <td width="160"><strong>PROJECT TITLE:</strong></td>
             <td width="250" style="font-weight: bold;">' . $data['ActivityTitle'] . '</td>
         </tr>
         <tr>
@@ -131,11 +131,11 @@ class PDF extends TCPDF
             <td width="250">' . $data['ActivityDateVenue'] . '</td>
         </tr>
         <tr>
-            <td width="160"><strong>ACTIVITY HEAD:</strong></td>
+            <td width="160"><strong>PROJECT HEAD:</strong></td>
             <td width="250">' . $data['ActivityHead'] . '</td>
         </tr>
         <tr>
-            <td width="160"><strong>ACTIVITY OBJECTIVE:</strong></td>
+            <td width="160"><strong>PROJECT OBJECTIVE:</strong></td>
             <td width="250">' . $data['ActivityObjective'] . '</td>
         </tr>
         <tr>
@@ -217,9 +217,9 @@ try {
     $pdf = new PDF('P', 'mm', 'Letter', true, 'UTF-8', false);
     $pdf->SetCreator(PDF_CREATOR);
     $pdf->SetAuthor($ID !== '' ? $Created_By : $_SESSION['FullName']);
-    $pdf->SetTitle('Activity Proposal');
-    $pdf->SetSubject('Activity Proposal for ' . $ActivityTitle);
-    $pdf->SetKeywords('Activity Proposal, ' . $ActivityTitle, $ID !== '' ? 'Updated ' . date('Y-m-d H:i:s') : 'Created ' . date('Y-m-d H:i:s'));
+    $pdf->SetTitle('Project Proposal');
+    $pdf->SetSubject('Project Proposal for ' . $ActivityTitle);
+    $pdf->SetKeywords('Project Proposal, ' . $ActivityTitle, $ID !== '' ? 'Updated ' . date('Y-m-d H:i:s') : 'Created ' . date('Y-m-d H:i:s'));
     $pdf->SetPrintHeader(false);
     $pdf->AddPage();
     $pdf->CustomHeader($conn, $ActivityTitle, $OrgCode);
@@ -232,7 +232,7 @@ try {
     $pdf->SignatureContent($ActivitySignature);
 
     if ($ID !== '') {
-        $stmt = $conn->prepare("SELECT file_path FROM activityproposaldocuments WHERE ID = ?");
+        $stmt = $conn->prepare("SELECT file_path FROM projectproposaldocuments WHERE ID = ?");
         $stmt->bind_param("i", $ID);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -247,7 +247,7 @@ try {
     }
 
 
-    $name = "Activity_Proposal_" . date('Y-m-d_H-i-s') . "_" . (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']) . "_" . rand(1000, 9999) . ".pdf";
+    $name = "Project_Proposal_" . date('Y-m-d_H-i-s') . "_" . (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']) . "_" . rand(1000, 9999) . ".pdf";
     $file_path = "DocumentsStorage/" . (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']) . "/" . $name;
     $storageDir = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'DocumentsStorage' . DIRECTORY_SEPARATOR . (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']);
     if (!file_exists($storageDir)) {
@@ -262,7 +262,7 @@ try {
     $conn->begin_transaction();
 
     if ($ID !== '') {
-        $stmt = $conn->prepare("UPDATE activityproposaldocuments SET file_Size = ?, file_path = ?, admin_name = ?, dear_title = ?, LetterBody = ?, act_title = ?, act_date_ven = ?, act_head = ?, act_obj = ?, act_participate = ?, act_mech = ?, act_budget = ?, act_funds = ?, act_expectOut = ?, act_signature = ?, taskID = ?, isFromTask = ? WHERE ID = ?");
+        $stmt = $conn->prepare("UPDATE projectproposaldocuments SET file_Size = ?, file_path = ?, admin_name = ?, dear_title = ?, LetterBody = ?, act_title = ?, act_date_ven = ?, act_head = ?, act_obj = ?, act_participate = ?, act_mech = ?, act_budget = ?, act_funds = ?, act_expectOut = ?, act_signature = ?, taskID = ?, isFromTask = ? WHERE ID = ?");
         $stmt->bind_param("isssssssssssssssis", $fileSize, $file_path, $AdminName, $LetterTo, $LetterBody, $ActivityTitle, $ActivityDateVenue, $ActivityHead, $ActivityObjective, $ActivityTarget, $ActivityMechanics, $ActivityBudget, $ActivitySourceFunds, $ActivityOutcomes, $ActivitySignature, $TaskID, $IsFromTask, $ID);
         $stmt->execute();
         $stmt->close();
@@ -275,7 +275,7 @@ try {
             $stmt->close();
         }
 
-        $stmt = $conn->prepare("INSERT INTO activityproposaldocuments (UUID, org_code, file_Size, file_path, admin_name, dear_title, LetterBody, act_title, act_date_ven, act_head, act_obj, act_participate, act_mech, act_budget, act_funds, act_expectOut, act_signature, taskID, isFromTask) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+        $stmt = $conn->prepare("INSERT INTO projectproposaldocuments (UUID, org_code, file_Size, file_path, admin_name, dear_title, LetterBody, act_title, act_date_ven, act_head, act_obj, act_participate, act_mech, act_budget, act_funds, act_expectOut, act_signature, taskID, isFromTask) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         $stmt->bind_param("ssissssssssssssssi", $_SESSION['UUID'], (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']), $fileSize, $file_path, $AdminName, $LetterTo, $LetterBody, $ActivityTitle, $ActivityDateVenue, $ActivityHead, $ActivityObjective, $ActivityTarget, $ActivityMechanics, $ActivityBudget, $ActivitySourceFunds, $ActivityOutcomes, $ActivitySignature, $TaskID, $IsFromTask);
         $stmt->execute();
         $stmt->close();
@@ -288,7 +288,7 @@ try {
 
     $conn->commit();
     $savePath = substr($savePath, 27);
-    response(['status' => 'success', 'message' => 'Activity Proposal successfully created', 'path' => $savePath]);
+    response(['status' => 'success', 'message' => 'Project Proposal successfully created', 'path' => $savePath]);
 
 } catch (Exception $e) {
     $conn->rollback();

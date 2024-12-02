@@ -27,7 +27,7 @@ $UserDashboard = "../User_Modules/Dashboard.php";
                             <svg class="me-3" width="24" height="24">
                                 <use xlink:href="#Dashboard" />
                             </svg>
-                            Officer Dashboard
+                            Records
                         </li>
                         <span class="hr-divider-start text-secondary d-none"></span>
                         <div class="accordion accordion-flush" id="Modules_Accord">
@@ -38,7 +38,7 @@ $UserDashboard = "../User_Modules/Dashboard.php";
                                     <svg class="me-3" width="24" height="24">
                                         <use xlink:href="#TestIcon" />
                                     </svg>
-                                    Modules
+                                    Menu
                                 </li>
                                 <div id="flush-collapseOne" class="accordion-collapse collapse <?php echo ($current_page == 'CourseSection.php' || $current_page == 'Organizations.php' || $current_page == 'User-Management.php') ? 'show' : ''; ?>"
                                     data-bs-parent="#Modules_Accord">

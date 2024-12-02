@@ -31,31 +31,48 @@ if (isset($_SESSION['last_activity'])) {
 
 $_SESSION['last_activity'] = time();
 
-    $stmt1 = $conn->prepare("SELECT SUM(file_Size) FROM activityproposaldocuments GROUP BY org_code");
-    $stmt1->execute();
-    $stmt1->bind_result($fileSize1);
-    $stmt1->fetch();
-    $stmt1->close();
+$stmt1 = $conn->prepare("SELECT SUM(file_Size) FROM activityproposaldocuments");
+$stmt1->execute();
+$stmt1->bind_result($fileSize1);
+$stmt1->fetch();
+$stmt1->close();
 
-    /* $stmt2 = $conn->prepare("SELECT SUM(file_Size) FROM activityproposaldocuments GROUP BY org_code");
-    $stmt2->execute();
-    $stmt2->bind_result($fileSize2);
-    $stmt2->fetch();
-    $stmt2->close();
+$stmt2 = $conn->prepare("SELECT SUM(file_Size) FROM excuseletterdocuments");
+$stmt2->execute();
+$stmt2->bind_result($fileSize2);
+$stmt2->fetch();
+$stmt2->close();
 
-    $fileSize = $fileSize1 + $fileSize2; */
-    $fileSize = $fileSize1;
+$stmt3 = $conn->prepare("SELECT SUM(file_Size) FROM minutemeetingdocuments");
+$stmt3->execute();
+$stmt3->bind_result($fileSize3);
+$stmt3->fetch();
+$stmt3->close();
+
+$stmt4 = $conn->prepare("SELECT SUM(file_Size) FROM officememorandomdocuments");
+$stmt4->execute();
+$stmt4->bind_result($fileSize4);
+$stmt4->fetch();
+$stmt4->close();
+
+$stmt5 = $conn->prepare("SELECT SUM(file_Size) FROM projectproposaldocuments");
+$stmt5->execute();
+$stmt5->bind_result($fileSize5);
+$stmt5->fetch();
+$stmt5->close();
+
+$fileSize = $fileSize1 + $fileSize2 + $fileSize3 + $fileSize4 + $fileSize5;
 
 if ($fileSize !== null) {
     if ($fileSize < 1024) {
         $Size = $fileSize;
         $SizeFormat = "B";
         $formattedFileSize = $fileSize . " B";
-    } else if ($fileSize < 1048576) {
+    } elseif ($fileSize < 1048576) {
         $Size = round($fileSize / 1024, 2);
         $SizeFormat = "KB";
         $formattedFileSize = $Size . " KB";
-    } else if ($fileSize < 1073741824) {
+    } elseif ($fileSize < 1073741824) {
         $Size = round($fileSize / 1024 / 1024, 2);
         $SizeFormat = "MB";
         $formattedFileSize = $Size . " MB";
@@ -176,7 +193,8 @@ $percentage = round(($fileSize / $storage) * 100, 2);
                                             <?php
                                         usort($data, function ($a, $b) {
                                             return $b['count'] - $a['count'];
-                                        });foreach ($data as $row) {?>
+                                        });
+foreach ($data as $row) {?>
                                             <li
                                                 class="list-group-item d-flex justify-content-between align-items-start">
                                                 <div class="ms-2 me-auto">
@@ -205,9 +223,17 @@ $percentage = round(($fileSize / $storage) * 100, 2);
                                 </div>
                                 <div class="card-body border m-3 rounded-1">
                                     <p class="fw-bold">Storage Usage</p>
-                                    <h5 class="text-success"><?php echo $formattedFileSize; ?> / <?php echo round($storage / 1024 / 1024 / 1024 / 1024, 2); ?> TB</h5>
+                                    <h5 class="text-success">
+                                        <?php echo $formattedFileSize; ?>
+                                        /
+                                        <?php echo round($storage / 1024 / 1024 / 1024 / 1024, 2); ?>
+                                        TB
+                                    </h5>
                                     <div class="progress" style="height: 10px;">
-                                        <div class="progress-bar bg-success" role="progressbar" style="width: <?php echo $percentage; ?>%;" aria-valuenow="<?php echo $percentage; ?>" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar bg-success" role="progressbar"
+                                            style="width: <?php echo $percentage; ?>%;"
+                                            aria-valuenow="<?php echo $percentage; ?>"
+                                            aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
                             </div>
@@ -253,16 +279,16 @@ $percentage = round(($fileSize / $storage) * 100, 2);
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1">
                                 <div class="card-body">
                                     <div class="hstack gap-2">
-                                        <p class="fw-bold">Generated Activity Proposals by Organization</p>
+                                        <p class="fw-bold">Task Assigned by Organization</p>
                                         <a class="text-decoration-none text-success ms-auto"
-                                            href="./SystemReport.php?status=active"><small>View More</small></a>
+                                            href="../User_Modules/Dashboard.php"><small>View More</small></a>
                                     </div>
-                                    <canvas id="Organization"></canvas>
-                                    <?php include_once "./Chart-data-5.php"; ?>
+                                    <canvas id="task"></canvas>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -273,10 +299,75 @@ $percentage = round(($fileSize / $storage) * 100, 2);
                                     <div class="hstack gap-2">
                                         <p class="fw-bold">Course Enrolled</p>
                                         <a class="text-decoration-none text-success ms-auto"
-                                            href="./SystemReport.php?status=active"><small>View More</small></a>
+                                            href="./CourseSection.php"><small>View More</small></a>
                                     </div>
                                     <canvas id="Course"></canvas>
                                     <?php include_once "./Chart-data-6.php"; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1">
+                                <div class="card-body">
+                                    <div class="hstack gap-2">
+                                        <p class="fw-bold">Generated Activity Proposals by Organization</p>
+                                        <a class="text-decoration-none text-success ms-auto"
+                                            href="../User_Modules/Dashboard.php"><small>View More</small></a>
+                                    </div>
+                                    <canvas id="Organization"></canvas>
+                                    <?php include_once "./Chart-data-5.php"; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1">
+                                <div class="card-body">
+                                    <div class="hstack gap-2">
+                                        <p class="fw-bold">Generated Excuse Letters by Organization</p>
+                                        <a class="text-decoration-none text-success ms-auto"
+                                            href="../User_Modules/Dashboard.php"><small>View More</small></a>
+                                    </div>
+                                    <canvas id="EQLetter"></canvas>
+                                    <?php include_once "./Chart-data-8.php"; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1">
+                                <div class="card-body">
+                                    <div class="hstack gap-2">
+                                        <p class="fw-bold">Generated Meeting Minutes by Organization</p>
+                                        <a class="text-decoration-none text-success ms-auto"
+                                            href="../User_Modules/Dashboard.php"><small>View More</small></a>
+                                    </div>
+                                    <canvas id="MMLetter"></canvas>
+                                    <?php include_once "./Chart-data-9.php"; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1">
+                                <div class="card-body">
+                                    <div class="hstack gap-2">
+                                        <p class="fw-bold">Generated Office Memorandum by Organization</p>
+                                        <a class="text-decoration-none text-success ms-auto"
+                                            href="../User_Modules/Dashboard.php"><small>View More</small></a>
+                                    </div>
+                                    <canvas id="OMLetter"></canvas>
+                                    <?php include_once "./Chart-data-10.php"; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1">
+                                <div class="card-body">
+                                    <div class="hstack gap-2">
+                                        <p class="fw-bold">Generated Project Proposals by Organization</p>
+                                        <a class="text-decoration-none text-success ms-auto"
+                                            href="../User_Modules/Dashboard.php"><small>View More</small></a>
+                                    </div>
+                                    <canvas id="PPLetter"></canvas>
+                                    <?php include_once "./Chart-data-11.php"; ?>
                                 </div>
                             </div>
                         </div>

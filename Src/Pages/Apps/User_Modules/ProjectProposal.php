@@ -45,7 +45,7 @@ $_SESSION['last_activity'] = time();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
     <!-- <link rel="stylesheet" href="../../../../Utilities/Third-party/Froalaeditor/css/froala_editor.pkgd.min.css"> -->
     <link rel="stylesheet" href="../../../../Utilities/Third-party/summernote/summernote-bs5.css">
-    <link rel="stylesheet" href="../../../../Utilities/Third-party/Froalaeditor/css/themes/dark.css">
+    <!-- <link rel="stylesheet" href="../../../../Utilities/Third-party/Froalaeditor/css/themes/dark.css"> -->
 
     <link rel="stylesheet" href="../../../../Utilities/Stylesheets/AB_DBStyle.css">
 
@@ -86,12 +86,15 @@ $_SESSION['last_activity'] = time();
             <div class="container">
                 <div class="row g-3">
                     <div class="col-md-8 z-2">
-                        <div class="card glass-default bg-opacity-25 mb-3">
+                        <div class="card glass-default bg-opacity-25 mb-3 rounded-1">
                             <div class="card-body">
-                                <h4 class="text-center fw-bold text-uppercase">Activity Proposal</h4>
+                                <h4 class="text-center fw-bold text-uppercase">Project Proposal</h4>
                                 <input type="hidden" id="ID" value="">
                                 <input type="hidden" id="OrgCode" value="">
                                 <input type="hidden" id="Created_By" value="">
+                                <input type="hidden" id="taskID" value="">
+                                <input type="radio" id="isFromTask" hidden>
+                                <input type="hidden" id="taskOrgCode" value="">
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <div class="mb-3">
@@ -117,26 +120,45 @@ $_SESSION['last_activity'] = time();
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="ActivityTitle" class="form-label">Activity Title</label>
+                                            <label for="ActivityTitle" class="form-label">Project Title</label>
                                             <input type="text" class="form-control rounded-0" id="ActivityTitle">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="ActivityDateVenue" class="form-label">Activity Date and
+                                            <label for="ActivityDateVenue" class="form-label">Project Date and
                                                 Venue</label>
                                             <input type="text" class="form-control rounded-0" id="ActivityDateVenue">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="ActivityHead" class="form-label">Activity Head</label>
+                                            <label for="ActivityHead" class="form-label">Project Head</label>
                                             <input type="text" class="form-control rounded-0" id="ActivityHead">
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="col-md-6 <?php echo $_SESSION['role'] == 1 ? '' : 'd-none'; ?>">
+                                        <div class="mb-3">
+                                            <label for="OrgCode_new" class="form-label">Organization</label>
+                                            <select id="OrgCode_new" class="form-select rounded-0">
+                                                <option value="0" selected hidden>Choose...</option>
+                                                <?php
+                                                    $stmt = $conn->prepare("SELECT * FROM sysorganizations WHERE stat = 0");
+$stmt->execute();
+$result = $stmt->get_result();
+$stmt->close();
+
+while ($row = $result->fetch_assoc()) {
+    echo '<option value="' . $row['org_code'] . '">' . $row['org_name'] . '</option>';
+}
+?>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="col-md-12">
                                         <div class="mb-3">
-                                            <label for="ActivityObjective" class="form-label">Activity Objective</label>
+                                            <label for="ActivityObjective" class="form-label">Project Objective</label>
                                             <textarea class="form-control rounded-1" id="ActivityObjective"
                                                 placeholder="Type the objective of the activity here"></textarea>
                                             <div class="form-text">Use bullet points or a numbered list</div>
@@ -144,20 +166,20 @@ $_SESSION['last_activity'] = time();
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="ActivityTarget" class="form-label">Activity Target
+                                            <label for="ActivityTarget" class="form-label">Project Target
                                                 Participants</label>
                                             <input type="text" class="form-control rounded-0" id="ActivityTarget">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="ActivityMechanics" class="form-label">Activity Mechanics</label>
+                                            <label for="ActivityMechanics" class="form-label">Project Mechanics</label>
                                             <input type="text" class="form-control rounded-0" id="ActivityMechanics">
                                         </div>
                                     </div>
                                     <div class="col-md-12">
                                         <div class="mb-3">
-                                            <label for="ActivityBudget" class="form-label">Activity Budget
+                                            <label for="ActivityBudget" class="form-label">Project Budget
                                                 Requirement</label>
                                             <textarea class="form-control rounded-1" id="ActivityBudget"
                                                 placeholder="Type the budget requirement here"></textarea>
@@ -210,7 +232,7 @@ $_SESSION['last_activity'] = time();
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="card glass-default bg-opacity-25">
+                        <div class="card glass-default bg-opacity-25 rounded-1">
                             <div class="card-body">
                                 <h5 class="text-center fw-bold text-uppercase">Previous Documents</h5>
                                 <div class="table-responsive">
@@ -231,6 +253,83 @@ $_SESSION['last_activity'] = time();
                                 </div>
                             </div>
                         </div>
+                        <div class="card glass-default bg-opacity-25 rounded-1 mt-5">
+                            <div class="card-body">
+                                <h5 class="text-center fw-bold text-uppercase">Task Status</h5>
+                                <p class="text-center" id="TasksMessage">No tasks found</p>
+                                <p>Task ID: <span id="TaskIDis">N/A</span></p>
+                                <div class="hstack gap-2">
+                                    <a href="javascript:void(0)" id="RefreshTasks"
+                                        class="btn btn-sm btn-outline-secondary rounded-0 w-100">Refresh</a>
+                                    <a href="javascript:void(0)" id="ClearTasks"
+                                        class="btn btn-sm btn-outline-danger rounded-0 w-100">Clear Task</a>
+                                </div>
+                                <script>
+                                    $('#RefreshTasks').on('click', function() {
+                                        if (localStorage.getItem('taskID_PP') != null) {
+                                            if ($('#ID').val() != "") {
+                                                Swal.fire({
+                                                    icon: 'warning',
+                                                    title: 'Are you sure?',
+                                                    text: 'You have edited a document. Do you want to continue?',
+                                                    showCancelButton: true,
+                                                    confirmButtonText: 'Yes',
+                                                    cancelButtonText: 'No',
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        $('#ClearFields').click();
+                                                        $('#TaskIDis').text(localStorage.getItem(
+                                                            'taskID_PP'));
+                                                        $('#taskID').val(localStorage.getItem(
+                                                            'taskID_PP'));
+                                                        $('#taskOrgCode').val(localStorage.getItem(
+                                                            'taskOrgCode_PP'));
+                                                        $('#isFromTask').val('true');
+                                                        $('#TasksMessage').text(
+                                                            'You are currently editing a task');
+                                                    }
+                                                });
+                                            } else {
+                                                $('#ClearFields').click();
+                                                $('#TaskIDis').text(localStorage.getItem('taskID_PP'));
+                                                $('#taskID').val(localStorage.getItem('taskID_PP'));
+                                                $('#taskOrgCode').val(localStorage.getItem('taskOrgCode_PP'));
+                                                $('#isFromTask').val('true');
+                                                $('#TasksMessage').text('You are currently editing a task');
+                                            }
+                                        }
+                                    });
+
+                                    $('#ClearTasks').on('click', function() {
+                                        Swal.fire({
+                                            icon: 'warning',
+                                            title: 'Confirm Clear Task',
+                                            text: 'Would you like to clear this task permanently or continue working on it later?',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'Clear Task',
+                                            cancelButtonText: 'Continue Later',
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                localStorage.removeItem('taskID_PP');
+                                                localStorage.removeItem('taskOrgCode_PP');
+                                                $('#taskID').val('');
+                                                $('#isFromTask').val('false');
+                                                $('#TasksMessage').text(
+                                                    'Task has been cleared. You can recover it from the task list.'
+                                                );
+                                                $('#TaskIDis').text('N/A');
+                                            } else {
+                                                $('#taskID').val('');
+                                                $('#isFromTask').val('false');
+                                                $('#TasksMessage').text(
+                                                    'No tasks found. reload to load the last task.');
+                                                $('#TaskIDis').text('N/A');
+                                            }
+                                        });
+                                    });
+                                </script>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -244,7 +343,7 @@ $_SESSION['last_activity'] = time();
 
             $.ajax({
                 type: 'GET',
-                url: '../../../Functions/api/getPreActivityProposal.php',
+                url: '../../../Functions/api/getPreProjectProposal.php',
                 success: function(response) {
                     if (response.status == 'success') {
                         $('#PreviousDocuments').empty();
@@ -253,33 +352,109 @@ $_SESSION['last_activity'] = time();
                                 var link = "../../../../" + doc.file_path;
                                 $('#PreviousDocuments').append(`
                             <tr>
-                                <td><a href="${link}" target="_blank" title="${doc.act_title}" class="text-decoration-none"><i class="fa fa-file-pdf-o"></i> View</a></td>
+                                <td><a href="${link}" target="_blank" title="${doc.act_title} / ${doc.date_Created}" class="text-decoration-none"><i class="fa fa-file-pdf-o"></i> View</a></td>
                                 <td>${doc.date_Created}</td>
                                 <td><a id="EditDocument_${doc.id}" style="cursor: pointer;" class="text-decoration-none"><i class="fa fa-edit"></i> Edit</a></td>
                             </tr>
                         `);
 
-                                $(`#EditDocument_${doc.id}`).on('click', function() {
-                                    if (doc.act_signature == null) {
-                                        doc.act_signature = ACTSIG;
-                                    }
+                                $(document).on('click', `#EditDocument_${doc.id}`, function() {
+                                    if ($('#taskID').val() != "") {
+                                        Swal.fire({
+                                            icon: 'warning',
+                                            title: 'Are you sure?',
+                                            text: 'You have unsaved changes. Do you want to continue?',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'Yes',
+                                            cancelButtonText: 'No',
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                if (doc.act_signature == null) {
+                                                    doc.act_signature = ACTSIG;
+                                                }
 
-                                    $('#AdminName').val(doc.admin_name);
-                                    $('#LetterTo').val(doc.dear_title);
-                                    $('#LetterBody').summernote('code', doc.LetterBody);
-                                    $('#ActivityTitle').val(doc.act_title);
-                                    $('#ActivityDateVenue').val(doc.act_date_ven);
-                                    $('#ActivityHead').val(doc.act_head);
-                                    $('#ActivityObjective').summernote('code', doc.act_obj);
-                                    $('#ActivityTarget').val(doc.act_participate);
-                                    $('#ActivityMechanics').val(doc.act_mech);
-                                    $('#ActivityBudget').summernote('code', doc.act_budget);
-                                    $('#ActivitySourceFunds').val(doc.act_funds);
-                                    $('#ActivityOutcomes').val(doc.act_expectOut);
-                                    $('#ActivitySignature').summernote('code', doc.act_signature);
-                                    $('#ID').val(doc.ID);
-                                    $('#OrgCode').val(doc.org_code);
-                                    $('#Created_By').val(doc.Created_By);
+                                                $('#AdminName').val(doc.admin_name);
+                                                $('#LetterTo').val(doc.dear_title);
+                                                $('#LetterBody').summernote('code',
+                                                    doc.LetterBody);
+                                                $('#ActivityTitle').val(doc
+                                                    .act_title);
+                                                $('#ActivityDateVenue').val(doc
+                                                    .act_date_ven);
+                                                $('#ActivityHead').val(doc
+                                                    .act_head);
+                                                $('#ActivityObjective').summernote(
+                                                    'code', doc.act_obj);
+                                                $('#ActivityTarget').val(doc
+                                                    .act_participate);
+                                                $('#ActivityMechanics').val(doc
+                                                    .act_mech);
+                                                $('#ActivityBudget').summernote(
+                                                    'code', doc.act_budget);
+                                                $('#ActivitySourceFunds').val(doc
+                                                    .act_funds);
+                                                $('#ActivityOutcomes').val(doc
+                                                    .act_expectOut);
+                                                $('#ActivitySignature').summernote(
+                                                    'code', doc.act_signature);
+                                                $('#ID').val(doc.ID);
+                                                $('#OrgCode').val(doc.org_code);
+                                                $('#Created_By').val(doc
+                                                    .Created_By);
+                                                $('#taskID').val("");
+                                                $('#isFromTask').val('false');
+                                                $('#TasksMessage').text(
+                                                    'No tasks found. Click reload to load the last task.'
+                                                );
+                                                $('#TaskIDis').text('N/A');
+                                                $('#taskOrgCode').val('');
+                                            }
+                                        });
+                                    } else {
+                                        if (doc.act_signature == null) {
+                                            doc.act_signature = ACTSIG;
+                                        }
+
+                                        $('#AdminName').val(doc.admin_name);
+                                        $('#LetterTo').val(doc.dear_title);
+                                        $('#LetterBody').summernote('code',
+                                            doc.LetterBody);
+                                        $('#ActivityTitle').val(doc
+                                            .act_title);
+                                        $('#ActivityDateVenue').val(doc
+                                            .act_date_ven);
+                                        $('#ActivityHead').val(doc
+                                            .act_head);
+                                        $('#ActivityObjective').summernote(
+                                            'code', doc.act_obj);
+                                        $('#ActivityTarget').val(doc
+                                            .act_participate);
+                                        $('#ActivityMechanics').val(doc
+                                            .act_mech);
+                                        $('#ActivityBudget').summernote(
+                                            'code', doc.act_budget);
+                                        $('#ActivitySourceFunds').val(doc
+                                            .act_funds);
+                                        $('#ActivityOutcomes').val(doc
+                                            .act_expectOut);
+                                        $('#ActivitySignature').summernote(
+                                            'code', doc.act_signature);
+                                        $('#ID').val(doc.ID);
+                                        $('#OrgCode').val(doc.org_code);
+                                        $('#Created_By').val(doc
+                                            .Created_By);
+                                        $('#taskID').val("");
+                                        $('#isFromTask').val('false');
+                                        if (localStorage.getItem('taskID_PP') == null) {
+                                            $('#TasksMessage').text('No tasks found.');
+                                        } else {
+                                            $('#TasksMessage').text(
+                                                'No tasks found. Click reload to load the last task.'
+                                                );
+                                        }
+
+                                        $('#TaskIDis').text('N/A');
+                                    }
                                 });
                             });
                         } else {
@@ -312,6 +487,20 @@ $_SESSION['last_activity'] = time();
         }
 
         $(document).ready(function() {
+
+            if (localStorage.getItem('taskID_PP') != null) {
+                $('#taskID').val(localStorage.getItem('taskID_PP'));
+                $('#taskOrgCode').val(localStorage.getItem('taskOrgCode_PP'));
+                $('#isFromTask').val('true');
+                $('#TasksMessage').text('You are currently editing a task');
+                $('#TaskIDis').text(localStorage.getItem('taskID_PP'));
+                //localStorage.removeItem('taskID');
+            } else {
+                $('#taskID').val('');
+                $('#isFromTask').val('false');
+                $('#RefreshTasks').addClass('d-none');
+                $('#ClearTasks').addClass('d-none');
+            }
 
             getAP_Documents();
 
@@ -373,7 +562,7 @@ $_SESSION['last_activity'] = time();
             });
 
             $('#ActivitySignature').summernote({
-                placeholder: 'Type your letter here',
+                placeholder: 'Type your letter here. You can use @ to mention the name of the person',
                 tabsize: 2,
                 width: 755,
                 height: 350,
@@ -385,48 +574,68 @@ $_SESSION['last_activity'] = time();
                     ['redo', ['redo']],
                 ],
                 maxCharCount: 8000,
+                hint: {
+                    mention: [
+                        '<?php echo $_SESSION['FullName']; ?>',
+                        'ORG Secretary', 'ORG President'
+                    ],
+                    match: /\B@(\w*)$/,
+                    search: function(keyword, callback) {
+                        callback($.grep(this.mention, function(item) {
+                            return item.indexOf(keyword) == 0;
+                        }));
+                    },
+                    content: function(item) {
+                        return item;
+                    }
+                }
             });
 
             $('.note-editable').css('font-family', 'Helvetica');
-            $('.note-editable').css('font-size', '12px');
             $('.note-editable').css('line-height', '1.0');
         });
 
         $('#ClearFields').on('click', function() {
             $('#AdminName').val('');
             $('#LetterTo').val('');
-            letterBodyEditor.html.set('');
+            $('#LetterBody').summernote('code', '');
             $('#ActivityTitle').val('');
             $('#ActivityDateVenue').val('');
-            activityObjectiveEditor.html.set('');
+            $('#ActivityObjective').summernote('code', '');
             $('#ActivityTarget').val('');
             $('#ActivityMechanics').val('');
-            activityBudgetEditor.html.set('');
+            $('#ActivityBudget').summernote('code', '');
             $('#ActivitySourceFunds').val('');
             $('#ActivityOutcomes').val('');
             $('#ActivityHead').val('');
-            activitySignatureEditor.html.set('');
+            $('#ActivitySignature').summernote('code', '');
             $('#PrintPreview').addClass('d-none');
             $('#ID').val('');
+            $('#OrgCode').val('');
+            $('#Created_By').val('');
+            $('#taskID').val('');
+            $('#isFromTask').val('false');
         });
 
         $('#GenerateLetter').on('click', function() {
+            var TaskID = $('#taskID').val() || '';
+            var isFromTask = $('#isFromTask').val() || 'false';
             var ID = $('#ID').val();
-            var OrgCode = $('#OrgCode').val();
+            var OrgCode = $('#OrgCode').val() || $('#OrgCode_new').val();
             var Created_By = $('#Created_By').val();
             var AdminName = $('#AdminName').val();
             var LetterTo = $('#LetterTo').val();
-            var LetterBody = $('#LetterBody').val();
+            var LetterBody = $('#LetterBody').summernote('code');
             var ActivityTitle = $('#ActivityTitle').val();
             var ActivityDateVenue = $('#ActivityDateVenue').val();
-            var ActivityObjective = $('#ActivityObjective').val();
+            var ActivityObjective = $('#ActivityObjective').summernote('code');
             var ActivityTarget = $('#ActivityTarget').val();
             var ActivityMechanics = $('#ActivityMechanics').val();
-            var ActivityBudget = $('#ActivityBudget').val();
+            var ActivityBudget = $('#ActivityBudget').summernote('code');
             var ActivityHead = $('#ActivityHead').val();
             var ActivitySourceFunds = $('#ActivitySourceFunds').val();
             var ActivityOutcomes = $('#ActivityOutcomes').val();
-            var ActivitySignature = $('#ActivitySignature').val();
+            var ActivitySignature = $('#ActivitySignature').summernote('code');
 
             if (AdminName == '' || LetterTo == '' || LetterBody == '' || ActivityTitle == '' ||
                 ActivityDateVenue == '' || ActivityObjective == '' || ActivityTarget == '' ||
@@ -445,7 +654,21 @@ $_SESSION['last_activity'] = time();
                 return;
             }
 
+            LetterBody = LetterBody.replace(new RegExp('style="background-color:\\s*var\\(--bs-card-bg\\);?"',
+                'g'), '');
+            ActivityObjective = ActivityObjective.replace(new RegExp(
+                'style="background-color:\\s*var\\(--bs-card-bg\\);?"', 'g'), '');
+            ActivityBudget = ActivityBudget.replace(new RegExp(
+                'style="background-color:\\s*var\\(--bs-card-bg\\);?"', 'g'), '');
+            ActivitySignature = ActivitySignature.replace(new RegExp(
+                'style="background-color:\\s*var\\(--bs-card-bg\\);\\s*color:\\s*var\\(--bs-body-color\\);"',
+                'g'), '');
+            ActivitySignature = ActivitySignature.replace(new RegExp(
+                'style="background-color:\\s*var\\(--bs-card-bg\\);?"', 'g'), '');
+
             var data = {
+                TaskID: TaskID,
+                isFromTask: isFromTask,
                 ID: ID,
                 OrgCode: OrgCode,
                 Created_By: Created_By,
@@ -468,7 +691,7 @@ $_SESSION['last_activity'] = time();
 
             $.ajax({
                 type: 'POST',
-                url: '../../../Functions/api/postActivityProposal.php',
+                url: '../../../Functions/api/postProjectProposal.php',
                 data: data,
                 success: function(response) {
                     if (response.status == 'success') {
@@ -484,9 +707,11 @@ $_SESSION['last_activity'] = time();
                         }).then((result) => {
                             if (result.dismiss === Swal.DismissReason.timer) {
                                 //$('#ClearFields').click();
+                                localStorage.removeItem('taskID_AP');
+                                localStorage.removeItem('taskOrgCode_AP');
                                 getAP_Documents();
                                 $('#PrintPreview').removeClass('d-none');
-                                $('#PrintPreview').on('click', function() {
+                                $('#PrintPreview').off('click').on('click', function() {
                                     window.open("../../../../" + response.path,
                                         '_blank');
                                 });

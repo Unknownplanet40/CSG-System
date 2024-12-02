@@ -85,7 +85,13 @@ if (isset($_GET['pending'])) {
         } elseif ($_GET['error'] == '005') {
             echo "<script>localStorage.setItem('error', 'Please activate your account before proceeding.');</script>";
             unset($_GET['error']);
-        } else {
+        } else if ($_GET['error'] == '006') {
+            echo "<script>localStorage.setItem('error', 'Your account is rejected. Please contact the administrator for assistance.');</script>";
+            unset($_GET['error']);
+        }
+        
+        
+        else {
             echo "<script>localStorage.removeItem('error');</script>";
         }
     } else {

@@ -470,7 +470,8 @@ while ($row = $result->fetch_assoc()) {
                             data-bs-target="#user-tab-pane" type="button" role="tab" aria-controls="user-tab-pane"
                             aria-selected="false">Officers <span class="d-none d-md-inline">Account</span></button>
                     </li>
-                    <li class="nav-item" role="presentation">
+                    <li class="nav-item <?php echo $_SESSION['role'] == 2 && ($_SESSION['org_position'] == 2 || $_SESSION['org_position'] == 3) ? 'd-none' : ''; ?>"
+                    role="presentation">
                         <button class="nav-link text-body" id="admin-tab" data-bs-toggle="tab"
                             data-bs-target="#admin-tab-pane" type="button" role="tab" aria-controls="admin-tab-pane"
                             aria-selected="false">Admins <span class="d-none d-md-inline">Account</span></button>

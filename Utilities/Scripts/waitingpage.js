@@ -199,6 +199,24 @@ $(document).ready(function () {
     if (!perEmail.includes(validDomain)) {
       QueueNotification(["error", "CVSU email address is required.", 4000, "top-end"]);
       return;
+    } else {
+      $.ajax({
+        url: "../Functions/api/checkEmail.php",
+        type: "POST",
+        data: { email: perEmail },
+        success: function (data) {
+          if (data.status == "success") {
+              QueueNotification(["success", data.message, 4000, "top-end"]);
+          } else {
+            QueueNotification(["error", data.message, 4000, "top-end"]);
+            return;
+          }
+        },
+        error: function (xhr, status, error) {
+          QueueNotification(["error", "An error occured. Please try again later.", 4000, "top-end"]);
+          return;
+        }
+      });
     }
 
     if (perOrg === null) {
@@ -256,53 +274,105 @@ $(document).ready(function () {
       return;
     }
 
-    var data = {
-      perFname: perFname,
-      perLname: perLname,
-      perEmail: perEmail,
-      perCourse: perCourse,
-      perStudentno: perStudentno,
-      perContact: perContact,
-      perAge: perAge,
+    function notifyUser(type, message, duration = 4000, position = "top-end") {
+      QueueNotification([type, message, duration, position]);
+    }
+    
+    function apiCall(url, type, data) {
+      return $.ajax({ url, type, data });
+    }
+    
+    function handleVerificationCode(perEmail) {
+      return Swal.fire({
+        title: "Verification Code",
+        text: "Please enter the verification code sent to your email.",
+        input: "text",
+        inputAttributes: { autocapitalize: "off" },
+        showCancelButton: true,
+        confirmButtonText: "Verify",
+        showLoaderOnConfirm: true,
+        preConfirm: (code) => {
+          return apiCall("../Functions/api/checkEmail.php", "POST", {
+            email: perEmail,
+            code: code,
+            action: "VerifyCode",
+          })
+            .then((response) => {
+              if (response.status === "success") {
+                notifyUser("success", response.message);
+                return { verified: true };
+              } else {
+                Swal.showValidationMessage(response.message);
+                return { verified: false };
+              }
+            })
+            .catch(() => {
+              Swal.showValidationMessage("An error occurred. Please try again later.");
+              return { verified: false };
+            });
+        },
+        allowOutsideClick: () => !Swal.isLoading(),
+      });
+    }
+    
+    function updateAccount(data) {
+      return apiCall(".../../../Functions/api/postupdateAccount.php", "POST", data)
+        .then((response) => {
+          if (response.stat === "success") {
+            $("#alert").removeClass("alert-primary alert-danger").addClass("alert-success");
+            ChangeStatus("4caf50", "SUBMITTED", 6000, 3500, 24);
+            notifyUser("success", response.message);
+            setTimeout(() => {
+              window.location.href = "./Accesspage.php?pending=logout";
+            }, 10000);
+          } else {
+            notifyUser("error", response.message);
+          }
+        })
+        .catch(() => {
+          notifyUser("error", "An error occurred. Please try again later.");
+        });
+    }
+    
+    function handleEmailVerification(perEmail, perData, perFname) {
+      apiCall("../Functions/api/checkEmail.php", "POST", { email: perEmail, action: "VerifyEmail", Name : perFname })
+        .then((response) => {
+          if (response.status === "success") {
+            notifyUser("success", response.message, 2000);
+            return handleVerificationCode(perEmail);
+          } else {
+            notifyUser("error", response.message);
+            return Promise.reject("Verification failed");
+          }
+        })
+        .then((result) => {
+          if (result.isConfirmed && result.value.verified) {
+            return updateAccount(perData);
+          }
+        })
+        .catch((error) => {
+          console.error(error); // Optional: Log errors for debugging
+        });
+    }
+    
+    // Usage example
+    const perData = {
+      perFname,
+      perLname,
+      perEmail,
+      perCourse,
+      perStudentno,
+      perContact,
+      perAge,
       perBirthdate: $("#perBirthdate").val(),
-      perOrg: perOrg,
-      perPosition: perPosition,
-      perUUID: perUUID,
-      perPassword: perPassword,
+      perOrg,
+      perPosition,
+      perUUID,
+      perPassword,
     };
-
-    $.ajax({
-      url: ".../../../Functions/api/postupdateAccount.php",
-      type: "POST",
-      data: data,
-      success: function (data) {
-        if (data.stat == "success") {
-          $("#alert").removeClass("alert-primary alert-danger").addClass("alert-success");
-          ChangeStatus("4caf50", "SUBMITTED", 6000, 3500, 24);
-          QueueNotification(["success", data.message, 4000, "top-end"]);
-          setTimeout(() => {
-            window.location.href = "./Accesspage.php?pending=logout";
-          }, 10000);
-        } else {
-          QueueNotification(["error", data.message, 4000, "top-end"]);
-        }
-      },
-
-      error: function (xhr, status, error) {
-        QueueNotification(["error", "An error occured. Please try again later.", 4000, "top-end"]);
-      }
-    });
-
     
-
-
+    handleEmailVerification(perEmail, perData, perFname);
     
-
-
-
-
-
-
   });
   setInterval(() => {
     $.ajax({
@@ -322,7 +392,7 @@ $(document).ready(function () {
               .addClass("alert-success");
             ChangeStatus("4caf50", "APPROVED", 6000, 3500, 24);
             setTimeout(() => {
-              window.location.href = "../../Src/Pages/Feed.php";
+              window.location.href = "../../Src/Pages/Accesspage.php?pending=logout";
             }, 4000);
           } else if (data.accountStat == "rejected") {
             $("#alert")
@@ -330,7 +400,7 @@ $(document).ready(function () {
               .addClass("alert-danger");
             ChangeStatus("f44336", "REJECTED", 6000, 3500, 24);
             setTimeout(() => {
-              window.location.href = "../../Src/Functions/api/UserLogout.php";
+              window.location.href = "../../Src/Pages/Accesspage.php?error=006";
             }, 4000);
           }
         } else {

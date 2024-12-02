@@ -5,10 +5,10 @@ $OfficerDashboard = "./Dashboard.php";
 $DocumentHeader = "./DocumentHeader.php";
 $Modules = "#Modules";
 $ActivityProposal = "./ActivityProposal.php";
-$ExcuseLetter = "#ExcuseLetter";
-$MinutesOfTheMeeting = "#MinutesOfTheMeeting";
-$OfficeMemorandum = "#OfficeMemorandum";
-$ProjectProposal = "#ProjectProposal";
+$ExcuseLetter = "./ExcuseLetter.php";
+$MinutesOfTheMeeting = "./MinutesOfTheMeeting.php";
+$OfficeMemorandum = "./OfficeMemorandum.php";
+$ProjectProposal = "./ProjectProposal.php";
 $Feed = "../../Feed.php";
 $Preference = "../../Preference.php";
 $enableDocumentHeader = false;
@@ -86,7 +86,7 @@ if ($_SESSION['role'] == 1) {
                 <svg class="me-3" width="24" height="24">
                     <use xlink:href="#Dashboard" />
                 </svg>
-                Officer Dashboard
+                Records
             </li>
             <li class="list-group-item lg my-2 <?php echo $current_page == 'DocumentHeader.php' ? 'lg-active' : ''; ?> <?php echo $enableDocumentHeader ? '' : 'd-none'; ?>"
                 <?php echo $current_page != 'DocumentHeader.php' ? "onclick='window.location.href = \"$DocumentHeader\"'" : ''; ?>>
@@ -103,7 +103,7 @@ if ($_SESSION['role'] == 1) {
                         <svg class="me-3" width="24" height="24">
                             <use xlink:href="#Folder" />
                         </svg>
-                        Modules
+                        Documents
                     </li>
                     <div id="flush-collapseOne" class="accordion-collapse collapse <?php echo $current_page == 'ActivityProposal.php' || $current_page == 'ExcuseLetter.php' || $current_page == 'MinutesOfTheMeeting.php' || $current_page == 'OfficeMemorandum.php' || $current_page == 'ProjectProposal.php' ? 'show' : ''; ?>
                     " data-bs-parent="#Modules_Accord">

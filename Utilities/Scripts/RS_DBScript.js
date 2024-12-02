@@ -177,21 +177,6 @@ $(document).ready(function () {
       { data: "timestamp" },
     ],
 
-    rowCallback: function (row, data) {
-      $(row).find('[data-bs-toggle="tooltip"]').tooltip();
-      $(row).hover(
-        function () {
-          const details = data.details;
-          if (details) {
-            $(this).find('[data-bs-toggle="tooltip"]').tooltip("show");
-          }
-        },
-        function () {
-          $(this).find('[data-bs-toggle="tooltip"]').tooltip("hide");
-        }
-      );
-    },
-
     initComplete: function () {
       let hasDate = false;
       let DateParams = "";
@@ -230,12 +215,13 @@ $(document).ready(function () {
       const DateSelect = document.createElement("select");
       DateSelect.className = "form-select form-select-sm me-2";
       DateSelect.id = "DateSelect";
-      DateSelect.innerHTML = `<option value="">All Dates</option>
-      <option value="Today">Today</option>
-      <option value="Yesterday">Yesterday</option>
-      <option value="This Week">This Week</option>
-      <option value="This Month">This Month</option>
-      <option value="This Year">This Year</option>`;
+      DateSelect.innerHTML =
+        '<option value="">All Dates</option>' +
+        '<option value="Today">Today</option>' +
+        '<option value="Yesterday">Yesterday</option>' +
+        '<option value="This Week">This Week</option>' +
+        '<option value="This Month">This Month</option>' +
+        '<option value="This Year">This Year</option>`;';
       newContainer.append(DateSelect);
 
       // Date change event
@@ -443,7 +429,13 @@ $(document).ready(function () {
       {
         targets: [0],
         visible: false,
+        searchable: false,
       },
+      {
+        targets: [3],
+        visible: false,
+        searchable: false,
+      }
     ],
 
     initComplete: function () {
@@ -482,12 +474,13 @@ $(document).ready(function () {
       const DateSelect = document.createElement("select");
       DateSelect.className = "form-select form-select-sm me-2";
       DateSelect.id = "DateSelect-AS";
-      DateSelect.innerHTML = `<option value="">All Dates</option>
-      <option value="Today">Today</option>
-      <option value="Yesterday">Yesterday</option>
-      <option value="This Week">This Week</option>
-      <option value="This Month">This Month</option>
-      <option value="This Year">This Year</option>`;
+      DateSelect.innerHTML = 
+      '<option value="">All Dates</option>' +
+      '<option value="Today">Today</option>' +
+      '<option value="Yesterday">Yesterday</option>' +
+      '<option value="This Week">This Week</option>' +
+      '<option value="This Month">This Month</option>' +
+      '<option value="This Year">This Year</option>`;';
       newContainer.append(DateSelect);
 
       $("#DateSelect-AS").on("change", function () {
@@ -659,21 +652,6 @@ $(document).ready(function () {
       },
     ],
 
-    rowCallback: function (row, data) {
-      $(row).find('[data-bs-toggle="tooltip"]').tooltip();
-      $(row).hover(
-        function () {
-          const details = data.summary;
-          if (details) {
-            $(this).find('[data-bs-toggle="tooltip"]').tooltip("show");
-          }
-        },
-        function () {
-          $(this).find('[data-bs-toggle="tooltip"]').tooltip("hide");
-        }
-      );
-    },
-
     initComplete: function () {
       let hasDate = false;
       let DateParams = "";
@@ -715,12 +693,13 @@ $(document).ready(function () {
       const DateSelect = document.createElement("select");
       DateSelect.className = "form-select form-select-sm me-2";
       DateSelect.id = "DateSelect-DA";
-      DateSelect.innerHTML = `<option value="">All Dates</option>
-      <option value="Today">Today</option>
-      <option value="Yesterday">Yesterday</option>
-      <option value="This Week">This Week</option>
-      <option value="This Month">This Month</option>
-      <option value="This Year">This Year</option>`;
+      DateSelect.innerHTML = 
+      '<option value="">All Dates</option>' +
+      '<option value="Today">Today</option>' +
+      '<option value="Yesterday">Yesterday</option>' +
+      '<option value="This Week">This Week</option>' +
+      '<option value="This Month">This Month</option>' +
+      '<option value="This Year">This Year</option>`;';
       newContainer.append(DateSelect);
 
       // Date change event

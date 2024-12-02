@@ -31,9 +31,13 @@ if (!isset($_SESSION['UUID'])) {
 
 if (isset($_SESSION['accountStat'])) {
     if ($_SESSION['accountStat'] === 'active') {
-        header('Location: ./Feed.php');
+        session_unset();
+        session_destroy();
+        header('Location: "./Accesspage.php"');
     } elseif ($_SESSION['accountStat'] === 'rejected') {
-        header('Location: ../Functions/api/UserLogout.php');
+        session_unset();
+        session_destroy();
+        header('Location: "./Accesspage.php?error=006"');
     }
 }
 
