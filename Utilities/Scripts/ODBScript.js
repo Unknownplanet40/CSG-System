@@ -230,12 +230,7 @@ $(document).ready(function () {
           cancelButtonColor: "#d33",
           confirmButtonColor: "#28a745",
           customClass: {
-            popup: "alert-popup glass-default bg-opacity-25 text-body",
-            container: "alert-container",
-            confirmButton: "btn btn-sm btn-success",
-            cancelButton: "btn btn-sm",
-            htmlContainer: "alert-html-container",
-            title: "alert-title",
+            popup: "bg-dark text-body rounded-0 glass-default bg-opacity-25",
           },
         }).then((result) => {
           if (result.isConfirmed) {
@@ -261,7 +256,7 @@ $(document).ready(function () {
                     timer: 1500,
                     timerProgressBar: true,
                     customClass: {
-                      popup: "glass-default bg-opacity-25 text-body",
+                      popup: "bg-dark text-body rounded-0 glass-default",
                     },
                   }).then(() => {
                     let doctype = response.tasktype;
@@ -304,11 +299,7 @@ $(document).ready(function () {
                     timer: 3000,
                     timerProgressBar: true,
                     customClass: {
-                      popup:
-                        "alert-popup glass-default bg-opacity-25 text-body",
-                      container: "alert-container",
-                      htmlContainer: "alert-html-container",
-                      title: "alert-title",
+                      popup: "bg-dark text-body rounded-0 glass-default",
                     },
                   })
                     .fire({
@@ -356,11 +347,7 @@ $(document).ready(function () {
                     timer: 3000,
                     timerProgressBar: true,
                     customClass: {
-                      popup:
-                        "alert-popup glass-default bg-opacity-25 text-body",
-                      container: "alert-container",
-                      htmlContainer: "alert-html-container",
-                      title: "alert-title",
+                      popup: "bg-dark text-body rounded-0 glass-default",
                     },
                   }).fire({
                     icon: "error",
@@ -376,10 +363,7 @@ $(document).ready(function () {
                   timer: 3000,
                   timerProgressBar: true,
                   customClass: {
-                    popup: "alert-popup glass-default bg-opacity-25 text-body",
-                    container: "alert-container",
-                    htmlContainer: "alert-html-container",
-                    title: "alert-title",
+                    popup: "bg-dark text-body rounded-0 glass-default",
                   },
                 }).fire({
                   icon: "error",
@@ -471,7 +455,138 @@ $(document).ready(function () {
         },
       },
       { data: "date_Created" },
+      {
+        data: null,
+        render: function (data) {
+          if (Position < 4) {
+            return '<button id="View-Btn" class="btn btn-sm btn-outline-success rounded-0">' +
+            '<svg width="16" height="16" fill="currentColor">' +
+            '<use xlink:href="#docAction"></use></svg> View</button>';
+          } else if (role == 1) {
+            return '<button id="View-Btn" class="btn btn-sm btn-outline-success rounded-0">' +
+            '<svg width="16" height="16" fill="currentColor">' +
+            '<use xlink:href="#docAction"></use></svg> View</button>';
+          } else {
+            return "";
+          }
+        },
+      },
     ],
+    initComplete: function () {
+      var table = this.api();
+      table.on("click", "#View-Btn", function () {
+        var data = table.row($(this).parents("tr")).data();
+        function sweetAlert() {
+          Swal.fire({
+            icon: "info",
+            title: "Document Approval",
+            text: "Do you want to Submit this document to CSG?",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            allowEnterKey: false,
+            showCancelButton: true,
+            showDenyButton: true,
+            denyButtonText: "VIEW DOCUMENT",
+            confirmButtonText: "SUBMIT",
+            cancelButtonText: "MAYBE LATER",
+            cancelButtonColor: "#d33",
+            confirmButtonColor: "#28a745",
+            denyButtonColor: "#6c757d",
+            customClass: {
+              popup: "text-light rounded-0 bg-opacity-10 glass-default",
+              actions: "hstack gap-1",
+              confirmButton: "btn btn-sm rounded-1 w-100",
+              denyButton: "btn btn-sm rounded-1 w-100",
+              cancelButton: "btn btn-sm rounded-1 w-100",
+            },
+          }).then((result) => {
+            if (result.isDenied) {
+              var path = "..\\..\\..\\..\\" + data.file_path;
+              var width = window.innerWidth;
+              var height = window.innerHeight;
+              window.open(
+                path,
+                "_blank",
+                "toolbar=0,location=0,menubar=0,width=" +
+                  width +
+                  ",height=" +
+                  height
+              );
+              sweetAlert();
+            } else if (result.isConfirmed) {
+              $.ajax({
+                url: "../../../Functions/api/ApproveDocument.php",
+                type: "POST",
+                data: {
+                  docID: data.fileID,
+                  document: "D-AP",
+                  orgCode: data.org_code,
+                },
+
+                success: function (response) {
+                  if (response.status == "success") {
+                    Swal.fire({
+                      icon: "success",
+                      title: "Document Approved",
+                      text: response.message,
+                      showConfirmButton: false,
+                      timer: 1500,
+                      timerProgressBar: true,
+                      customClass: {
+                        popup:
+                          "text-light rounded-0 bg-opacity-25 glass-default",
+                        confirmButton: "btn btn-sm",
+                        denyButton: "btn btn-sm",
+                        cancelButton: "btn btn-sm",
+                      },
+                    }).then(() => {
+                      $("#APDocTable").DataTable().ajax.reload();
+                    });
+                  } else {
+                    Swal.fire({
+                      icon: "error",
+                      title: "Document Approval Failed",
+                      text: response.message,
+                      showConfirmButton: false,
+                      timer: 1500,
+                      timerProgressBar: true,
+                      customClass: {
+                        popup:
+                          "text-light rounded-0 bg-opacity25 glass-default",
+                        confirmButton: "btn btn-sm",
+                        denyButton: "btn btn-sm",
+                        cancelButton: "btn btn-sm",
+                      },
+                    }).then(() => {
+                      $("#APDocTable").DataTable().ajax.reload();
+                    });
+                  }
+                },
+                error: function (data) {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Document Approval Failed",
+                    text: "Something went wrong. Please try again later",
+                    showConfirmButton: false,
+                    timer: 1500,
+                    timerProgressBar: true,
+                    customClass: {
+                      popup: "text-light rounded-0 bg-opacity-25 glass-default",
+                      confirmButton: "btn btn-sm",
+                      denyButton: "btn btn-sm",
+                      cancelButton: "btn btn-sm",
+                    },
+                  }).then(() => {
+                    $("#APDocTable").DataTable().ajax.reload();
+                  });
+                },
+              });
+            }
+          });
+        }
+        sweetAlert();
+      });
+    },
   });
 
   $("#ELDocTable").DataTable({
@@ -552,7 +667,139 @@ $(document).ready(function () {
       },
       { data: "Created_By" },
       { data: "DateCreated" },
+      {
+        data: null,
+        render: function (data) {
+          if (Position < 4) {
+           return '<button id="View-Btn" class="btn btn-sm btn-outline-success rounded-0">' +
+            '<svg width="16" height="16" fill="currentColor">' +
+            '<use xlink:href="#docAction"></use></svg> View</button>';
+          } else if (role == 1) {
+           return '<button id="View-Btn" class="btn btn-sm btn-outline-success rounded-0">' +
+            '<svg width="16" height="16" fill="currentColor">' +
+            '<use xlink:href="#docAction"></use></svg> View</button>';
+          } else {
+            return "";
+          }
+        },
+      },
     ],
+
+    initComplete: function () {
+      var table = this.api();
+      table.on("click", "#View-Btn", function () {
+        var data = table.row($(this).parents("tr")).data();
+        function sweetAlert() {
+          Swal.fire({
+            icon: "info",
+            title: "Document Approval",
+            text: "Do you want to Submit this document to CSG?",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            allowEnterKey: false,
+            showCancelButton: true,
+            showDenyButton: true,
+            denyButtonText: "VIEW DOCUMENT",
+            confirmButtonText: "YES SUBMIT",
+            cancelButtonText: "MAYBE LATER",
+            cancelButtonColor: "#d33",
+            confirmButtonColor: "#28a745",
+            denyButtonColor: "#6c757d",
+            customClass: {
+              popup: "text-light rounded-0 bg-opacity-10 glass-default",
+              actions: "hstack gap-1",
+              confirmButton: "btn btn-sm rounded-1 w-100",
+              denyButton: "btn btn-sm rounded-1 w-100",
+              cancelButton: "btn btn-sm rounded-1 w-100",
+            },
+          }).then((result) => {
+            if (result.isDenied) {
+              var path = "..\\..\\..\\..\\" + data.file_path;
+              var width = window.innerWidth;
+              var height = window.innerHeight;
+              window.open(
+                path,
+                "_blank",
+                "toolbar=0,location=0,menubar=0,width=" +
+                  width +
+                  ",height=" +
+                  height
+              );
+              sweetAlert();
+            } else if (result.isConfirmed) {
+              $.ajax({
+                url: "../../../Functions/api/ApproveDocument.php",
+                type: "POST",
+                data: {
+                  docID: data.fileID,
+                  document: "D-EL",
+                  orgCode: data.org_code,
+                },
+
+                success: function (response) {
+                  if (response.status == "success") {
+                    Swal.fire({
+                      icon: "success",
+                      title: "Document Approved",
+                      text: response.message,
+                      showConfirmButton: false,
+                      timer: 1500,
+                      timerProgressBar: true,
+                      customClass: {
+                        popup:
+                          "text-light rounded-0 bg-opacity-25 glass-default",
+                        confirmButton: "btn btn-sm",
+                        denyButton: "btn btn-sm",
+                        cancelButton: "btn btn-sm",
+                      },
+                    }).then(() => {
+                      $("#APDocTable").DataTable().ajax.reload();
+                    });
+                  } else {
+                    Swal.fire({
+                      icon: "error",
+                      title: "Document Approval Failed",
+                      text: response.message,
+                      showConfirmButton: false,
+                      timer: 1500,
+                      timerProgressBar: true,
+                      customClass: {
+                        popup:
+                          "text-light rounded-0 bg-opacity25 glass-default",
+                        confirmButton: "btn btn-sm",
+                        denyButton: "btn btn-sm",
+                        cancelButton: "btn btn-sm",
+                      },
+                    }).then(() => {
+                      $("#APDocTable").DataTable().ajax.reload();
+                    });
+                  }
+                },
+                error: function (data) {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Document Approval Failed",
+                    text: "Something went wrong. Please try again later",
+                    showConfirmButton: false,
+                    timer: 1500,
+                    timerProgressBar: true,
+                    customClass: {
+                      popup: "text-light rounded-0 bg-opacity-25 glass-default",
+                      confirmButton: "btn btn-sm",
+                      denyButton: "btn btn-sm",
+                      cancelButton: "btn btn-sm",
+                    },
+                  }).then(() => {
+                    $("#APDocTable").DataTable().ajax.reload();
+                  });
+                },
+              });
+            }
+          });
+        }
+        sweetAlert();
+      });
+    },
 
     columnDefs: [
       {
@@ -643,7 +890,137 @@ $(document).ready(function () {
       },
       { data: "Created_By" },
       { data: "DateCreated" },
+      {
+        data: null,
+        render: function (data) {
+          if (Position < 4) {
+           return '<button id="View-Btn" class="btn btn-sm btn-outline-success rounded-0">' +
+            '<svg width="16" height="16" fill="currentColor">' +
+            '<use xlink:href="#docAction"></use></svg> View</button>';
+          } else if (role == 1) {
+           return '<button id="View-Btn" class="btn btn-sm btn-outline-success rounded-0">' +
+            '<svg width="16" height="16" fill="currentColor">' +
+            '<use xlink:href="#docAction"></use></svg> View</button>';
+          }
+        },
+      },
     ],
+
+    initComplete: function () {
+      var table = this.api();
+      table.on("click", "#View-Btn", function () {
+        var data = table.row($(this).parents("tr")).data();
+        function sweetAlert() {
+          Swal.fire({
+            icon: "info",
+            title: "Document Approval",
+            text: "Do you want to Submit this document to CSG?",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            allowEnterKey: false,
+            showCancelButton: true,
+            showDenyButton: true,
+            denyButtonText: "VIEW DOCUMENT",
+            confirmButtonText: "YES SUBMIT",
+            cancelButtonText: "MAYBE LATER",
+            cancelButtonColor: "#d33",
+            confirmButtonColor: "#28a745",
+            denyButtonColor: "#6c757d",
+            customClass: {
+              popup: "text-light rounded-0 bg-opacity-10 glass-default",
+              actions: "hstack gap-1",
+              confirmButton: "btn btn-sm rounded-1 w-100",
+              denyButton: "btn btn-sm rounded-1 w-100",
+              cancelButton: "btn btn-sm rounded-1 w-100",
+            },
+          }).then((result) => {
+            if (result.isDenied) {
+              var path = "..\\..\\..\\..\\" + data.file_path;
+              var width = window.innerWidth;
+              var height = window.innerHeight;
+              window.open(
+                path,
+                "_blank",
+                "toolbar=0,location=0,menubar=0,width=" +
+                  width +
+                  ",height=" +
+                  height
+              );
+              sweetAlert();
+            } else if (result.isConfirmed) {
+              $.ajax({
+                url: "../../../Functions/api/ApproveDocument.php",
+                type: "POST",
+                data: {
+                  docID: data.fileID,
+                  document: "D-MM",
+                  orgCode: data.org_code,
+                },
+
+                success: function (response) {
+                  if (response.status == "success") {
+                    Swal.fire({
+                      icon: "success",
+                      title: "Document Approved",
+                      text: response.message,
+                      showConfirmButton: false,
+                      timer: 1500,
+                      timerProgressBar: true,
+                      customClass: {
+                        popup:
+                          "text-light rounded-0 bg-opacity-25 glass-default",
+                        confirmButton: "btn btn-sm",
+                        denyButton: "btn btn-sm",
+                        cancelButton: "btn btn-sm",
+                      },
+                    }).then(() => {
+                      $("#APDocTable").DataTable().ajax.reload();
+                    });
+                  } else {
+                    Swal.fire({
+                      icon: "error",
+                      title: "Document Approval Failed",
+                      text: response.message,
+                      showConfirmButton: false,
+                      timer: 1500,
+                      timerProgressBar: true,
+                      customClass: {
+                        popup:
+                          "text-light rounded-0 bg-opacity25 glass-default",
+                        confirmButton: "btn btn-sm",
+                        denyButton: "btn btn-sm",
+                        cancelButton: "btn btn-sm",
+                      },
+                    }).then(() => {
+                      $("#APDocTable").DataTable().ajax.reload();
+                    });
+                  }
+                },
+                error: function (data) {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Document Approval Failed",
+                    text: "Something went wrong. Please try again later",
+                    showConfirmButton: false,
+                    timer: 1500,
+                    timerProgressBar: true,
+                    customClass: {
+                      popup: "text-light rounded-0 bg-opacity-25 glass-default",
+                      confirmButton: "btn btn-sm",
+                      denyButton: "btn btn-sm",
+                      cancelButton: "btn btn-sm",
+                    },
+                  }).then(() => {
+                    $("#APDocTable").DataTable().ajax.reload();
+                  });
+                },
+              });
+            }
+          });
+        }
+        sweetAlert();
+      });
+    },
 
     columnDefs: [
       {
@@ -733,9 +1110,137 @@ $(document).ready(function () {
         },
       },
       { data: "DateCreated" },
+      {
+        data: null,
+        render: function (data) {
+          if (Position < 4) {
+           return '<button id="View-Btn" class="btn btn-sm btn-outline-success rounded-0">' +
+            '<svg width="16" height="16" fill="currentColor">' +
+            '<use xlink:href="#docAction"></use></svg> View</button>';
+          } else if (role == 1) {
+           return '<button id="View-Btn" class="btn btn-sm btn-outline-success rounded-0">' +
+            '<svg width="16" height="16" fill="currentColor">' +
+            '<use xlink:href="#docAction"></use></svg> View</button>';
+          }
+        },
+      },
     ],
 
+    initComplete: function () {
+      var table = this.api();
+      table.on("click", "#View-Btn", function () {
+        var data = table.row($(this).parents("tr")).data();
+        function sweetAlert() {
+          Swal.fire({
+            icon: "info",
+            title: "Document Approval",
+            text: "Do you want to Submit this document to CSG?",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            allowEnterKey: false,
+            showCancelButton: true,
+            showDenyButton: true,
+            denyButtonText: "VIEW DOCUMENT",
+            confirmButtonText: "YES I DO",
+            cancelButtonText: "MAYBE LATER",
+            cancelButtonColor: "#d33",
+            confirmButtonColor: "#28a745",
+            denyButtonColor: "#6c757d",
+            customClass: {
+              popup: "text-light rounded-0 bg-opacity-10 glass-default",
+              actions: "hstack gap-1",
+              confirmButton: "btn btn-sm rounded-1 w-100",
+              denyButton: "btn btn-sm rounded-1 w-100",
+              cancelButton: "btn btn-sm rounded-1 w-100",
+            },
+          }).then((result) => {
+            if (result.isDenied) {
+              var path = "..\\..\\..\\..\\" + data.file_path;
+              var width = window.innerWidth;
+              var height = window.innerHeight;
+              window.open(
+                path,
+                "_blank",
+                "toolbar=0,location=0,menubar=0,width=" +
+                  width +
+                  ",height=" +
+                  height
+              );
+              sweetAlert();
+            } else if (result.isConfirmed) {
+              $.ajax({
+                url: "../../../Functions/api/ApproveDocument.php",
+                type: "POST",
+                data: {
+                  docID: data.fileID,
+                  document: "D-OM",
+                  orgCode: data.org_code,
+                },
 
+                success: function (response) {
+                  if (response.status == "success") {
+                    Swal.fire({
+                      icon: "success",
+                      title: "Document Approved",
+                      text: response.message,
+                      showConfirmButton: false,
+                      timer: 1500,
+                      timerProgressBar: true,
+                      customClass: {
+                        popup:
+                          "text-light rounded-0 bg-opacity-25 glass-default",
+                        confirmButton: "btn btn-sm",
+                        denyButton: "btn btn-sm",
+                        cancelButton: "btn btn-sm",
+                      },
+                    }).then(() => {
+                      $("#APDocTable").DataTable().ajax.reload();
+                    });
+                  } else {
+                    Swal.fire({
+                      icon: "error",
+                      title: "Document Approval Failed",
+                      text: response.message,
+                      showConfirmButton: false,
+                      timer: 1500,
+                      timerProgressBar: true,
+                      customClass: {
+                        popup:
+                          "text-light rounded-0 bg-opacity25 glass-default",
+                        confirmButton: "btn btn-sm",
+                        denyButton: "btn btn-sm",
+                        cancelButton: "btn btn-sm",
+                      },
+                    }).then(() => {
+                      $("#APDocTable").DataTable().ajax.reload();
+                    });
+                  }
+                },
+                error: function (data) {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Document Approval Failed",
+                    text: "Something went wrong. Please try again later",
+                    showConfirmButton: false,
+                    timer: 1500,
+                    timerProgressBar: true,
+                    customClass: {
+                      popup: "text-light rounded-0 bg-opacity-25 glass-default",
+                      confirmButton: "btn btn-sm",
+                      denyButton: "btn btn-sm",
+                      cancelButton: "btn btn-sm",
+                    },
+                  }).then(() => {
+                    $("#APDocTable").DataTable().ajax.reload();
+                  });
+                },
+              });
+            }
+          });
+        }
+        sweetAlert();
+      });
+    },
   });
 
   $("#PPDocTable").DataTable({
@@ -816,6 +1321,242 @@ $(document).ready(function () {
         },
       },
       { data: "date_Created" },
+      {
+        data: null,
+        render: function (data) {
+          if (Position < 4) {
+           return '<button id="View-Btn" class="btn btn-sm btn-outline-success rounded-0">' +
+            '<svg width="16" height="16" fill="currentColor">' +
+            '<use xlink:href="#docAction"></use></svg> View</button>';
+          } else if (role == 1) {
+           return '<button id="View-Btn" class="btn btn-sm btn-outline-success rounded-0">' +
+            '<svg width="16" height="16" fill="currentColor">' +
+            '<use xlink:href="#docAction"></use></svg> View</button>';
+          }
+        },
+      },
     ],
+
+    initComplete: function () {
+      var table = this.api();
+      table.on("click", "#View-Btn", function () {
+        var data = table.row($(this).parents("tr")).data();
+        function sweetAlert() {
+          Swal.fire({
+            icon: "info",
+            title: "Document Approval",
+            text: "Do you want to Submit this document to CSG?",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            allowEnterKey: false,
+            showCancelButton: true,
+            showDenyButton: true,
+            denyButtonText: "VIEW DOCUMENT",
+            confirmButtonText: "YES SUBMIT",
+            cancelButtonText: "MAYBE LATER",
+            cancelButtonColor: "#d33",
+            confirmButtonColor: "#28a745",
+            denyButtonColor: "#6c757d",
+            customClass: {
+              popup: "text-light rounded-0 bg-opacity-10 glass-default",
+              actions: "hstack gap-1",
+              confirmButton: "btn btn-sm rounded-1 w-100",
+              denyButton: "btn btn-sm rounded-1 w-100",
+              cancelButton: "btn btn-sm rounded-1 w-100",
+            },
+          }).then((result) => {
+            if (result.isDenied) {
+              var path = "..\\..\\..\\..\\" + data.file_path;
+              var width = window.innerWidth;
+              var height = window.innerHeight;
+              window.open(
+                path,
+                "_blank",
+                "toolbar=0,location=0,menubar=0,width=" +
+                  width +
+                  ",height=" +
+                  height
+              );
+              sweetAlert();
+            } else if (result.isConfirmed) {
+              $.ajax({
+                url: "../../../Functions/api/ApproveDocument.php",
+                type: "POST",
+                data: {
+                  docID: data.fileID,
+                  document: "D-PP",
+                  orgCode: data.org_code,
+                },
+
+                success: function (response) {
+                  if (response.status == "success") {
+                    Swal.fire({
+                      icon: "success",
+                      title: "Document Approved",
+                      text: response.message,
+                      showConfirmButton: false,
+                      timer: 1500,
+                      timerProgressBar: true,
+                      customClass: {
+                        popup:
+                          "text-light rounded-0 bg-opacity-25 glass-default",
+                        confirmButton: "btn btn-sm",
+                        denyButton: "btn btn-sm",
+                        cancelButton: "btn btn-sm",
+                      },
+                    }).then(() => {
+                      $("#APDocTable").DataTable().ajax.reload();
+                    });
+                  } else {
+                    Swal.fire({
+                      icon: "error",
+                      title: "Document Approval Failed",
+                      text: response.message,
+                      showConfirmButton: false,
+                      timer: 1500,
+                      timerProgressBar: true,
+                      customClass: {
+                        popup:
+                          "text-light rounded-0 bg-opacity25 glass-default",
+                        confirmButton: "btn btn-sm",
+                        denyButton: "btn btn-sm",
+                        cancelButton: "btn btn-sm",
+                      },
+                    }).then(() => {
+                      $("#APDocTable").DataTable().ajax.reload();
+                    });
+                  }
+                },
+                error: function (data) {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Document Approval Failed",
+                    text: "Something went wrong. Please try again later",
+                    showConfirmButton: false,
+                    timer: 1500,
+                    timerProgressBar: true,
+                    customClass: {
+                      popup: "text-light rounded-0 bg-opacity-25 glass-default",
+                      confirmButton: "btn btn-sm",
+                      denyButton: "btn btn-sm",
+                      cancelButton: "btn btn-sm",
+                    },
+                  }).then(() => {
+                    $("#APDocTable").DataTable().ajax.reload();
+                  });
+                },
+              });
+            }
+          });
+        }
+        sweetAlert();
+      });
+    },
+  });
+
+  $("#SubDocTable").DataTable({
+    ordering: false,
+    pageLength: 5,
+    order: [[1, "desc"]],
+    lengthMenu: [7],
+    language: {
+      search: "_INPUT_",
+      searchPlaceholder: "Search Submissions",
+      lengthMenu: "_MENU_",
+      info: "Showing _START_ to _END_ of _TOTAL_ Submissions",
+      infoEmpty: "",
+      infoFiltered: "(filtered from _MAX_ total Submissions)",
+      zeroRecords: "No matching Submissions found",
+      thousands: ",",
+      emptyTable: "Currently no Project Submissions available",
+      paginate: {
+        next: "Next",
+        previous: "Previous",
+      },
+    },
+    layout: {
+      top1: [
+        {
+          div: {
+            className: "",
+          },
+        },
+        {
+          div: {
+            className: "select-DT-TDs",
+            text: "",
+          },
+        },
+        {
+          div: {
+            className: "",
+            text: "",
+          },
+        },
+      ],
+      topStart: {
+        search: {
+          placeholder: "Search Submissions",
+        },
+      },
+      topEnd: {
+        info: true,
+      },
+      bottomStart: null,
+    },
+
+    ajax: {
+      url: "../../../Functions/api/getFileSummision.php",
+      type: "GET",
+      dataType: "json",
+      dataSrc: "data",
+    },
+
+    columnDefs: [
+      {
+        targets: [0],
+        orderable: false,
+        visible: false,
+        searchable: false,
+      },
+    ],
+
+    columns: [
+      { data: "ID" },
+      { data: "fileID" },
+      { data: "document" },
+      { data: "name" },
+      { data: "org_code" },
+      { data: "DateCreated" },
+      {
+        data: null,
+        render: function (data) {
+          if (Position < 4) {
+           return '<button id="View-Btn" class="btn btn-sm btn-outline-success rounded-0">' +
+            '<svg width="16" height="16" fill="currentColor">' +
+            '<use xlink:href="#docAction"></use></svg> View</button>';
+          } else if (role == 1) {
+           return '<button id="View-Btn" class="btn btn-sm btn-outline-success rounded-0">' +
+            '<svg width="16" height="16" fill="currentColor">' +
+            '<use xlink:href="#docAction"></use></svg> View</button>';
+          }
+        },
+      },
+    ],
+
+    initComplete: function () {
+      var table = this.api();
+      table.on("click", "#View-Btn", function () {
+        var data = table.row($(this).parents("tr")).data();
+        var path = "..\\..\\..\\..\\" + data.file_path;
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+        window.open(
+          path,
+          "_blank",
+          "toolbar=0,location=0,menubar=0,width=" + width + ",height=" + height
+        );
+      });
+    },
   });
 });

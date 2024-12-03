@@ -243,6 +243,15 @@ while ($row = $result->fetch_assoc()) {
                                     <select class="form-select form-select-sm rounded-1" id="inputsection" required>
                                     </select>
                                 </div>
+                                <div class="col-md-4">
+                                    <label for="inputTerm" class="form-label">Term Ended</label>
+                                    <select class="form-select form-select-sm rounded-1" id="inputTerm" required>
+                                        <option selected hidden disabled>Select Term Status</option>
+                                        <option value="0">Ongoing</option>
+                                        <option value="1">Ended</option>
+                                    </select>
+                                    </script>
+                                </div>
                                 <div class="col-md-6">
                                     <label for="inputpassword" class="form-label">New Password (Optional)</label>
                                     <div class="hstack">
@@ -570,6 +579,7 @@ while ($row = $result->fetch_assoc()) {
                                         <th scope="col" class="text-nowrap">Contact Number</th>
                                         <th scope="col" class="text-nowrap">Course</th>
                                         <th scope="col" class="text-nowrap">Organization</th>
+                                        <th scope="col" class="text-nowrap">is Term Ended</th>
                                         <th scope="col" class="text-nowrap">Status</th>
                                         <th scope="col" class="text-nowrap">Action</th>
                                     </tr>

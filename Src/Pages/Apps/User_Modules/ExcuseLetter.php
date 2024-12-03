@@ -489,6 +489,13 @@ while ($row = $result->fetch_assoc()) {
                             },
                             success: function(data) {
                                 if (data.status == 'success') {
+                                    if (data.data.length === 0){
+                                        $('#PreviousDocuments').html(
+                                            '<tr><td colspan="3" class="text-center">No Files yet</td></tr>'
+                                        );
+                                        return;
+                                    }
+                                    
                                     $('#PreviousDocuments').empty();
                                     const tooltipList = [];
                                     data.data.forEach(function(item) {

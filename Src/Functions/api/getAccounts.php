@@ -52,7 +52,7 @@ if ($result->num_rows > 0) {
 
         $row['isLogin'] = $row['isLogin'] == 1 ? 'Online' : 'Offline';
 
-        $stmt = $conn->prepare("SELECT role, org_code, org_position FROM userpositions WHERE UUID = ?");
+        $stmt = $conn->prepare("SELECT role, org_code, org_position, isTermComplete FROM userpositions WHERE UUID = ?");
         $stmt->bind_param("s", $row['UUID']);
         $stmt->execute();
         $role = $stmt->get_result()->fetch_assoc();
@@ -61,6 +61,7 @@ if ($result->num_rows > 0) {
         $row['role'] = $role ? $role['role'] : '';
         $row['org_code'] = $role ? $role['org_code'] : '';
         $row['org_position'] = $role ? $role['org_position'] : '';
+        $row['isTermComplete'] = $role ? $role['isTermComplete'] : '';
 
         if ($row['First_Name'] == 'None' && $row['Last_Name'] == 'None') {
             $row['First_Name'] = 'TBA';
@@ -114,6 +115,7 @@ if ($result->num_rows > 0) {
                     'role' => $row['role'],
                     'org_code' => $row['org_code'],
                     'org_position' => $row['org_position'],
+                    'isTermComplete' => $row['isTermComplete'],
                     'isLocked' => $isLocked,
                 ];
             } else {

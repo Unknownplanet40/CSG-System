@@ -283,15 +283,82 @@ foreach ($data as $row) {?>
                             <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1">
                                 <div class="card-body">
                                     <div class="hstack gap-2">
-                                        <p class="fw-bold">Task Assigned by Organization</p>
+                                        <p class="fw-bold">Submitted Documents for this Month</p>
                                         <a class="text-decoration-none text-success ms-auto"
                                             href="../User_Modules/Dashboard.php"><small>View More</small></a>
                                     </div>
-                                    <canvas id="task"></canvas>
-                                    
+                                    <div class="d-flex justify-content-center">
+                                        <div id="chatOVERALL"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1"
+                                style="max-height: 600px;">
+                                <div class="card-body">
+                                    <div class="hstack gap-2">
+                                        <p class="fw-bold">Activity Proposals</p>
+                                        <a class="text-decoration-none text-success ms-auto"
+                                            href="../User_Modules/ActivityProposal.php"><small>View More</small></a>
+                                    </div>
+                                    <div id="chatAP"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1"
+                                style="max-height: 600px;">
+                                <div class="card-body">
+                                    <div class="hstack gap-2">
+                                        <p class="fw-bold">Excuse Letters</p>
+                                        <a class="text-decoration-none text-success ms-auto"
+                                            href="../User_Modules/ExcuseLetter.php"><small>View More</small></a>
+                                    </div>
+                                    <div id="chatEL"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1"
+                                style="max-height: 600px;">
+                                <div class="card-body">
+                                    <div class="hstack gap-2">
+                                        <p class="fw-bold">Minutes of the Meeting</p>
+                                        <a class="text-decoration-none text-success ms-auto"
+                                            href="../User_Modules/MinutesOfTheMeeting.php"><small>View More</small></a>
+                                    </div>
+                                    <div id="chatMM"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1"
+                                style="max-height: 600px;">
+                                <div class="card-body">
+                                    <div class="hstack gap-2">
+                                        <p class="fw-bold">Office Memorandum</p>
+                                        <a class="text-decoration-none text-success ms-auto"
+                                            href="../User_Modules/OfficeMemorandum.php"><small>View More</small></a>
+                                    </div>
+                                </div>
+                                <div id="chatOM"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1"
+                                style="max-height: 600px;">
+                                <div class="card-body">
+                                    <div class="hstack gap-2">
+                                        <p class="fw-bold">Project Proposals</p>
+                                        <a class="text-decoration-none text-success ms-auto"
+                                            href="../User_Modules/ProjectProposal.php"><small>View More</small></a>
+                                    </div>
+                                    <div id="chatPP"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php include_once "./Chart-data-12.php"; ?>
                         <div class="col-md-6">
                             <div class="card glass-default bg-opacity-25 border-0 h-100 rounded-1"
                                 style="max-height: 600px;">

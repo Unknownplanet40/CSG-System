@@ -64,13 +64,13 @@ function GetCourse() {
         $("#inputCourse").empty();
         $("#inputCourse").append(`<option hidden>Choose...</option>`);
         res.data.forEach((courses) => {
-          if (courses.ShortName === old) {
+          if (courses.CourseID === old) {
             $("#inputCourse").append(
-              `<option value="${courses.ShortName}" selected>${courses.CourseName}</option>`
+              `<option value="${courses.CourseID}" selected>${courses.CourseName}</option>`
             );
           } else {
             $("#inputCourse").append(
-              `<option value="${courses.ShortName}">${courses.CourseName}</option>`
+              `<option value="${courses.CourseID}">${courses.CourseName}</option>`
             );
           }
         });
@@ -581,9 +581,32 @@ $(document).ready(function () {
       },
       { data: "contactNumber" },
       { data: "course_code" },
-      { data: "org_code" },
+      { data: null,
+        render: function (data) {
+          if (data.org_position === "1") {
+            return `<p class='text-truncate' style='max-width: 128px; cursor: pointer;' data-bs-toggle='popover' data-bs-trigger='hover' data-bs-placement='top' data-bs-title="Position and Term Status" data-bs-content='Position: ${data.org_code} President | ${data.isTermComplete === 0 ? "Ongoing" : "Ended"}'><span class='d-print-none'>${data.org_code} &#10148;</span><span class='d-none d-print-block'>${data.org_code} President</span></p>`;
+          } else if (data.org_position === "2") {
+            return `<p class='text-truncate' style='max-width: 128px; cursor: pointer;' data-bs-toggle='popover' data-bs-trigger='hover' data-bs-placement='top' data-bs-title="Position and Term Status" data-bs-content='${data.org_code} Vice President for Internal Affairs | ${data.isTermComplete == 0 ? "Ongoing" : "Ended"}'><span class='d-print-none'>${data.org_code} &#10148;</span><span class='d-none d-print-block'>${data.org_code} Vice President for Internal Affairs</span></p>`;
+          } else if (data.org_position === "3") {
+            return `<p class='text-truncate' style='max-width: 128px; cursor: pointer;' data-bs-toggle='popover' data-bs-trigger='hover' data-bs-placement='top' data-bs-title="Position and Term Status" data-bs-content='${data.org_code} Vice President for External Affairs | ${data.isTermComplete == 0 ? "Ongoing" : "Ended"}'><span class='d-print-none'>${data.org_code} &#10148;</span><span class='d-none d-print-block'>${data.org_code} Vice President for External Affairs</span></p>`;
+          } else if (data.org_position === "4") {
+            return `<p class='text-truncate' style='max-width: 128px; cursor: pointer;' data-bs-toggle='popover' data-bs-trigger='hover' data-bs-placement='top' data-bs-title="Position and Term Status" data-bs-content='${data.org_code} Secretary | ${data.isTermComplete == 0 ? "Ongoing" : "Ended"}'><span class='d-print-none'>${data.org_code} &#10148;</span><span class='d-none d-print-block'>${data.org_code} Secretary</span></p>`;
+          } else {
+            return "<span class='p-2 py-1 rounded-5 text-bg-secondary'>Not Assigned</span>";
+          }
+        }
+       },
+      { data: "isTermComplete",
+        render: function (data) {
+          if (data.isTermComplete === "1") {
+            return "<span class='badge text-bg-success'>Yes</span>";
+          } else {
+            return "<span class='badge text-bg-info'>No</span>";
+          }
+        },
+      },
       {
-        data: null,
+        data: "accountStat",
         render: function (data) {
           if (data.accountStat !== "archived") {
             if (data.isLocked) {
@@ -610,7 +633,7 @@ $(document).ready(function () {
 
     columnDefs: [
       {
-        targets: 0,
+        targets: [0,7],
         visible: false,
       },
       {
@@ -651,6 +674,19 @@ $(document).ready(function () {
         var courseName = parts[0].trim() || "";
         var courseYear = parts[1] ? parts[1].slice(0, -1).trim() : "";
         var courseSection = parts[1] ? parts[1].slice(-1).trim() : "";
+        var termchoice = $("#inputTerm");
+        termchoice.empty();
+        if (data.isTermComplete === 0) {
+          termchoice.append(`<option value="1" selected>Ongoing</option>`);
+          termchoice.append(`<option value="2">Ended</option>`);
+        } else if (data.isTermComplete === 1) {
+          termchoice.append(`<option value="1">Ongoing</option>`);
+          termchoice.append(`<option value="2" selected>Ended</option>`);
+        } else {
+          termchoice.append(`<option selected hidden disabled>Select Term Status</option>`);
+          termchoice.append(`<option value="1">Ongoing</option>`);
+          termchoice.append(`<option value="2">Ended</option>`);
+        }
 
         $("#inputCourse").attr("data-old", courseName);
         GetCourse();
@@ -976,7 +1012,6 @@ $(document).ready(function () {
           funnyDeleteButtons[
             Math.floor(Math.random() * funnyDeleteButtons.length)
           ],
-        allowOutsideClick: false,
         confirmButtonColor: "#d33",
         customClass: {
           popup: "alert-popup-inform",

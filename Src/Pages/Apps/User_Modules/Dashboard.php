@@ -12,6 +12,8 @@ if (!isset($_SESSION['UUID'])) {
 } else {
     $logPath = "../../../Debug/Users/UUID.log";
     echo '<script>var UUID = "' . $_SESSION['UUID'] . '";</script>';
+    echo '<script>var role = "' . $_SESSION['role'] . '";</script>';
+    echo '<script>var Position = "' . $_SESSION['org_position'] . '";</script>';
 }
 
 if ($_SESSION['role'] > 3) {
@@ -338,16 +340,22 @@ $stmt->close();?>
                 </div>
             </div>
             <div class="container mt-3">
-                <ul class="nav nav-tabs d-flex justify-content-center" id="myTab" role="tablist">
+                <ul class="nav nav-tabs nav-fill " id="myTab" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button
-                            class="nav-link <?php echo $_SESSION['org_position'] == 4 ? "active" : ""; ?>"
-                            id="Task-tab" data-bs-toggle="tab" data-bs-target="#Task-tab-pane" type="button" role="tab"
+                            class="nav-link <?php echo ($_SESSION['role'] == 1 || ($_SESSION['role'] == 2 && $_SESSION['org_position'] != 4) ? "active" : ""); ?>
+                            " id="submitted-tab" data-bs-toggle="tab" data-bs-target="#Submitted-tab-pane" type="button" role="tab"
+                            aria-controls="Submitted-tab-pane" aria-selected="false">Submitted Documents</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button
+                            class="nav-link <?php echo ($_SESSION['role'] == 2 && $_SESSION['org_position'] == 4) || ($_SESSION['role'] == 3 && $_SESSION['org_position'] == 4) ? "active" : ""; ?>
+                            " id="Task-tab" data-bs-toggle="tab" data-bs-target="#Task-tab-pane" type="button" role="tab"
                             aria-controls="Task-tab-pane" aria-selected="false">Task</button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button
-                            class="nav-link <?php echo $_SESSION['org_position'] == 4 ? "" : "active"; ?> position-relative"
+                            class="nav-link position-relative <?php echo ($_SESSION['role'] == 3 ? "active" : ""); ?>"
                             id="home-tab" data-bs-toggle="tab" data-bs-target="#APDoc-tab-pane" type="button" role="tab"
                             aria-controls="APDoc-tab-pane" aria-selected="true">Activity Proposal
                             <span
@@ -405,8 +413,29 @@ $stmt->close();?>
                     </li>
                 </ul>
                 <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade <?php echo $_SESSION['org_position'] == 4 ? "show active" : ""; ?>"
-                        id="Task-tab-pane" role="tabpanel" aria-labelledby="Task-tab" tabindex="0">
+                    <div class="tab-pane fade <?php echo ($_SESSION['role'] == 1 || ($_SESSION['role'] == 2 && $_SESSION['org_position'] != 4) ? "show active" : ""); ?>" id="Submitted-tab-pane" role="tabpanel" aria-labelledby="submitted-tab" tabindex="0">
+                        <div class="card glass-default border-0">
+                            <div class="card-body">
+                                <h5 class="card-title">Submitted Documents</h5>
+                                <table class="table table-hover table-striped table-responsive" id="SubDocTable">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="text-nowrap">ID</th>
+                                            <th scope="col" class="text-nowrap">File ID</th>
+                                            <th scope="col" class="text-nowrap">Document Type</th>
+                                            <th scope="col" class="text-nowrap">Submitted By</th>
+                                            <th scope="col" class="text-nowrap">Organiation</th>
+                                            <th scope="col" class="text-nowrap">Date Submitted</th>
+                                            <th scope="col" class="text-nowrap">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade <?php echo ($_SESSION['role'] == 2 && $_SESSION['org_position'] == 4) || ($_SESSION['role'] == 3 && $_SESSION['org_position'] == 4) ? "show active" : ""; ?>" id="Task-tab-pane" role="tabpanel" aria-labelledby="Task-tab" tabindex="0">
                         <div class="card glass-default border-0">
                             <div class="card-body">
                                 <div class="hstack gap-3">
@@ -438,8 +467,7 @@ $stmt->close();?>
                             </table>
                         </div>
                     </div>
-                    <div class="tab-pane fade <?php echo $_SESSION['org_position'] == 4 ? "" : "show active"; ?>"
-                        id="APDoc-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                    <div class="tab-pane fade <?php echo ($_SESSION['role'] == 3 ? "show active" : ""); ?>" id="APDoc-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                         <div class="card glass-default bg-opacity-10 border-0">
                             <div class="card-body">
                                 <h5 class="card-title">Activity Proposal Documents</h5>
@@ -452,6 +480,7 @@ $stmt->close();?>
                                             <th scope="col" class="text-nowrap">From</th>
                                             <th scope="col" class="text-nowrap">File Size</th>
                                             <th scope="col" class="text-nowrap">Date Submitted</th>
+                                            <th scope="col" class="text-nowrap">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -475,6 +504,7 @@ $stmt->close();?>
                                         <th scope="col" class="text-nowrap">File Size</th>
                                         <th scope="col" class="text-nowrap">Created By</th>
                                         <th scope="col" class="text-nowrap">Date Submitted</th>
+                                        <th scope="col" class="text-nowrap">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -498,6 +528,7 @@ $stmt->close();?>
                                         <th scope="col" class="text-nowrap">File Size</th>
                                         <th scope="col" class="text-nowrap">Created By</th>
                                         <th scope="col" class="text-nowrap">Date Submitted</th>
+                                        <th scope="col" class="text-nowrap">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -520,6 +551,7 @@ $stmt->close();?>
                                         <th scope="col" class="text-nowrap">Created By</th>
                                         <th scope="col" class="text-nowrap">File Size</th>
                                         <th scope="col" class="text-nowrap">Date Submitted</th>
+                                        <th scope="col" class="text-nowrap">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -542,6 +574,7 @@ $stmt->close();?>
                                         <th scope="col" class="text-nowrap">From</th>
                                         <th scope="col" class="text-nowrap">File Size</th>
                                         <th scope="col" class="text-nowrap">Date Submitted</th>
+                                        <th scope="col" class="text-nowrap">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
