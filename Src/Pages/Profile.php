@@ -83,7 +83,7 @@ $_SESSION['last_activity'] = time();
                                                                 width="42" height="42" class="rounded-circle">
                                                             <?php
                                                                 } else {?>
-                                                            <img src="../../Assets/Images/UserProfiles/<?php echo $_SESSION['ProfileImage']?>"
+                                                            <img src="../../Assets/Images/UserProfiles/<?php echo $_SESSION['ProfileImage']?>" id="change-profile"
                                                                 alt="" width="42" height="42" class="rounded-circle">
                                                             <?php }?>
                                                         </div>
@@ -168,7 +168,9 @@ $_SESSION['last_activity'] = time();
                                                 style="height: 300px; overflow-y: auto;">
                                             </div>
                                             <hr>
-                                            <small class="text-muted">Reminder: Once posted, your announcement is permanent and visible to everyone. It cannot be edited, only deleted if necessary—make sure your message is final before posting!</small>
+                                            <small class="text-muted">Reminder: Once posted, your announcement is
+                                                permanent and visible to everyone. It cannot be edited, only deleted if
+                                                necessary—make sure your message is final before posting!</small>
                                             <div class="hstack gap-1">
                                                 <div>
                                                     <button class="btn btn-sm btn-primary rounded-1 border-0 my-1 px-5"
@@ -187,13 +189,16 @@ $_SESSION['last_activity'] = time();
                                                                 value="<?php echo $_SESSION['UUID']; ?>">
                                                         </cite>
                                                     </small>
-                                                    <button class="btn btn-sm btn-outline-danger border-0 rounded-1 my-1" id="ClearPost">
+                                                    <button
+                                                        class="btn btn-sm btn-outline-danger border-0 rounded-1 my-1"
+                                                        id="ClearPost">
                                                         <svg width="24" height="24">
                                                             <use xlink:href="#Trash" />
                                                         </svg>
                                                         <span class="d-sm-none ms-2">Clear</span>
                                                     </button>
-                                                    <button class="btn btn-sm btn-outline-secondary border-0 rounded-1 my-1"
+                                                    <button
+                                                        class="btn btn-sm btn-outline-secondary border-0 rounded-1 my-1"
                                                         data-bs-dismiss="modal" id="closePostModal">
                                                         <svg width="24" height="24">
                                                             <use xlink:href="#Close" />
@@ -213,7 +218,7 @@ $_SESSION['last_activity'] = time();
         </div>
     </div>
 
-    <div class="modal fade" id="ProfileModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal" id="ProfileModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div class="modal-content glass-default border-0 bg-opacity-25 rounded-1">
                 <div class="modal-body">
@@ -221,12 +226,12 @@ $_SESSION['last_activity'] = time();
                         <div class="row g-2 row-cols-1 row-cols-md-2">
                             <div class="col-md-12 d-flex justify-content-center align-items-center">
                                 <?php if ($_SESSION['ProfileImage'] == "Default-Profile.gif") { ?>
-                                <img src="../../Assets/Images/Default-Profile.gif"
+                                <img src="../../Assets/Images/Default-Profile.gif" id="profileImage"
                                     class="img-fluid border-3 rounded-circle" width="192" height="192"
                                     alt="<?php echo $_SESSION['FirstName'] . ' ' . $_SESSION['LastName']; ?> Profile Image">
                                 <?php } else { ?>
                                 <img src="../../Assets/Images/UserProfiles/<?php echo $_SESSION['ProfileImage']; ?>"
-                                    class="img-fluid border rounded-circle" width="192" height="192"
+                                    class="img-fluid border rounded-circle" width="192" height="192" 
                                     alt="<?php echo $_SESSION['FirstName'] . ' ' . $_SESSION['LastName']; ?> Profile Image">
                                 <?php } ?>
                             </div>
@@ -238,13 +243,14 @@ $_SESSION['last_activity'] = time();
                             </div>
                         </div>
                         <div class="hstack gap-1 mb-2">
-                            <button class="btn btn-sm text-light fw-bold rounded-1 border-0 me-auto ms-5">
+                            <button class="btn btn-sm text-light fw-bold rounded-1 border-0 me-auto ms-5"
+                                id="changeProfimg">
                                 <svg width="24" height="24">
                                     <use xlink:href="#changeProf" />
                                 </svg>
                                 <span>Update Profile</span>
-                                <input type="file" class="d-none" id="change-profile" accept="image/*">
                             </button>
+                            <input type="file" class="d-none" id="change-profile" accept="image/*">
                             <button class="btn btn-sm text-light fw-bold rounded-1 border-0 me-5 d-none">
                                 <svg width="24" height="24">
                                     <use xlink:href="#changeCov" />
@@ -258,101 +264,51 @@ $_SESSION['last_activity'] = time();
                                 <ul class="list-group list-group-flush">
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 bg-body bg-opacity-10 bg-blur-3">
-                                        Name
-                                        <input type="text"
-                                            class="form-control border-0 rounded-0 text-end w-50 bg-transparent"
-                                            value="<?php echo $_SESSION['FirstName'] . ' ' . $_SESSION['LastName']; ?>">
+                                        First Name
+                                        <input type="text" class="form-control border-0 text-end w-50 bg-transparent"
+                                            value="<?php echo $_SESSION['FirstName']; ?>"
+                                            id="FirstName">
                                     </li>
                                     <li
-                                        class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 bg-body bg-opacity-10 bg-blur-3 d-none">
-                                        Role
-                                        <select class="form-select border-0 rounded-0 text-end w-50 bg-transparent">
-                                            <?php
-
-                                            $roles = [
-                                                1 => 'ADMINISTRATOR',
-                                                2 => 'CSG OFFICER',
-                                                3 => 'OFFICER'
-                                            ];
-
-foreach ($roles as $role => $label) {
-    echo '<option value="' . $role . '" ' . ($role == $_SESSION['role'] ? 'selected' : '') . '' . ($role == 1 ? 'disabled' : ($role == 3 ? 'disabled' : '')) . '>' . $label . '</option>';
-}
-?>
-                                        </select>
-                                    </li>
-                                    <li
-                                        class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 bg-body bg-opacity-10 bg-blur-3 <?php echo $_SESSION['role'] == 1 ? 'd-none' : ''; ?>">
-                                        Organization
-                                        <select class="form-select border-0 rounded-0 text-end w-50 bg-transparent">
-                                            <?php if ($_SESSION['role'] != 1) {
-                                                $stmt = $conn->prepare("SELECT * FROM userpositions WHERE UUID = ?");
-                                                $stmt->bind_param("s", $_SESSION['UUID']);
-                                                $stmt->execute();
-                                                $result = $stmt->get_result();
-                                                $stmt->close();
-
-                                                if ($result->num_rows > 0) {
-                                                    $org = $result->fetch_assoc();
-                                                }
-
-                                                $stmt = $conn->prepare("SELECT * FROM sysorganizations");
-                                                $stmt->execute();
-                                                $orgs = $stmt->get_result();
-                                                $stmt->close();
-
-                                                if ($orgs->num_rows > 0) {
-                                                    while ($organization = $orgs->fetch_assoc()) {
-                                                        if (!empty($org) && $org['org_code'] == $organization['org_code']) {
-                                                            echo '<option selected value="' . $organization['org_code'] . '">' . $organization['org_name'] . '</option>';
-                                                        } else {
-                                                            echo '<option value="' . $organization['org_code'] . '">' . $organization['org_name'] . '</option>';
-                                                        }
-                                                    }
-                                                } else {
-                                                    echo '<option selected hidden>No Organization</option>';
-                                                    echo '<option disabled class="text-center text-secondary">No Organization Available</option>';
-                                                }
-                                            } else {
-                                                echo '<option selected hidden>No Organization</option>';
-                                                echo '<option disabled class="text-center text-secondary">You are an Administrator</option>';
-                                            } ?>
-                                        </select>
+                                        class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 bg-body bg-opacity-10 bg-blur-3">
+                                        Last Name
+                                        <input type="text" class="form-control border-0 text-end w-50 bg-transparent"
+                                            value="<?php echo $_SESSION['LastName']; ?>"
+                                            id="LastName">
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 bg-body bg-opacity-10 bg-blur-3">
                                         Student Number
                                         <input type="text" class="form-control border-0 text-end w-50 bg-transparent"
-                                            value="<?php echo $_SESSION['student_Number']; ?>">
+                                            value="<?php echo $_SESSION['student_Number']; ?>"
+                                            id="studentNumber">
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 bg-body bg-opacity-10 bg-blur-3">
                                         Course & Section
                                         <input type="text" class="form-control border-0 text-end w-50 bg-transparent"
-                                            value="BSIT-4B">
+                                            value="BSIT-4B" id="course" data-original-value="BSIT-4B">
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 bg-body bg-opacity-10 bg-blur-3">
                                         Email
                                         <input type="email" class="form-control border-0 text-end w-50 bg-transparent"
-                                            value="<?php echo $_SESSION['PrimaryEmail']; ?>">
+                                            value="<?php echo $_SESSION['PrimaryEmail']; ?>"
+                                            id="email"
+                                            data-original-value="<?php echo $_SESSION['PrimaryEmail']; ?>">
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 bg-body bg-opacity-10 bg-blur-3">
                                         Contact Number
                                         <input type="text" class="form-control border-0 text-end w-50 bg-transparent"
                                             value="<?php echo $_SESSION['contactNumber']; ?>"
+                                            id="contactNumber" maxlength="11"
+                                            data-original-value="<?php echo $_SESSION['contactNumber']; ?>"
                                             pattern="[0-9]{11}" placeholder="09xxxxxxxxx">
-                                    </li>
-                                    <li
-                                        class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 bg-body bg-opacity-10 bg-blur-3">
-                                        Address
-                                        <textarea class="form-control border-0 text-end w-50 bg-transparent"
-                                            placeholder="1234 Main St" rows="3"></textarea>
                                     </li>
                                 </ul>
                                 <div class="hstack gap-1 mt-3">
-                                    <button class="btn btn-sm btn-primary rounded-0 border-0 me-auto">
+                                    <button class="btn btn-sm btn-primary rounded-0 border-0 me-auto" id="SaveChanges">
                                         <svg width="18" height="18">
                                             <use xlink:href="#AccSav" />
                                         </svg>
@@ -364,13 +320,15 @@ foreach ($roles as $role => $label) {
                                         </svg>
                                         <span>Close</span>
                                     </button>
-                                    <button class="btn btn-sm btn-danger rounded-0 ms-3">
+                                    <button class="btn btn-sm btn-danger rounded-0 ms-3 d-none" id="DeleteAccount">
                                         <svg width="18" height="18">
                                             <use xlink:href="#AccDel" />
                                         </svg>
                                         <span>Delete Account</span>
                                     </button>
                                 </div>
+                                <script>
+                                </script>
                             </div>
                         </div>
                     </div>
@@ -475,7 +433,7 @@ if ($row['org_code'] != null) {
                                     <ul class="list-group list-group-flush">
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
                                             Course & Section
-                                            <span><?php echo $_SESSION['course_code']; ?></span>
+                                            <span><?php echo $_SESSION['course_code'] ? $_SESSION['course_code'] : 'No Course'; ?></span>
                                         </li>
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
                                             Organization
@@ -509,8 +467,7 @@ if ($row['org_code'] != null) {
                                                     } catch (Exception $e) {
                                                         error_log("Database error: " . $e->getMessage());
                                                         echo 'Error retrieving organization';
-                                                    }
-?>
+                                                    }?>
                                             </span>
                                         </li>
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -563,7 +520,8 @@ if ($row['org_code'] != null) {
                                     <ul class="list-group list-group-flush">
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
                                             Cvsu Email
-                                            <span><?php echo $_SESSION['PrimaryEmail']; ?></span>
+                                            <span
+                                                class="text-break text-truncate d-inline-block w-50"><?php echo isset($_SESSION['PrimaryEmail']) ? htmlspecialchars($_SESSION['PrimaryEmail']) : 'No email available'; ?></span>
                                         </li>
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
                                             Contact Number
@@ -664,17 +622,234 @@ if ($row['org_code'] != null) {
     </div>
     <script src="../../Utilities/Third-party/AOS/js/aos.js"></script>
     <script>
+        $(document).ready(function() {
+            $("#changeProfimg").click(function() {
+                $("#change-profile").click();
+            });
+
+            $("#change-profile").change(function() {
+                var file = this.files[0];
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $("#profileImage").attr("src", e.target.result);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        $('#SaveChanges').click(function() {
+            var FirstName = $('#FirstName').val();
+            var LastName = $('#LastName').val();
+            var studentNumber = $('#studentNumber').val();
+            var course = $('#course').val();
+            var email = $('#email').val();
+            var contactNumber = $('#contactNumber').val();
+            var UUID =
+                "<?php echo $_SESSION['UUID']; ?>";
+            var profileImage = $('#change-profile').prop('files')[0];
+
+            if (FirstName == '' || LastName == '' || studentNumber == '' || course == '' || email == '' ||
+                contactNumber == '') {
+                Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                }).fire({
+                    icon: 'error',
+                    title: 'Please fill up all fields'
+                });
+                return;
+            }
+
+            if (!/^[A-Z]+-\d[A-Z]$/.test(course)) {
+                Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                }).fire({
+                    icon: 'error',
+                    title: 'Invalid course format',
+                    text: 'Please follow the format: BSIT-4B'
+                });
+                return;
+            }
+
+            if (!/^09\d{9}$/.test(contactNumber)) {
+                Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                }).fire({
+                    icon: 'error',
+                    title: 'Invalid contact number',
+                    text: 'Please follow the format: 09xxxxxxxxx'
+                });
+                return;
+            }
+
+            if (!/^\d{9}$/.test(studentNumber)) {
+                Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                }).fire({
+                    icon: 'error',
+                    title: 'Invalid student number',
+                    text: 'Please follow the format: 2019-12345'
+                });
+                return;
+            }
+
+            if (!/^[a-zA-Z0-9._%+-]+@cvsu\.edu\.ph$/.test(email)) {
+                Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                }).fire({
+                    icon: 'error',
+                    title: 'Invalid email',
+                    text: 'Please use your cvsu email'
+                });
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append('UUID', UUID);
+            formData.append('FirstName', FirstName);
+            formData.append('LastName', LastName);
+            formData.append('studentNumber', studentNumber);
+            formData.append('course', course);
+            formData.append('email', email);
+            formData.append('contactNumber', contactNumber);
+            if (profileImage) {
+                formData.append('profileImage', profileImage);
+            }
+
+            $.ajax({
+                url: '../Functions/api/UpdateProfile.php',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    if (response.status == 'success') {
+                        Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer)
+                                toast.addEventListener('mouseleave', Swal.resumeTimer)
+                            }
+                        }).fire({
+                            icon: 'success',
+                            title: 'Profile updated successfully'
+                        }).then((result) => {
+                            if (result.dismiss === Swal.DismissReason.timer) {
+                                $('#ProfileModal').modal('hide');
+                                $('#FirstName').val(FirstName);
+                                $('#LastName').val(LastName);
+                                $('#studentNumber').val(studentNumber);
+                                $('#course').val(course);
+                                $('#email').val(email);
+                                $('#contactNumber').val(contactNumber);
+                                $('#profileImage').attr('src',
+                                    '../../Assets/Images/UserProfiles/' + response
+                                    .profileImage);
+                                $('#change-profile').val('').attr('src', '../../Assets/Images/UserProfiles/' +
+                                    response.profileImage); 
+                                    
+                            }
+                        });
+                    } else {
+                        Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer)
+                                toast.addEventListener('mouseleave', Swal.resumeTimer)
+                            }
+                        }).fire({
+                            icon: 'error',
+                            title: response.message
+                        });
+                    }
+                },
+            });
+        });
+
         const toolbarOptions = [
-            [{'header': [1, 2, 3, 4, 5, 6, false]}],
+            [{
+                'header': [1, 2, 3, 4, 5, 6, false]
+            }],
             ['bold', 'italic', 'underline', 'strike'], // toggled buttons
-            [{'header': 1 }, {'header': 2 }], // custom button values
-            [{'size': ['small', false, 'large', 'huge']}],
+            [{
+                'header': 1
+            }, {
+                'header': 2
+            }], // custom button values
+            [{
+                'size': ['small', false, 'large', 'huge']
+            }],
             ['blockquote', 'code-block'],
-            [{'list': 'ordered'}, {'list': 'bullet'}, {'list': 'check'}],
-            [{'script': 'sub'}, {'script': 'super'}], // superscript/subscript
-            [{'indent': '-1'}, {'indent': '+1'}], // outdent/indent
-            [{'direction': 'rtl'}], // text direction
-            [{'align': [false, 'center', 'right', 'justify']}],
+            [{
+                'list': 'ordered'
+            }, {
+                'list': 'bullet'
+            }, {
+                'list': 'check'
+            }],
+            [{
+                'script': 'sub'
+            }, {
+                'script': 'super'
+            }], // superscript/subscript
+            [{
+                'indent': '-1'
+            }, {
+                'indent': '+1'
+            }], // outdent/indent
+            [{
+                'direction': 'rtl'
+            }], // text direction
+            [{
+                'align': [false, 'center', 'right', 'justify']
+            }],
         ];
         AOS.init();
         const quill = new Quill('#editor', {
@@ -707,7 +882,7 @@ if ($row['org_code'] != null) {
         }, true);
 
         let postDetails = '';
-        quill.on('text-change', function () {
+        quill.on('text-change', function() {
             // max of 500 characters
             if (quill.getLength() >= 500) {
                 quill.deleteText(499, quill.getLength());
@@ -722,11 +897,10 @@ if ($row['org_code'] != null) {
             postDetails = quill.root.innerHTML;
             document.getElementById('post-details').value = postDetails;
         });
-        document.getElementById('ClearPost').addEventListener('click', function () {
+        document.getElementById('ClearPost').addEventListener('click', function() {
             quill.root.innerHTML = '';
             $('#post-details').val('');
         });
-
     </script>
 </body>
 

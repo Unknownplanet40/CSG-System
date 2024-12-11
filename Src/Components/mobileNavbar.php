@@ -38,6 +38,7 @@ if (isset($_SESSION['role'])) {
         $MDashboard = "./Apps/ADMIN/Dashboard.php";
     }
 }
+
 ?>
 
 <div class="b_navbar d-lg-none bg-body bg-blur-5 bg-opacity-25" id="b_Navbar">

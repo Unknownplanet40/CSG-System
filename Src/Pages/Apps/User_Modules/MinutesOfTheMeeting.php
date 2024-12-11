@@ -230,88 +230,88 @@ while ($row = $result->fetch_assoc()) {
                             </div>
                         </div>
                         <div class="card glass-default bg-opacity-25 rounded-1 mt-5">
-                                <div class="card-body">
-                                    <h5 class="text-center fw-bold text-uppercase">Task Status</h5>
-                                    <p class="text-center" id="TasksMessage">No tasks found</p>
-                                    <p>Task ID: <span id="TaskIDis">N/A</span></p>
-                                    <div class="hstack gap-2">
-                                        <a href="javascript:void(0)" id="RefreshTasks"
-                                            class="btn btn-sm btn-outline-secondary rounded-0 w-100">Refresh</a>
-                                        <a href="javascript:void(0)" id="ClearTasks"
-                                            class="btn btn-sm btn-outline-danger rounded-0 w-100">Clear Task</a>
-                                    </div>
-                                    <script>
-                                        $('#RefreshTasks').on('click', function() {
-                                            if (localStorage.getItem('taskID_MM') != null) {
-                                                if ($('#ID').val() != "") {
-                                                    Swal.fire({
-                                                        icon: 'warning',
-                                                        title: 'Are you sure?',
-                                                        text: 'You have edited a document. Do you want to continue?',
-                                                        showCancelButton: true,
-                                                        confirmButtonText: 'Yes',
-                                                        cancelButtonText: 'No',
-                                                    }).then((result) => {
-                                                        if (result.isConfirmed) {
-                                                            if ($('#Constituents-tab').hasClass(
-                                                                    'active')) {
-                                                                $('#Cons-Cancel').click();
-                                                            } else {
-                                                                $('#Off-Cancel').click();
-                                                            }
-                                                            $('#ClearFields').click();
-                                                            $('#TaskIDis').text(localStorage.getItem(
-                                                                'taskID_MM'));
-                                                            $('#taskID').val(localStorage.getItem(
-                                                                'taskID_MM'));
-                                                            $('#taskOrgCode').val(localStorage.getItem(
-                                                                'orgCODE_MM'));
-                                                            $('#isFromTask').val('true');
-                                                            $('#TasksMessage').text(
-                                                                'You are currently editing a task');
+                            <div class="card-body">
+                                <h5 class="text-center fw-bold text-uppercase">Task Status</h5>
+                                <p class="text-center" id="TasksMessage">No tasks found</p>
+                                <p>Task ID: <span id="TaskIDis">N/A</span></p>
+                                <div class="hstack gap-2">
+                                    <a href="javascript:void(0)" id="RefreshTasks"
+                                        class="btn btn-sm btn-outline-secondary rounded-0 w-100">Refresh</a>
+                                    <a href="javascript:void(0)" id="ClearTasks"
+                                        class="btn btn-sm btn-outline-danger rounded-0 w-100">Clear Task</a>
+                                </div>
+                                <script>
+                                    $('#RefreshTasks').on('click', function() {
+                                        if (localStorage.getItem('taskID_MM') != null) {
+                                            if ($('#ID').val() != "") {
+                                                Swal.fire({
+                                                    icon: 'warning',
+                                                    title: 'Are you sure?',
+                                                    text: 'You have edited a document. Do you want to continue?',
+                                                    showCancelButton: true,
+                                                    confirmButtonText: 'Yes',
+                                                    cancelButtonText: 'No',
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        if ($('#Constituents-tab').hasClass(
+                                                                'active')) {
+                                                            $('#Cons-Cancel').click();
+                                                        } else {
+                                                            $('#Off-Cancel').click();
                                                         }
-                                                    });
-                                                } else {
-                                                    $('#ClearFields').click();
-                                                    $('#TaskIDis').text(localStorage.getItem('taskID_MM'));
-                                                    $('#taskID').val(localStorage.getItem('taskID_MM'));
-                                                    $('#isFromTask').val('true');
-                                                    $('#TasksMessage').text('You are currently editing a task');
-                                                }
+                                                        $('#ClearFields').click();
+                                                        $('#TaskIDis').text(localStorage.getItem(
+                                                            'taskID_MM'));
+                                                        $('#taskID').val(localStorage.getItem(
+                                                            'taskID_MM'));
+                                                        $('#taskOrgCode').val(localStorage.getItem(
+                                                            'orgCODE_MM'));
+                                                        $('#isFromTask').val('true');
+                                                        $('#TasksMessage').text(
+                                                            'You are currently editing a task');
+                                                    }
+                                                });
+                                            } else {
+                                                $('#ClearFields').click();
+                                                $('#TaskIDis').text(localStorage.getItem('taskID_MM'));
+                                                $('#taskID').val(localStorage.getItem('taskID_MM'));
+                                                $('#isFromTask').val('true');
+                                                $('#TasksMessage').text('You are currently editing a task');
+                                            }
+                                        }
+                                    });
+
+                                    $('#ClearTasks').on('click', function() {
+                                        Swal.fire({
+                                            icon: 'warning',
+                                            title: 'Confirm Clear Task',
+                                            text: 'Would you like to clear this task permanently or continue working on it later?',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'Clear Task',
+                                            cancelButtonText: 'Continue Later',
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                localStorage.removeItem('taskID_MM');
+                                                localStorage.removeItem('orgCODE_MM');
+                                                $('#taskID').val('');
+                                                $('#isFromTask').val('false');
+                                                $('#TasksMessage').text(
+                                                    'Task has been cleared. You can recover it from the task list.'
+                                                );
+                                                $('#TaskIDis').text('N/A');
+                                            } else {
+                                                $('#taskID').val('');
+                                                $('#isFromTask').val('false');
+                                                $('#TasksMessage').text(
+                                                    'No tasks found. reload to load the last task.'
+                                                );
+                                                $('#TaskIDis').text('N/A');
                                             }
                                         });
-
-                                        $('#ClearTasks').on('click', function() {
-                                            Swal.fire({
-                                                icon: 'warning',
-                                                title: 'Confirm Clear Task',
-                                                text: 'Would you like to clear this task permanently or continue working on it later?',
-                                                showCancelButton: true,
-                                                confirmButtonText: 'Clear Task',
-                                                cancelButtonText: 'Continue Later',
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    localStorage.removeItem('taskID_MM');
-                                                    localStorage.removeItem('orgCODE_MM');
-                                                    $('#taskID').val('');
-                                                    $('#isFromTask').val('false');
-                                                    $('#TasksMessage').text(
-                                                        'Task has been cleared. You can recover it from the task list.'
-                                                    );
-                                                    $('#TaskIDis').text('N/A');
-                                                } else {
-                                                    $('#taskID').val('');
-                                                    $('#isFromTask').val('false');
-                                                    $('#TasksMessage').text(
-                                                        'No tasks found. reload to load the last task.'
-                                                    );
-                                                    $('#TaskIDis').text('N/A');
-                                                }
-                                            });
-                                        });
-                                    </script>
-                                </div>
+                                    });
+                                </script>
                             </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -519,7 +519,17 @@ while ($row = $result->fetch_assoc()) {
                 formData.append('isFromTask', isFromTask);
                 formData.append('taskOrgCode', taskOrgCode);
 
-
+                Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    didOpen: (toast) => {
+                        Swal.showLoading();
+                    }
+                }).fire({
+                    icon: 'info',
+                    title: 'Saving Minutes of the Meeting'
+                });
 
                 $.ajax({
                     url: '../../../Functions/api/postMinutesOfTheMeeting.php',
@@ -545,6 +555,15 @@ while ($row = $result->fetch_assoc()) {
                                     $('#TaskIDis').text('N/A');
                                     getMM_Documents();
                                     $('#MM-CANCEL').click();
+
+                                    $('#MM-Print').removeClass('d-none');
+                                    $('#MM-Print').off('click').on('click',
+                                        function() {
+                                            window.open("../../../../" +
+                                                data.filepaths, '_blank'
+                                            );
+                                        });
+
                                 }
                             }).fire({
                                 icon: 'success',
@@ -570,15 +589,21 @@ while ($row = $result->fetch_assoc()) {
                 $('#taskID').val('');
                 $('#isFromTask').val('false');
                 $('#taskOrgCode').val('');
-                $('#MM-DATE').val('<?php echo date('Y-m-d'); ?>');
-                $('#MM-TIMESTARTED').val('<?php echo date('H:i'); ?>');
+                $('#MM-DATE').val(
+                    '<?php echo date('Y-m-d'); ?>'
+                );
+                $('#MM-TIMESTARTED').val(
+                    '<?php echo date('H:i'); ?>'
+                );
                 $('#MM-LOC').val('');
                 $('#MM-PRESIDER').val('');
                 $('#MM-ATTENDEES').summernote('code', '');
                 $('#MM-ABSENTEES').summernote('code', '');
                 $('#MM-AGENDA').summernote('code', '');
                 $('#MM-COMMENCEMENT').summernote('code', '');
-                $('#MM-TIMEADJOURNED').val('<?php echo date('H:i'); ?>');
+                $('#MM-TIMEADJOURNED').val(
+                    '<?php echo date('H:i'); ?>'
+                );
                 $('#MM-DOCS').val('');
                 $('#MM-SIGNATURE').summernote('code', '');
                 $('#MM-SAVE').text('Save');

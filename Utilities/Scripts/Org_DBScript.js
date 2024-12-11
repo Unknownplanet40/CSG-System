@@ -131,6 +131,13 @@ $(document).ready(function () {
         let shortname = $("#input_orgshortname").val();
         let desc = $("#input_orgdesc").val();
 
+
+
+        if (name === "" || shortname === "" || desc === "") {
+          QueueNotification(["danger", "Please fill out all fields."]);
+          return;
+        }
+
         $.ajax({
           url: "../../../Functions/api/CreateOrg.php",
           type: "POST",

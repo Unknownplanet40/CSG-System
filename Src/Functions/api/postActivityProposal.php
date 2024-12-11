@@ -54,22 +54,22 @@ class PDF extends TCPDF
         if (!$isDocHeaderHidden) {
             $this->Image('../../../Assets/Images/pdf-Resource/' . $LeftLogo, 45, 20, 40);
             $this->Image('../../../Assets/Images/pdf-Resource/' . $RightLogo, 155, 20, 40);
-    
+
             $this->setX(38.1);
             $this->SetFont('helvetica', '', 10);
             $this->Cell(0, 5, $FirstLine, 0, 1, 'C');
-    
+
             $this->setX(38.1);
             $this->SetFont('helvetica', 'B', 12);
             $this->Cell(0, 6, $SecondLine, 0, 1, 'C');
             $this->SetFont('helvetica', 'B', 10);
-    
+
             $this->setX(38.1);
             $this->Cell(0, 5, $ThirdLine, 0, 1, 'C');
-    
+
             $this->setX(38.1);
             $this->Cell(0, 5, $FourthLine, 0, 1, 'C');
-    
+
             $this->SetFont('helvetica', 'B', 12);
             $this->setX(38.1);
             $this->Cell(0, 5, $FifthLine, 0, 1, 'C');
@@ -177,6 +177,30 @@ try {
         response(['status' => 'error', 'message' => 'Invalid request method']);
     }
 
+    function filterAndRemove($input, $patterns)
+    {
+        $filteredOutput = $input;
+        foreach ($patterns as $pattern) {
+            $filteredOutput = preg_replace($pattern, '', $filteredOutput);
+        }
+        $filteredOutput = preg_replace('/\n+/', "\n", trim($filteredOutput));
+        return $filteredOutput;
+    }
+
+    function updateCssProperty($input, $search, $replace)
+    {
+        return str_replace($search, $replace, $input);
+    }
+
+    $patterns = [
+        '/background-color: var\(--bs-card-bg\); color: var\(--bs-body-color\);/',
+        '/background-color: var\(--bs-card-bg\);/',
+        '/color: rgb\(222, 226, 230\);/'
+    ];
+
+    $search = 'font-size: 14px;';
+    $replace = 'font-size: 11px;';
+
     $TaskID = $_POST['TaskID'] ?? '';
     $IsFromTask = $_POST['isFromTask'] == 'true' ? 1 : 0;
     $ID = $_POST['ID'] ?? '';
@@ -185,22 +209,26 @@ try {
     $AdminName = $_POST['AdminName'];
     $LetterTo = $_POST['LetterTo'];
     $ActivityHead = $_POST['ActivityHead'];
-    $LetterBody = $_POST['LetterBody']; // html content
+    $LetterBody = $_POST['LetterBody'];
     $ActivityTitle = $_POST['ActivityTitle'];
     $ActivityDateVenue = $_POST['ActivityDateVenue'];
-    $ActivityObjective = $_POST['ActivityObjective']; // html content
+    $ActivityObjective = $_POST['ActivityObjective'];
     $ActivityTarget = $_POST['ActivityTarget'];
     $ActivityMechanics = $_POST['ActivityMechanics'];
-    $ActivityBudget = $_POST['ActivityBudget']; // html content
+    $ActivityBudget = $_POST['ActivityBudget'];
     $ActivitySourceFunds = $_POST['ActivitySourceFunds'];
     $ActivityOutcomes = $_POST['ActivityOutcomes'];
     $ActivitySignature = $_POST['ActivitySignature'];
 
-    $remove = '<p data-f-id="pbf" style="text-align: center; font-size: 14px; margin-top: 30px; opacity: 0.65; font-family: sans-serif;">Powered by <a href="https://www.froala.com/wysiwyg-editor?pb=1" title="Froala Editor">Froala Editor</a></p>';
-    $LetterBody = str_replace($remove, '', $LetterBody);
-    $ActivityObjective = str_replace($remove, '', $ActivityObjective);
-    $ActivityBudget = str_replace($remove, '', $ActivityBudget);
-    $ActivitySignature = str_replace($remove, '', $ActivitySignature);
+    $LetterBody = filterAndRemove($LetterBody, $patterns);
+    $ActivityObjective = filterAndRemove($ActivityObjective, $patterns);
+    $ActivityBudget = filterAndRemove($ActivityBudget, $patterns);
+    $ActivitySignature = filterAndRemove($ActivitySignature, $patterns);
+
+    $LetterBody = updateCssProperty($LetterBody, $search, $replace);
+    $ActivityObjective = updateCssProperty($ActivityObjective, $search, $replace);
+    $ActivityBudget = updateCssProperty($ActivityBudget, $search, $replace);
+    $ActivitySignature = updateCssProperty($ActivitySignature, $search, $replace);
 
     $data = [
         'ActivityTitle' => $ActivityTitle,
@@ -248,7 +276,7 @@ try {
 
 
     $name = "Activity_Proposal_" . date('Y-m-d_H-i-s') . "_" . (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']) . "_" . rand(1000, 9999) . ".pdf";
-    $file_path = "DocumentsStorage/" . (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']) . "/" . $name;
+    $file_path = "DocumentsStorage" . DIRECTORY_SEPARATOR . (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']) . DIRECTORY_SEPARATOR . $name;
     $storageDir = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'DocumentsStorage' . DIRECTORY_SEPARATOR . (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']);
     if (!file_exists($storageDir)) {
         mkdir($storageDir, 0777, true);
@@ -275,8 +303,11 @@ try {
             $stmt->close();
         }
 
-        $stmt = $conn->prepare("INSERT INTO activityproposaldocuments (UUID, org_code, file_Size, file_path, admin_name, dear_title, LetterBody, act_title, act_date_ven, act_head, act_obj, act_participate, act_mech, act_budget, act_funds, act_expectOut, act_signature, taskID, isFromTask) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-        $stmt->bind_param("ssissssssssssssssi", $_SESSION['UUID'], (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']), $fileSize, $file_path, $AdminName, $LetterTo, $LetterBody, $ActivityTitle, $ActivityDateVenue, $ActivityHead, $ActivityObjective, $ActivityTarget, $ActivityMechanics, $ActivityBudget, $ActivitySourceFunds, $ActivityOutcomes, $ActivitySignature, $TaskID, $IsFromTask);
+        $UUID = $_SESSION['UUID'];
+        $orgCode = (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']);
+
+        $stmt = $conn->prepare("INSERT INTO activityproposaldocuments (UUID, org_code, file_Size, file_path, admin_name, dear_title, LetterBody, act_title, act_date_ven, act_head, act_obj, act_participate, act_mech, act_budget, act_funds, act_expectOut, act_signature, taskID, isFromTask) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+        $stmt->bind_param("ssissssssssssssssis", $UUID, $orgCode, $fileSize, $file_path, $AdminName, $LetterTo, $LetterBody, $ActivityTitle, $ActivityDateVenue, $ActivityHead, $ActivityObjective, $ActivityTarget, $ActivityMechanics, $ActivityBudget, $ActivitySourceFunds, $ActivityOutcomes, $ActivitySignature, $TaskID, $IsFromTask);
         $stmt->execute();
         $stmt->close();
     }
@@ -292,5 +323,5 @@ try {
 
 } catch (Exception $e) {
     $conn->rollback();
-    response(['status' => 'error', 'message' => $e->getMessage()]);
+    response(['status' => 'error', 'message' => $e->getMessage() . ' at line ' . $e->getLine()]);
 }

@@ -67,7 +67,7 @@ foreach ($data2 as $row) {
             scales: {
                 r: {
                     beginAtZero: true,
-                    suggestedMax: <?php echo max(array_merge($values_theme1, $values_theme2)); ?>
+                    suggestedMax: <?php echo max(1, (int)max(array_merge($values_theme1, $values_theme2))); ?>
                 },
                 x: {
                     stacked: true,

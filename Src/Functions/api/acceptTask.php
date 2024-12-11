@@ -50,7 +50,6 @@ try {
             response(['status' => 'success', 'message' => 'You have ongoing task', 'tasktype' => $taskType, 'taskID' => $activeTask, 'org_Code' => $taskData['AssignedTO']]);
         }
 
-
         if ($taskData['tastStat'] === 'Ongoing') {
             if ($taskData['doingby'] == $_SESSION['UUID']) {
                 response(['status' => 'info', 'message' => 'You are currently doing this task', 'tasktype' => $taskType, 'taskID' => $taskID, 'org_Code' => $taskData['AssignedTO']]);
@@ -77,7 +76,8 @@ try {
     $stmt->bind_param("ssiss", $status, $currentDate, $isDue, $currentUserID, $taskID);
     $stmt->execute();
     $stmt->close();
+
     response(['status' => 'success', 'message' => 'You have accepted the task', 'tasktype' => $taskType, 'taskID' => $taskID, 'org_Code' => $taskData['AssignedTO']]);
 } catch (\Throwable $th) {
-    response(['status' => 'error', 'message' => $th->getMessage()]);
+    response(['status' => 'error', 'message' => $th->getMessage() . ' on line ' . $th->getLine()]);
 }

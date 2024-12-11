@@ -43,6 +43,7 @@ $_SESSION['last_activity'] = time();
     <link rel="stylesheet" href="../../../../Utilities/Stylesheets/BGaniStyle.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="../../../../Utilities/Third-party/summernote/summernote-bs5.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="../../../../Utilities/Stylesheets/CustomStyle.css">
     <link rel="stylesheet" href="../../../../Utilities/Stylesheets/AB_DBStyle.css">
 
@@ -50,6 +51,7 @@ $_SESSION['last_activity'] = time();
     <script defer src="../../../../Utilities/Third-party/Datatable/js/datatables.js"></script>
     <script src="../../../../Utilities/Third-party/Sweetalert2/js/sweetalert2.all.min.js"></script>
     <script src="../../../../Utilities/Third-party/JQuery/js/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
     <script src="../../../../Utilities/Third-party/summernote/summernote-bs5.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script defer type="module" src="../../../../Utilities/Scripts/BS_DBScript.js"></script>
@@ -170,11 +172,46 @@ while ($row = $result->fetch_assoc()) {
                                                     <div class="mb-3">
                                                         <label for="Cons-DateStart" class="form-label">Date
                                                             Start</label>
-                                                        <input type="date" class="form-control rounded-0"
+                                                        <input type="text" class="form-control rounded-0"
                                                             id="Cons-DateStart"
+                                                            min="<?php echo date('Y-m-d'); ?>"
                                                             value="<?php echo date('Y-m-d'); ?>">
                                                     </div>
                                                 </div>
+                                                <script>
+                                                    $('#Cons-DateStart').datepicker({
+                                                        dateFormat: 'yy-mm-dd',
+                                                        minDate: '<?php echo date('Y-m-d'); ?>',
+                                                        beforeShowDay: function(date) {
+                                                            const dateString = $.datepicker.formatDate(
+                                                                'yy-mm-dd', date);
+                                                            const disabledRanges = [{
+                                                                    start: '2024-12-07',
+                                                                    end: '2024-12-10'
+                                                                },
+                                                                {
+                                                                    start: '2024-12-14',
+                                                                    end: '2024-12-15'
+                                                                },
+                                                                {
+                                                                    start: '2024-12-21',
+                                                                    end: '2024-12-25'
+                                                                },
+                                                                {
+                                                                    start: '2024-12-28',
+                                                                    end: '2024-12-30'
+                                                                },
+                                                            ];
+                                                            for (const range of disabledRanges) {
+                                                                if (dateString >= range.start &&
+                                                                    dateString <= range.end) {
+                                                                    return [false];
+                                                                }
+                                                            }
+                                                            return [true];
+                                                        }
+                                                    });
+                                                </script>
                                                 <div class="col-md-6">
                                                     <div class="mb-3">
                                                         <label for="Cons-StartTime" class="form-label">Start
@@ -489,13 +526,13 @@ while ($row = $result->fetch_assoc()) {
                             },
                             success: function(data) {
                                 if (data.status == 'success') {
-                                    if (data.data.length === 0){
+                                    if (data.data.length === 0) {
                                         $('#PreviousDocuments').html(
                                             '<tr><td colspan="3" class="text-center">No Files yet</td></tr>'
                                         );
                                         return;
                                     }
-                                    
+
                                     $('#PreviousDocuments').empty();
                                     const tooltipList = [];
                                     data.data.forEach(function(item) {
@@ -549,7 +586,8 @@ while ($row = $result->fetch_assoc()) {
                                                     item.Reason);
                                                 $('#Cons-Recommending').summernote(
                                                     'code', item.RecommSig);
-                                                $('#OrgCode_new').attr('disabled', 'disabled');
+                                                $('#OrgCode_new').attr('disabled',
+                                                    'disabled');
                                             } else {
                                                 $('#Officers-tab').tab('show');
 
@@ -574,7 +612,8 @@ while ($row = $result->fetch_assoc()) {
                                                     item.Reason);
                                                 $('#Off-Recommending').summernote(
                                                     'code', item.RecommSig);
-                                                $('#OrgCode_new-off').attr('disabled', 'disabled');
+                                                $('#OrgCode_new-off').attr(
+                                                    'disabled', 'disabled');
                                             }
 
                                             $('#ID').val(item.ID);
@@ -641,7 +680,7 @@ while ($row = $result->fetch_assoc()) {
 
                     $('#Off-Participant').summernote('code',
                         '<table class="table table-bordered"><tbody><tr><td><i>Officer Name</i></td><td><i>Officer Position</i></td></tr><tr><td><i>You can add more</i></td><td><i>&nbsp;table as needed</i></td></tr></tbody></table>'
-                        );
+                    );
 
                     $('#Cons-Create').click(function() {
                         var LetterTo = $('#Cons-LetterTo').val();
@@ -803,12 +842,13 @@ while ($row = $result->fetch_assoc()) {
                         }
 
                         reason = reason.replace(/background-color: var\(--bs-card-bg\);/g, '');
-                        Recommending = Recommending.replace(/background-color: var\(--bs-card-bg\);/g,'');
+                        Recommending = Recommending.replace(/background-color: var\(--bs-card-bg\);/g,
+                            '');
 
                         Participants = Participants.replace(
                             /table class="table table-bordered"><tbody>/g,
                             'table class="table table-bordered" style="border: 1px solid black; border-collapse: collapse;"><tbody>'
-                            );
+                        );
                         Participants = Participants.replace(/<td>/g,
                             '<td style="border: 1px solid black;">');
 

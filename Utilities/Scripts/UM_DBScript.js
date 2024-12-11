@@ -202,6 +202,8 @@ $("#inputYear").change(function () {
 
 let userTempMail = "";
 let userTempPass = "";
+let accountCount = 0;
+let accounts = [];
 
 let funnyLogoutButtons = [
   "Bye Felicia!",
@@ -309,21 +311,39 @@ $(document).ready(function () {
   }
 
   $("#CreateMultiple_Btn").click(function () {
-    let accounts = [];
     for (let i = 0; i < 10; i++) {
       let role = $("#Role_Select_" + i).val();
       let pos = $("#Pos_Select_" + i).val();
+      let CvSU_Mail = $("#CvsuEmail_" + i).val();
+      //let isCvSUMail = CvSU_Mail.includes("@cvsu.edu.ph");
+      let message = "Please add a Email Address for number " + (i + 1) + ".";
+
+      /* if (!isCvSUMail) {
+        QueueNotification(['info', "Please add a valid CvSU email address for number " + (i + 1) + ".", 3000]);
+      } */
 
       if (role !== "null") {
         if (role > 1 && pos !== "null") {
+          if (CvSU_Mail === "") {
+            QueueNotification(["info", message, 3000]);
+            return;
+          }
+          accountCount++;
           accounts.push({
             role: role,
             pos: pos,
+            cvsu_mail: CvSU_Mail,
           });
         } else if (role == 1) {
+          if (CvSU_Mail === "") {
+            QueueNotification(["info", message, 3000]);
+            return;
+          }
+          accountCount++;
           accounts.push({
             role: role,
             pos: null,
+            cvsu_mail: CvSU_Mail,
           });
         }
       }
@@ -337,6 +357,22 @@ $(document).ready(function () {
           action: "multi-create",
           accounts: accounts,
         },
+
+        beforeSend: function () {
+          $("#CreateMultiple_Btn").prop("disabled", true);
+          Swal.mixin({
+            toast: true,
+            position: "top",
+            showConfirmButton: false,
+            didOpen: (toast) => {
+              Swal.showLoading();
+            },
+          }).fire({
+            title: "Creating Accounts...",
+            text: "This may take a while.",
+          });
+        },
+
         success: function (response) {
           if (response.stat === "success") {
             if (response.ZipPath) {
@@ -349,9 +385,9 @@ $(document).ready(function () {
               for (let i = 0; i < 10; i++) {
                 $("#Role_Select_" + i).val("null");
                 $("#Pos_Select_" + i).val("null");
+                $("#CvsuEmail_" + i).val("");
               }
 
-              // hide all MultipleAccounts divs except the first one
               for (let i = 1; i < 10; i++) {
                 $("#MultipleAccounts_" + i).addClass("d-none");
               }
@@ -361,6 +397,10 @@ $(document).ready(function () {
               OfficerSelectedPositions = [];
               accounts = [];
 
+              $("#CreateMultiple_Btn").prop("disabled", false);
+
+              Swal.close();
+              QueueNotification(["success", response.message, 3000, "top"]);
               $("#cococlose").data("zip-path", response.ZipPath);
             } else {
               QueueNotification([
@@ -381,6 +421,20 @@ $(document).ready(function () {
         3000,
       ]);
     }
+  });
+
+  $("#ResetMultiple_Btn").click(function () {
+    for (let i = 0; i < 10; i++) {
+      $("#Role_Select_" + i).val("null");
+      $("#Pos_Select_" + i).val("null");
+      $("#CvsuEmail_" + i).val("");
+      $("#MultipleAccounts_" + i).addClass("d-none");
+    }
+    $("#MultipleAccounts_0").removeClass("d-none");
+    accounts = [];
+    CSGSelectedPositions = [];
+    OfficerSelectedPositions = [];
+    accountCount = 0;
   });
 
   $("#GenTemp_Btn").click(function () {
@@ -421,6 +475,7 @@ $(document).ready(function () {
 
   $("#CreateAccount_Btn").click(function () {
     var UUID = $("#UUID_Input").val();
+    var CvSU_Mail = $("#UUID_CvSU_Mail").val();
     var Role = $("#Role_Select").val();
     var Pos = $("#Pos_Select").val();
     var TempMail = $("#TempMail_Input").val();
@@ -428,6 +483,16 @@ $(document).ready(function () {
 
     if (UUID == "" || Role == null || TempMail == "" || TempPass == "") {
       QueueNotification(["error", "Please fill up all the fields.", 3000]);
+      return;
+    }
+
+    if (Role == "null" || Pos == "null") {
+      $("#Error_Msg").text("Please select a role and position");
+      return;
+    }
+
+    if (CvSU_Mail.includes("@cvsu.edu.ph") == false) {
+      $("#Error_Msg").text("Invalid CvSU Email");
       return;
     }
 
@@ -454,14 +519,47 @@ $(document).ready(function () {
 
           userTempMail = TempMail;
           userTempPass = TempPass;
-          window.location.href = `../../../Functions/TempAccount_Gen.php?Email=${TempMail}&Password=${TempPass}`;
 
-          $("#UUID_Input").val("");
-          $("#Role_Select").val("null");
-          $("#Pos_Select").val("null").attr("disabled", false);
-          $("#TempMail_Input").val("");
-          $("#TempPass_Input").val("");
-          $("#print_Btn").removeClass("d-none");
+          $.ajax({
+            type: "GET",
+            url: "../../../Functions/TempAccount_Gen.php",
+            data: {
+              Email: TempMail,
+              Password: TempPass,
+              CvSU_Mail: CvSU_Mail,
+            },
+            beforeSend: function () {
+              $("#print_Btn").prop("disabled", true);
+              Swal.mixin({
+                toast: true,
+                position: "top",
+                showConfirmButton: false,
+                didOpen: (toast) => {
+                  Swal.showLoading();
+                },
+              }).fire({
+                title: "Generating Account...",
+              });
+            },
+            success: function (response) {
+              if (response.stat === "success") {
+                QueueNotification(["success", response.message, 3000]);
+
+                $("#UUID_Input").val("");
+                $("#UUID_CvSU_Mail").val("");
+                $("#Role_Select").val("null");
+                $("#Pos_Select").val("null").attr("disabled", false);
+                $("#TempMail_Input").val("");
+                $("#TempPass_Input").val("");
+                $("#print_Btn").removeClass("d-none");
+              } else {
+                Swal.close();
+                QueueNotification(["error", response.message, 3000]);
+              }
+            },
+          });
+
+          window.location.href = `../../../Functions/TempAccount_Gen.php?Email=${TempMail}&Password=${TempPass}`;
 
           setTimeout(function () {
             $("#print_Btn").prop("disabled", false);
@@ -472,7 +570,7 @@ $(document).ready(function () {
               "Temporary account has been expired.",
               3000,
             ]);
-          }, 300000); // 5 minutes
+          }, 300000);
         } else {
           QueueNotification(["error", response.message, 3000]);
         }
@@ -536,7 +634,7 @@ $(document).ready(function () {
                 second: "2-digit",
               }),
             exportOptions: {
-              columns: [1,2,3,4,5,6,7],
+              columns: [1, 2, 3, 4, 5, 6, 7],
             },
           },
         ],
@@ -547,7 +645,7 @@ $(document).ready(function () {
       bottomStart: function () {
         return $(
           '<select id="usertype" class="form-select"><option value="active">Active</option><option value="pending">Pending</option><option value="archived">Archived</option></select>'
-        )
+        );
       },
     },
     responsive: true,
@@ -563,7 +661,7 @@ $(document).ready(function () {
         } else {
           return "<span class='text-body'>Currently no <b>ARCHIVED</b> user accounts can be found.</span>";
         }
-      }
+      },
     },
     ajax: {
       url: userAPI,
@@ -574,29 +672,72 @@ $(document).ready(function () {
       { data: "UUID" },
       { data: "fullName" },
       { data: "student_Number" },
-      { data: null,
+      {
+        data: null,
         render: function (data) {
           return `<p class='text-truncate' style='max-width: 128px; cursor: pointer;' data-bs-toggle='popover' data-bs-trigger='hover' data-bs-placement='top' data-bs-title="Email Address" data-bs-content='${data.primary_email}'><span class='badge rounded-1 bg-secondary d-print-none'>View</span><span class='d-none d-print-block'>${data.primary_email}</span></p>`;
-        }
+        },
       },
       { data: "contactNumber" },
       { data: "course_code" },
-      { data: null,
+      {
+        data: null,
         render: function (data) {
           if (data.org_position === "1") {
-            return `<p class='text-truncate' style='max-width: 128px; cursor: pointer;' data-bs-toggle='popover' data-bs-trigger='hover' data-bs-placement='top' data-bs-title="Position and Term Status" data-bs-content='Position: ${data.org_code} President | ${data.isTermComplete === 0 ? "Ongoing" : "Ended"}'><span class='d-print-none'>${data.org_code} &#10148;</span><span class='d-none d-print-block'>${data.org_code} President</span></p>`;
+            return (
+              "<p class='text-truncate' style='max-width: 128px; cursor: pointer;' data-bs-toggle='popover' data-bs-trigger='hover' data-bs-placement='top' data-bs-title='Position and Term Status' data-bs-content='Position: " +
+              data.org_code +
+              " President | " +
+              (data.isTermComplete === 0 ? "Ongoing" : "Ended") +
+              "'><span class='d-print-none'>" +
+              data.org_code +
+              " &#10148;</span><span class='d-none d-print-block'>" +
+              data.org_code +
+              " President</span></p>"
+            );
           } else if (data.org_position === "2") {
-            return `<p class='text-truncate' style='max-width: 128px; cursor: pointer;' data-bs-toggle='popover' data-bs-trigger='hover' data-bs-placement='top' data-bs-title="Position and Term Status" data-bs-content='${data.org_code} Vice President for Internal Affairs | ${data.isTermComplete == 0 ? "Ongoing" : "Ended"}'><span class='d-print-none'>${data.org_code} &#10148;</span><span class='d-none d-print-block'>${data.org_code} Vice President for Internal Affairs</span></p>`;
+            return (
+              "<p class='text-truncate' style='max-width: 128px; cursor: pointer;' data-bs-toggle='popover' data-bs-trigger='hover' data-bs-placement='top' data-bs-title='Position and Term Status' data-bs-content='Position: " +
+              data.org_code +
+              " Vice President for Internal Affairs | " +
+              (data.isTermComplete === 0 ? "Ongoing" : "Ended") +
+              "'><span class='d-print-none'>" +
+              data.org_code +
+              " &#10148;</span><span class='d-none d-print-block'>" +
+              data.org_code +
+              " Vice President for Internal Affairs</span></p>"
+            );
           } else if (data.org_position === "3") {
-            return `<p class='text-truncate' style='max-width: 128px; cursor: pointer;' data-bs-toggle='popover' data-bs-trigger='hover' data-bs-placement='top' data-bs-title="Position and Term Status" data-bs-content='${data.org_code} Vice President for External Affairs | ${data.isTermComplete == 0 ? "Ongoing" : "Ended"}'><span class='d-print-none'>${data.org_code} &#10148;</span><span class='d-none d-print-block'>${data.org_code} Vice President for External Affairs</span></p>`;
+            return (
+              "<p class='text-truncate' style='max-width: 128px; cursor: pointer;' data-bs-toggle='popover' data-bs-trigger='hover' data-bs-placement='top' data-bs-title='Position and Term Status' data-bs-content='Position: " +
+              data.org_code +
+              " Vice President for External Affairs | " +
+              (data.isTermComplete === 0 ? "Ongoing" : "Ended") +
+              "'><span class='d-print-none'>" +
+              data.org_code +
+              " &#10148;</span><span class='d-none d-print-block'>" +
+              data.org_code +
+              " Vice President for External Affairs</span></p>"
+            );
           } else if (data.org_position === "4") {
-            return `<p class='text-truncate' style='max-width: 128px; cursor: pointer;' data-bs-toggle='popover' data-bs-trigger='hover' data-bs-placement='top' data-bs-title="Position and Term Status" data-bs-content='${data.org_code} Secretary | ${data.isTermComplete == 0 ? "Ongoing" : "Ended"}'><span class='d-print-none'>${data.org_code} &#10148;</span><span class='d-none d-print-block'>${data.org_code} Secretary</span></p>`;
+            return (
+              "<p class='text-truncate' style='max-width: 128px; cursor: pointer;' data-bs-toggle='popover' data-bs-trigger='hover' data-bs-placement='top' data-bs-title='Position and Term Status' data-bs-content='Position: " +
+              data.org_code +
+              " Secretary | " +
+              (data.isTermComplete === 0 ? "Ongoing" : "Ended") +
+              "'><span class='d-print-none'>" +
+              data.org_code +
+              " &#10148;</span><span class='d-none d-print-block'>" +
+              data.org_code +
+              " Secretary</span></p>"
+            );
           } else {
             return "<span class='p-2 py-1 rounded-5 text-bg-secondary'>Not Assigned</span>";
           }
-        }
-       },
-      { data: "isTermComplete",
+        },
+      },
+      {
+        data: "isTermComplete",
         render: function (data) {
           if (data.isTermComplete === "1") {
             return "<span class='badge text-bg-success'>Yes</span>";
@@ -633,7 +774,7 @@ $(document).ready(function () {
 
     columnDefs: [
       {
-        targets: [0,7],
+        targets: [0, 7],
         visible: false,
       },
       {
@@ -683,7 +824,9 @@ $(document).ready(function () {
           termchoice.append(`<option value="1">Ongoing</option>`);
           termchoice.append(`<option value="2" selected>Ended</option>`);
         } else {
-          termchoice.append(`<option selected hidden disabled>Select Term Status</option>`);
+          termchoice.append(
+            `<option selected hidden disabled>Select Term Status</option>`
+          );
           termchoice.append(`<option value="1">Ongoing</option>`);
           termchoice.append(`<option value="2">Ended</option>`);
         }

@@ -8,7 +8,332 @@ import {
 } from "../Scripts/Modules/FeedModules.js";
 import { QueueNotification } from "./Modules/Queueing_Notification.js";
 
+let currentTheme = theme === "dark" ? "dark" : "light";
+
 $(document).ready(function () {
+  const calendar = new tui.Calendar("#calendar", {
+    defaultView: "month",
+    isReadOnly: true,
+    useDetailPopup: true,
+    useCreationPopup: false,
+    timezone: {
+      zones: [
+        {
+          timezoneName: "Asia/Manila",
+          displayLabel: "Philippine Time",
+          tooltip: "Philippine Time",
+        },
+      ],
+    },
+    borderRadius: "5px",
+    template: {
+      alldayTitle: "All Day",
+      time: function (schedule) {
+        return `<span class="fw-bold text-capitalize text-body">${schedule.title}</span>`;
+      },
+      popupDetailTitle: function () {
+        return "<span class='text-body fw-bold text-uppercase'>Event Details</span>";
+      },
+
+      popupDetailDate: function (Schedule) {
+        return `<span class="fw-bold">Date: </span> <span>${
+          Schedule.start
+            ? new Date(Schedule.start).toLocaleString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })
+            : ""
+        }</span>`;
+      },
+
+      popupDetailBody: function (schedule) {
+        return `<div class="d-flex flex-column gap-2">
+        <div class="d-flex gap-2">
+          <div class="fw-bold">Title:</div>
+          <div>${schedule.title || ""}</div>
+        </div>
+      <div class="d-flex gap-2">
+        <div class="fw-bold">Start:</div>
+        <div>${
+          schedule.start
+            ? new Date(schedule.start).toLocaleString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+                hour12: true,
+              })
+            : ""
+        }</div>
+      </div>
+      <div class="d-flex gap-2">
+        <div class="fw-bold">End:</div>
+        <div>${
+          schedule.end
+            ? new Date(schedule.end).toLocaleString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+                hour12: true,
+              })
+            : ""
+        }</div>
+      </div>
+      <div class="d-flex gap-2">
+        <div class="fw-bold">Body:</div>
+        <div>${schedule.body || ""}</div>
+      </div>
+      `;
+      },
+    },
+  });
+
+  calendar.setOptions({
+    month: {
+      isAlways6Weeks: false,
+      startDayOfWeek: 0,
+      dayNames: [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ],
+      narrowWeekend: true,
+    },
+  });
+
+  calendar.setTheme({
+    common: {
+      backgroundColor: "var(--bs-body-bg)",
+      border: "1px solid var(--bs-body-border-color)",
+      dayName: {
+        color: "var(--bs-body-text-color)",
+      },
+      holiday: {
+        color: "var(--bs-danger)",
+      },
+      saturday: {
+        color: "var(--bs-primary)",
+      },
+    },
+    month: {
+      dayExceptThisMonth: {
+        color: "var(--bs-secondary)",
+      },
+      dayName: {
+        borderLeft: "none",
+        backgroundColor: "var(--bs-primary-bg-subtle)",
+      },
+      weekend: {
+        backgroundColor: "var(--bs-primary-bg-subtle)",
+      },
+      moreView: {
+        backgroundColor: "var(--bs-body-bg)",
+        color: "var(--bs-body-text-color)",
+        boxShadow: "0 2px 6px 0 rgba(0, 0, 0, 0.1)",
+        borderRadius: "5px",
+        height: "256px",
+      },
+      moreViewTitle: {
+        backgroundColor: "var(--bs-secondary)",
+        borderRadius: "5px",
+      },
+    },
+    popup: {
+      backgroundColor: "var(--bs-body-bg)",
+      border: "1px solid var(--bs-body-border-color)",
+      showArrow: true,
+    },
+  });
+
+  function UpdateEvents() {
+    $.ajax({
+      url: "../Functions/api/getCalendarEvents.php",
+      method: "GET",
+
+      success: function (data) {
+        if (data.status === "success") {
+          if (data.data.length === 0) {
+            return;
+          }
+          calendar.clear();
+
+          data.data.forEach((event) => {
+            let start = new Date(event.start);
+            let end = new Date(event.end);
+
+            calendar.createEvents([
+              {
+                id: event.id,
+                calendarId: event.calendarId,
+                title: event.title,
+                category: event.category,
+                body: event.body,
+                location: event.location,
+                state: event.state,
+                attendees: [event.attendees[0]],
+                isReadOnly: event.isReadOnly,
+                start: start,
+                end: end,
+                backgroundColor: `var(--${event.backgroundColor})`,
+              },
+            ]);
+          });
+        } else {
+          console.log("An error occurred while fetching events");
+        }
+      },
+
+      error: function () {
+        console.log("An error occurred while fetching events");
+      },
+    });
+  }
+
+  UpdateEvents();
+  setInterval(() => {
+    if (!$("#CalendarEvent").hasClass("collapsed")) {
+      UpdateEvents();
+    }
+  }, 3000);
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.addedNodes.length > 0) {
+        $(
+          ".toastui-calendar-popup-section.toastui-calendar-section-button"
+        ).remove();
+      }
+    });
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
+
+  $("#nextBtn").on("click", function () {
+    calendar.next();
+    let currentMonth = calendar.getDate().getMonth();
+    let currentYear = calendar.getDate().getFullYear();
+    let formattedMonth = new Intl.DateTimeFormat("en-US", {
+      month: "long",
+    }).format(new Date(currentYear, currentMonth));
+    $("#CurrentMonth").html(`${formattedMonth} ${currentYear}`);
+  });
+
+  $("#prevBtn").on("click", function () {
+    calendar.prev();
+    let currentMonth = calendar.getDate().getMonth();
+    let currentYear = calendar.getDate().getFullYear();
+    let formattedMonth = new Intl.DateTimeFormat("en-US", {
+      month: "long",
+    }).format(new Date(currentYear, currentMonth));
+    $("#CurrentMonth").html(`${formattedMonth} ${currentYear}`);
+  });
+
+  $("#todayBtn").on("click", function () {
+    calendar.today();
+    let currentMonth = calendar.getDate().getMonth();
+    let currentYear = calendar.getDate().getFullYear();
+    let formattedMonth = new Intl.DateTimeFormat("en-US", {
+      month: "long",
+    }).format(new Date(currentYear, currentMonth));
+    $("#CurrentMonth").html(`${formattedMonth} ${currentYear}`);
+  });
+
+  $("#addEvent").click(function () {
+    var title = $("#eventTitle").val();
+    var location = $("#eventLocation").val();
+    var description = $("#eventDescription").val();
+    var color = $("#eventColor").val();
+    var start = $("#eventStart").val();
+    var end = $("#eventEnd").val();
+
+    if (!title || !location || !description || !color || !start || !end) {
+      QueueNotification(["info", "Please fill up all fields", 1500, "top"]);
+
+      const fields = [
+        { id: "#eventTitle", value: title },
+        { id: "#eventLocation", value: location },
+        { id: "#eventDescription", value: description },
+        { id: "#eventColor", value: color },
+        { id: "#eventStart", value: start },
+        { id: "#eventEnd", value: end },
+      ];
+
+      fields.forEach((field) => {
+        if (!field.value) {
+          $(field.id).addClass("is-invalid");
+        } else {
+          $(field.id).removeClass("is-invalid");
+        }
+      });
+
+      return;
+    }
+
+    $.ajax({
+      url: "../Functions/api/postEvent.php",
+      method: "POST",
+      data: {
+        UUID: UUID,
+        title: title,
+        location: location,
+        description: description,
+        color: color,
+        start: start,
+        end: end,
+      },
+
+      beforeSend: function () {
+        $("#addEvent").prop("disabled", true);
+        $("#addEvent").html(
+          '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Adding...'
+        );
+      },
+
+      success: function (data) {
+        if (data.status === "success") {
+          QueueNotification([
+            "success",
+            "Event added successfully",
+            1500,
+            "top",
+          ]);
+          UpdateEvents();
+
+          $("#eventTitle").val("");
+          $("#eventLocation").val("");
+          $("#eventDescription").val("");
+          $("#eventColor").val("");
+          $("#eventStart").val("");
+          $("#eventEnd").val("");
+
+          $("#addEventModal").modal("hide");
+
+          $("#addEvent").prop("disabled", false);
+          $("#addEvent").html("Add Event");
+        } else {
+          QueueNotification(["error", "An error occurred", 1500, "top"]);
+        }
+      },
+
+      error: function () {
+        QueueNotification(["error", "An error occurred", 1500, "top"]);
+        $("#addEvent").prop("disabled", false);
+        $("#addEvent").html("Add Event");
+      },
+    });
+  });
+
   setTimeout(function () {
     $("#EmptyFeed").addClass("d-none");
     $("#Announcements").removeClass("d-none");
@@ -16,9 +341,40 @@ $(document).ready(function () {
     window.scrollTo(0, 0);
   }, 1000);
 
+  let inactivityTimeout;
+
+  function resetInactivityTimer() {
+    clearTimeout(inactivityTimeout);
+    let warningShown = false;
+
+    inactivityTimeout = setTimeout(() => {
+      if (!warningShown) {
+        warningShown = true;
+        Swal.fire({
+          title: "Inactivity Alert",
+          text: "We noticed that you have been inactive for a while. To continue using the system, please interact with the page.",
+          icon: "warning",
+          confirmButtonText: "Got it",
+        });
+        setTimeout(() => {
+          location.reload();
+        }, 15 * 60 * 1000); // 15 minutes
+      }
+    }, 30 * 60 * 1000); // 30 minutes
+  }
+
+  window.addEventListener("load", resetInactivityTimer);
+
+  // Reset timer on user activity
+  ["mousedown", "mousemove", "keypress", "scroll", "touchstart"].forEach(
+    (event) => {
+      document.addEventListener(event, resetInactivityTimer);
+    }
+  );
+
   // check if user is still logged in every 5 seconds
   setInterval(() => {
-    checkifISLogin();
+    //checkifISLogin();
     checkIfSessionChange();
   }, 5000);
 

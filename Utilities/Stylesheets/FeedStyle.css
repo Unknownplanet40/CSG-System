@@ -315,3 +315,15 @@ div:where(.alert-container) button:where(.swal2-styled).alert-button-confirm{
 .chat-aniSide svg:hover{
   transform: scale(1.1);
 }
+
+.toastui-calendar-detail-container {
+  background-color: rgba(var(--bs-body-rgb), 0.9);
+  color: var(--bs-body-color);
+  border-radius: 5px;
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, .1);
+  min-width: 301px;
+  padding: 17px 17px 0;
+  width: 301px;
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+}

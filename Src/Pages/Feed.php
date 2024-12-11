@@ -39,6 +39,7 @@ if (isset($_SESSION['last_activity'])) {
 }
 
 $_SESSION['last_activity'] = time();
+echo '<script>var theme = "' . $_SESSION['theme'] . '";</script>';
 ?>
 
 
@@ -49,8 +50,9 @@ $_SESSION['last_activity'] = time();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../../Utilities/Third-party/Bootstrap/css/bootstrap.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <link href='../../Utilities/Third-party/Bootstrap/css/bootstrap.css' rel='stylesheet'>
+    <link href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
     <link rel="stylesheet" href="../../Utilities/Stylesheets/BGaniStyle.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css" />
@@ -60,10 +62,11 @@ $_SESSION['last_activity'] = time();
     <link rel="shortcut icon" href="../../Assets/Icons/PWA-Icon/MainIcon.png" type="image/x-icon">
     <link rel="stylesheet" href="../../Utilities/Stylesheets/FeedStyle.css">
 
-    <script defer src="../../Utilities/Third-party/Bootstrap/js/bootstrap.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
     <script defer src="../../Utilities/Third-party/Sweetalert2/js/sweetalert2.all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
     <script src="../../Utilities/Third-party/JQuery/js/jquery.min.js"></script>
+    <script src="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.js"></script>
     <script src="../../Utilities/Scripts/animate-browser-title.js"></script>
     <script type="module" src="../../Utilities/Scripts/FeedScipt.js"></script>
     <title>Anouncements Feed</title>
@@ -196,10 +199,126 @@ $_SESSION['last_activity'] = time();
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="addEventModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+            aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content bg-transparent border-0 rounded-1">
+                    <div class="modal-header border-0 glass-default bg-opacity-25">
+                        <h1 class="modal-title fs-5">Add Event</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body glass-default bg-opacity-25">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control rounded-0" id="eventTitle"
+                                            placeholder="Event Title" required>
+                                        <label for="eventTitle">Event Title</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control rounded-0" id="eventLocation"
+                                            placeholder="Event Location" required>
+                                        <label for="eventLocation">Event Location</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-floating mb-3">
+                                        <textarea class="form-control rounded-0" id="eventDescription" cols="30"
+                                            rows="5" placeholder="Event Description" required></textarea>
+                                        <label for="eventDescription">Event Description</label>
+                                    </div>
+                                </div>
+                                <div class="col-2 position-relative mb-3">
+                                    <span class="position-absolute top-50 start-50 translate-middle text-white rounded-1 p-3 shadow"
+                                        id="eventColorPreview"></span>
+                                </div>
+                                <div class="col-10">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-select rounded-0" id="eventColor" required>
+                                            <option value="" selected disabled>Select Event Color</option>
+                                            <option value="bs-primary">Blue</option>
+                                            <option value="bs-success">Green</option>
+                                            <option value="bs-danger">Red</option>
+                                            <option value="bs-warning">Yellow</option>
+                                            <option value="bs-info">Cyan</option>
+                                            <option value="bs-light">white</option>
+                                            <option value="bs-dark">Black</option>
+                                        </select>
+                                        <label for="eventColor">Event Color</label>
+                                    </div>
+                                    <script>
+                                        document.getElementById('eventColor').addEventListener('change', function () {
+                                            document.getElementById('eventColorPreview').removeAttribute('class');
+                                            document.getElementById('eventColorPreview').classList = "position-absolute top-50 start-50 translate-middle text-white rounded-1 p-3 shadow " + this.value;
+                                        });
+                                    </script>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-floating mb-3">
+                                        <input type="datetime-local" class="form-control rounded-0" id="eventStart"
+                                            required>
+                                        <label for="eventStart">Event Start</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-floating mb-3">
+                                        <input type="datetime-local" class="form-control rounded-0" id="eventEnd"
+                                            required>
+                                        <label for="eventEnd">Event End</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 glass-default bg-opacity-25">
+                        <button type="button" class="btn btn-sm btn-outline-success rounded-0" id="addEvent">Add Event</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <?php include_once '../Components/mobileNavbar.php'; ?>
         <div class="container-fluid mt-3 con-H">
             <div class="row row-cols-1 row-cols-xl-3 row-cols-lg-3 row-cols-md-2 g-0">
                 <div class="order-md-2 col-xl-7 col-lg-7 col-md-7">
+                    <div class="accordion" id="accordionExample">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <div class="hstack gap-3 accordion-button" type="button" data-bs-toggle="collapse" id="CalendarEvent"
+                                    data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    <span id="CurrentMonth"
+                                        class="me-auto fs-3 fw-bold text-uppercase"><?php echo date('F Y'); ?></span>
+                                    <button class="btn btn-sm rounded-0 btn-outline-success <?= $_SESSION['role'] == 1 ? '' : ($_SESSION['role'] == 2 && $_SESSION['org_position'] == 1 ? '' : 'd-none'); ?>
+                                    " id="addEventBtn"
+                                        data-bs-toggle="modal" data-bs-target="#addEventModal">
+                                        <i class="bi bi-plus"></i>
+                                        <span class="d-none d-md-inline">Add Event</span>
+                                    </button>
+                                    <button class="btn btn-sm rounded-0 btn-outline-success" id="todayBtn">
+                                        <i class="bi bi-calendar2-check"></i>
+                                        <span class="d-none d-md-inline">Today</span>
+                                    </button>
+                                    <button class="btn btn-sm rounded-0 btn-outline-success" id="prevBtn">
+                                        <i class="bi bi-arrow-left"></i>
+                                        <span class="d-none d-md-inline">Prev</span>
+                                    </button>
+                                    <button class="btn btn-sm rounded-0 btn-outline-success" id="nextBtn">
+                                        <span class="d-none d-md-inline">Next</span>
+                                        <i class="bi bi-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show"
+                                data-bs-parent="#accordionExample">
+                                <div class="accordion-body bg-transparent glass-default bg-opacity-25">
+                                    <div id="calendar" style="height: 512px;" class="shadow"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="container-fluid" id="annsmain">
                         <div class="emptyfeed" id="EmptyFeed">
                             <div class="card border-0 bg-transparent">

@@ -142,7 +142,7 @@ $_SESSION['last_activity'] = time();
                                         <div class="mb-3">
                                             <label for="OrgCode_new" class="form-label">Organization</label>
                                             <select id="OrgCode_new" class="form-select rounded-0">
-                                                <option value="0" selected hidden>Choose...</option>
+                                            <option value="<?php echo isset($_SESSION['org_Code']) ? $_SESSION['org_Code'] : '0'; ?>" selected>Select Organization</option>
                                                 <?php
                                                     $stmt = $conn->prepare("SELECT * FROM sysorganizations WHERE stat = 0");
 $stmt->execute();
@@ -621,7 +621,7 @@ while ($row = $result->fetch_assoc()) {
             var TaskID = $('#taskID').val() || '';
             var isFromTask = $('#isFromTask').val() || 'false';
             var ID = $('#ID').val();
-            var OrgCode = $('#OrgCode').val() || $('#OrgCode_new').val();
+            var OrgCode = $('#OrgCode_new').val() == '0' ? $('#OrgCode').val() : $('#OrgCode_new').val();
             var Created_By = $('#Created_By').val();
             var AdminName = $('#AdminName').val();
             var LetterTo = $('#LetterTo').val();
@@ -654,17 +654,50 @@ while ($row = $result->fetch_assoc()) {
                 return;
             }
 
-            LetterBody = LetterBody.replace(new RegExp('style="background-color:\\s*var\\(--bs-card-bg\\);?"',
-                'g'), '');
-            ActivityObjective = ActivityObjective.replace(new RegExp(
-                'style="background-color:\\s*var\\(--bs-card-bg\\);?"', 'g'), '');
-            ActivityBudget = ActivityBudget.replace(new RegExp(
-                'style="background-color:\\s*var\\(--bs-card-bg\\);?"', 'g'), '');
-            ActivitySignature = ActivitySignature.replace(new RegExp(
-                'style="background-color:\\s*var\\(--bs-card-bg\\);\\s*color:\\s*var\\(--bs-body-color\\);"',
-                'g'), '');
-            ActivitySignature = ActivitySignature.replace(new RegExp(
-                'style="background-color:\\s*var\\(--bs-card-bg\\);?"', 'g'), '');
+            var patterns = [
+                        /background-color: var\(--bs-card-bg\); color: var\(--bs-body-color\);/g,
+                        /background-color: var\(--bs-card-bg\);/g,
+                        /color: rgb\(222, 226, 230\);/g
+                    ];
+
+                    var search = /font-size: 14px;/g;
+                    var replace = 'font-size: 11px;';
+
+                    function filterAndRemove(input, patterns) {
+                        var output = input;
+                        for (var i = 0; i < patterns.length; i++) {
+                            output = output.replace(patterns[i],
+                                ''); // Replace matched patterns with an empty string
+                        }
+                        return output;
+                    }
+
+                    function updateCssProperty(input, search, replace) {
+                        return input.replace(search, replace); // Replace font-size as needed
+                    }
+                    
+                    if (typeof LetterBody === 'string' && typeof ActivityObjective === 'string' && typeof ActivityBudget === 'string' && typeof ActivitySignature === 'string') {
+                        letterBody = filterAndRemove(LetterBody, patterns);
+                        activityObjective = filterAndRemove(ActivityObjective, patterns);
+                        activityBudget = filterAndRemove(ActivityBudget, patterns);
+                        activitySignature = filterAndRemove(ActivitySignature, patterns);
+
+                        letterBody = updateCssProperty(letterBody, search, replace);
+                        activityObjective = updateCssProperty(activityObjective, search, replace);
+                        activityBudget = updateCssProperty(activityBudget, search, replace);
+                        activitySignature = updateCssProperty(activitySignature, search, replace);
+                    } else {
+                        Swal.mixin({
+                            toast: true,
+                            position: 'top',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                        }).fire({
+                            icon: 'error',
+                            title: 'Error in Processing the document'
+                        });
+                    }
 
             var data = {
                 TaskID: TaskID,
@@ -706,7 +739,7 @@ while ($row = $result->fetch_assoc()) {
                             title: response.message
                         }).then((result) => {
                             if (result.dismiss === Swal.DismissReason.timer) {
-                                //$('#ClearFields').click();
+                                $('#ClearFields').click();
                                 localStorage.removeItem('taskID_AP');
                                 localStorage.removeItem('taskOrgCode_AP');
                                 getAP_Documents();

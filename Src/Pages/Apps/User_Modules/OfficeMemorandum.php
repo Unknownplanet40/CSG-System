@@ -31,7 +31,8 @@ if (isset($_SESSION['last_activity'])) {
 $_SESSION['last_activity'] = time();
 
 
-$stmt = $conn->prepare("SELECT OM_No FROM officememorandomdocuments ORDER BY ID DESC LIMIT 1");
+$stmt = $conn->prepare("SELECT OM_No FROM officememorandomdocuments WHERE UUID = ? ORDER BY OM_No DESC LIMIT 1");
+$stmt->bind_param('s', $_SESSION['UUID']);
 $stmt->execute();
 $result = $stmt->get_result();
 $stmt->close();
@@ -188,6 +189,8 @@ while ($row = $result->fetch_assoc()) {
                                     </div>
                                     <div class="col-md-12">
                                         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                            <button class="btn btn-sm btn-secondary rounded-0 w-25 d-none"
+                                                id="OM-preview">Print Preview</button>
                                             <button class="btn btn-sm btn-success rounded-0 w-25"
                                                 id="OM-Submit">Submit</button>
                                             <button class="btn btn-sm btn-danger rounded-0 w-25"
@@ -454,13 +457,11 @@ while ($row = $result->fetch_assoc()) {
                     var OMSubject = $('#OM-Subject').val();
                     var OMContent = $('#OM-Content').summernote('code');
                     var OMSignature = $('#OM-Signature').summernote('code');
-                    var OMORG = $('#OM-ORG').val();
-
+                    var OMORG = $('#OM-ORG').val() || $('#taskOrgCode').val() || '<?php echo $_SESSION['org_Code']; ?>';
                     var ID = $('#ID').val() || '';
                     var Created_By = $('#Created_By').val() || '';
                     var taskID = $('#taskID').val() || '';
                     var isFromTask = $('#isFromTask').val() || false;
-                    var taskOrgCode = $('#taskOrgCode').val() || '';
 
                     var patterns = [
                         /background-color: var\(--bs-card-bg\); color: var\(--bs-body-color\);/g,
@@ -504,12 +505,14 @@ while ($row = $result->fetch_assoc()) {
                         OMSubject: OMSubject,
                         OMContent: OMContent,
                         OMSignature: OMSignature,
-                        OMORG: taskOrgCode != '' ? taskOrgCode : OMORG,
+                        OMORG: OMORG,
                         ID: ID,
                         Created_By: Created_By,
                         taskID: taskID,
                         isFromTask: isFromTask
                     };
+
+                    console.log(data);
 
                     if (OMNo == '' || OMDate == '' || OMTO == '' || OMTOPosition == '' || OMFROM ==
                         '' || OMFROMPosition == '' || OMSubject == '' || OMContent == '' ||
@@ -571,6 +574,12 @@ while ($row = $result->fetch_assoc()) {
                                     $('#OM-Clear').click();
                                     localStorage.removeItem('taskID_OM');
                                     localStorage.removeItem('orgCODE_OM');
+                                    $('#OM-preview').removeClass('d-none');
+                                    var link = "../../../../" + response.filepaths;
+                                    $("#OM-preview").off('click').on('click', function() {
+                                        window.open(link, '_blank');
+                                    });
+
                                 });
                             } else {
                                 Swal.mixin({

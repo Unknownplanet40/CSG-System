@@ -22,7 +22,10 @@ export function openChat(
   if (Profile === "Default-Profile.gif") {
     $("#toUserImage").attr("src", "../../Assets/Images/Default-Profile.gif");
   } else {
-  $("#toUserImage").attr("src", "../../Assets/Images/UserProfiles/" + Profile);
+    $("#toUserImage").attr(
+      "src",
+      "../../Assets/Images/UserProfiles/" + Profile
+    );
   }
   let chatContainer = $("#messageContainer");
   let chatInput = $("#messageInput");
@@ -228,7 +231,7 @@ export function openChat(
         },
         complete: function () {
           chatSend.prop("disabled", false);
-        }
+        },
       });
     }
   });
@@ -300,7 +303,7 @@ export function loadUsers() {
           } else {
             userProfPath = `../../Assets/Images/UserProfiles/${user.toUser_Profile}`;
           }
-          
+
           usersCons.append(`
                 <div class="card rounded-0 border-0 mb-2 conusers-card" id="user-${randNum}">
                     <div class="card-body">
@@ -397,8 +400,11 @@ export function loadUsers() {
   });
 }
 
-export function checkifISLogin(path = "../Functions/api/checkUserLogin.php", errorpath = "../Functions/api/UserLogout.php?error=001") {
-  $.ajax({
+export function checkifISLogin(
+  path = "../Functions/api/checkUserLogin.php",
+  errorpath = "../Functions/api/UserLogout.php?error=001"
+) {
+  /*   $.ajax({
     url: path,
     type: "GET",
     data: {
@@ -407,14 +413,17 @@ export function checkifISLogin(path = "../Functions/api/checkUserLogin.php", err
     success: function (data) {
       if (data.status === "success") {
         if (!data.isLogin) {
-          window.location.href = errorpath;
+          // window.location.href = errorpath;
+          console.log("You are not logged in");
         }
       }
     },
-  });
+  }); */
 }
 
-export function checkIfSessionChange(path = "../Functions/api/checkSession.php") {
+export function checkIfSessionChange(
+  path = "../Functions/api/checkSession.php"
+) {
   $.ajax({
     url: path,
     type: "GET",
@@ -434,7 +443,9 @@ export function checkIfSessionChange(path = "../Functions/api/checkSession.php")
   });
 }
 
-export function sessionAlert(errorpath = "../../Src/Functions/api/UserLogout.php?error=003") {
+export function sessionAlert(
+  errorpath = "../../Src/Functions/api/UserLogout.php?error=003"
+) {
   if (
     localStorage.getItem("anotherSession") !== null &&
     localStorage.getItem("anotherSession") === "true"
@@ -491,7 +502,7 @@ export function sessionAlert(errorpath = "../../Src/Functions/api/UserLogout.php
 }
 
 export function fetch_Announcements() {
-  let annCon = $("#Announcements"); 
+  let annCon = $("#Announcements");
   $.ajax({
     url: "../Functions/api/getAnnouncements.php",
     type: "GET",
@@ -501,9 +512,9 @@ export function fetch_Announcements() {
 
         // check data.data count
         if (data.data.length > 2) {
-          $('#annsmain').addClass('ansscroll');
+          $("#annsmain").addClass("ansscroll");
         } else {
-          $('#annsmain').removeClass('ansscroll');
+          $("#annsmain").removeClass("ansscroll");
         }
 
         data.data.forEach((announcement) => {
@@ -521,8 +532,9 @@ export function fetch_Announcements() {
           if (announcement.profileImage === "Default-Profile.gif") {
             profpath = "../../Assets/Images/Default-Profile.gif";
           } else {
-            profpath = "../../Assets/Images/UserProfiles/" + announcement.profileImage;
-          } 
+            profpath =
+              "../../Assets/Images/UserProfiles/" + announcement.profileImage;
+          }
 
           function formatNumber(num) {
             let formatted = num;
@@ -604,7 +616,9 @@ export function fetch_Announcements() {
                     let index = announcement.dislikeBy_Name.indexOf("You");
                     announcement.dislikeBy_Name.splice(index, 1);
                     display_dislikeby =
-                      "You and " + announcement.dislikeBy_Name.length + " others";
+                      "You and " +
+                      announcement.dislikeBy_Name.length +
+                      " others";
                   }
                 } else {
                   if (announcement.dislikeBy_Name.length === 1) {
@@ -635,9 +649,7 @@ export function fetch_Announcements() {
                                                     style="max-width: 315px;">
                                                     ${announcement.postedBy}
                                                 </p>
-                                                <small class="moveu">${
-                                                  announcement.postedDate
-                                                }</small>
+                                                <small class="moveu">${announcement.postedDate}</small>
                                             </div>
                                         </div>
                                     </div>
@@ -645,33 +657,25 @@ export function fetch_Announcements() {
                                         <div class="priority">
                                             <svg width="24" height="24">
                                                 <use
-                                                    xlink:href="#${
-                                                      announcement.priority
-                                                    }"></use>
+                                                    xlink:href="#${announcement.priority}"></use>
                                             </svg>
                                         </div>
                                     </div>
                                 </div>
-                                <p class="alert-heading" style="white-space: pre-wrap;">${
-                                  announcement.postContent
-                                }</p>
+                                <p class="alert-heading" style="white-space: pre-wrap;">${announcement.postContent}</p>
                                 <hr>
                                 <!-- Reactions -->
                                 <div class="hstack gap-1 user-select-none">
                                     <div
                                         class="p-1 rounded-5 d-flex align-items-center fw-bold user-select-none reaction" id="like-${announcement.postID}">
-                                        <small class="me-2" id="likeCount-${
-                                          announcement.postID
-                                        }">${postLikesFormatted}</small>
+                                        <small class="me-2" id="likeCount-${announcement.postID}">${postLikesFormatted}</small>
                                         <svg width="16" height="16">
                                             <use xlink:href="#Like" />
                                         </svg>
                                     </div>
                                     <div class="vr"></div>
                                     <div class="p-1 rounded-5 d-flex align-items-center user-select-none reaction" id="dislike-${announcement.postID}">
-                                        <small class="me-2" id="dislikeCount-${
-                                          announcement.postID
-                                        }">${postDislikesFormatted}</small>
+                                        <small class="me-2" id="dislikeCount-${announcement.postID}">${postDislikesFormatted}</small>
                                         <svg width="16" height="16">
                                             <use xlink:href="#Dislike" />
                                         </svg>

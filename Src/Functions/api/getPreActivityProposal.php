@@ -18,19 +18,29 @@ try {
     if (!isset($_SESSION['role'])) {
         response(['status' => 'error', 'message' => 'Session expired']);
     }
-    
+
+    if (isset($_GET['isSubmittedtoCSG'])) {
+        if ($_SESSION['role'] == 1) {
+            $submitted = " WHERE isSubmittedtoCSG = 0";
+        } else {
+            $submitted = " AND isSubmittedtoCSG = 0";
+        }
+    } else {
+        $submitted = "";
+    }
+
     if ($_SESSION['role'] == 1) {
-        $stmt = $conn->prepare("SELECT * FROM activityproposaldocuments");
+        $stmt = $conn->prepare("SELECT * FROM activityproposaldocuments $submitted");
     } else {
         if (!isset($_SESSION['org_position']) || !isset($_SESSION['org_Code']) || !isset($_SESSION['UUID'])) {
             response(['status' => 'error', 'message' => 'Session expired']);
         }
-        
+
         if ($_SESSION['org_position'] < 4) {
-            $stmt = $conn->prepare("SELECT * FROM activityproposaldocuments WHERE org_code = ?");
+            $stmt = $conn->prepare("SELECT * FROM activityproposaldocuments WHERE org_code = ? $submitted");
             $stmt->bind_param("s", $_SESSION['org_Code']);
         } else {
-            $stmt = $conn->prepare("SELECT * FROM activityproposaldocuments WHERE org_code = ? AND UUID = ?");
+            $stmt = $conn->prepare("SELECT * FROM activityproposaldocuments WHERE org_code = ? AND UUID = ? $submitted");
             $stmt->bind_param("ss", $_SESSION['org_Code'], $_SESSION['UUID']);
         }
     }
@@ -41,7 +51,6 @@ try {
     $data = [];
 
     while ($row = $result->fetch_assoc()) {
-        $row['date_Created'] = date('F d, Y', strtotime($row['date_Created']));
 
         $stmt = $conn->prepare("SELECT fullName FROM usercredentials WHERE UUID = ?");
         $stmt->bind_param("s", $row['UUID']);
@@ -50,7 +59,7 @@ try {
         $stmt->close();
         $row2 = $result2->fetch_assoc();
         $row['Created_By'] = $row2['fullName'];
-        
+
         $data[] = $row;
     }
 

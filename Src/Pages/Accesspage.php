@@ -85,13 +85,10 @@ if (isset($_GET['pending'])) {
         } elseif ($_GET['error'] == '005') {
             echo "<script>localStorage.setItem('error', 'Please activate your account before proceeding.');</script>";
             unset($_GET['error']);
-        } else if ($_GET['error'] == '006') {
+        } elseif ($_GET['error'] == '006') {
             echo "<script>localStorage.setItem('error', 'Your account is rejected. Please contact the administrator for assistance.');</script>";
             unset($_GET['error']);
-        }
-        
-        
-        else {
+        } else {
             echo "<script>localStorage.removeItem('error');</script>";
         }
     } else {
@@ -167,8 +164,9 @@ if (isset($_GET['pending'])) {
                 <div>
                     <h3 class="fw-bold my-3">
                         <div class="hstack gap-3">
-                            <span><img src="../../Assets/Icons/PWA-Icon/Icon-x96.jpeg" alt="csg logo" width="48"></span>
+                            <span><img src="../../Assets/Images/Default_CSG_LOGO.png" alt="csg logo" width="48"></span>
                             <span>Central Student Government</span>
+                            <small id="timer" class="text-muted"></small>
                         </div>
                     </h3>
                 </div>
@@ -518,7 +516,7 @@ if (isset($_GET['pending'])) {
             </div>
         </div>
     </div>
-    <?php include_once '../Components/mobileNavbar.php'; ?>
+    <?php include_once '../Components/mobileNavbar_Access.php'; ?>
 </body>
 
 </html>

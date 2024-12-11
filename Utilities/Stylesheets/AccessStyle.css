@@ -12,11 +12,11 @@ body {
 body::after {
   content: "";
   position: fixed;
-  bottom:  92px;
+  bottom:  120px;
   right: -92px;
   width: 739px;
   height: 100%;
-  background-image: url(../../Assets/Images/Logo-Layers/Logo-trans.png);
+  background-image: url(../../Assets/Images/Default_CSG_Trans.png);
   background-repeat: no-repeat;
   background-size: cover;
   opacity: 0.5;
@@ -25,8 +25,6 @@ body::after {
   transform: translateY(50%);
 }
 
-
-/*remove after in body if the screen is lwer than medium screen*/
 @media (max-width: 768px) {
   body::after {
     display: none;

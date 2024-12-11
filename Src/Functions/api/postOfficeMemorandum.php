@@ -243,13 +243,13 @@ try {
 
     $filesize = filesize($filepaths);
 
-    $filepaths = substr($filepaths, strlen(dirname(__DIR__, 3) . DIRECTORY_SEPARATOR));
+    $filepaths = substr($filepaths, strlen(dirname(__DIR__, 3)));
     $currentDate = date('Y-m-d H:i:s');
     $UUID = $_SESSION['UUID'];
 
     if ($ID !== '') {
-        $stmt = $conn->prepare("UPDATE officememorandomdocuments SET org_Code = ?, file_Size = ?, TaskID = ?, isFromTask = ?, OM_No = ?, OM_To = ?, OM_To_Position = ?, OM_From = ?, OM_From_Position = ?, OM_Sub = ?, OM_Date = ?, OM_Body = ?, OM_Signature = ?, DateCreated = ?, UUID = ? WHERE ID = ?");
-        $stmt->bind_param("sssisssssssssssi", $OMORG, $filesize, $taskID, $isFromTask, $OMNo, $OMTO, $OMTOPosition, $OMFROM, $OMFROMPosition, $OMSubject, $OMDate, $OMContent, $OMSignature, $currentDate, $UUID, $ID);
+        $stmt = $conn->prepare("UPDATE officememorandomdocuments SET org_Code = ?, file_Size = ?, file_path = ?, TaskID = ?, isFromTask = ?, OM_No = ?, OM_To = ?, OM_To_Position = ?, OM_From = ?, OM_From_Position = ?, OM_Sub = ?, OM_Date = ?, OM_Body = ?, OM_Signature = ?, DateCreated = ?, UUID = ? WHERE ID = ?");
+        $stmt->bind_param("ssssisssssssssssi", $OMORG, $filesize, $filepaths, $taskID, $isFromTask, $OMNo, $OMTO, $OMTOPosition, $OMFROM, $OMFROMPosition, $OMSubject, $OMDate, $OMContent, $OMSignature, $currentDate, $UUID, $ID);
         $stmt->execute();
         $stmt->close();
     } else {
@@ -260,13 +260,13 @@ try {
             $stmt->close();
         }
 
-        $stmt = $conn->prepare("INSERT INTO officememorandomdocuments (org_Code, file_Size, TaskID, isFromTask, OM_No, OM_To, OM_To_Position, OM_From, OM_From_Position, OM_Sub, OM_Date, OM_Body, OM_Signature, DateCreated, UUID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("sisssssssssssss", $OMORG, $filesize, $taskID, $isFromTask, $OMNo, $OMTO, $OMTOPosition, $OMFROM, $OMFROMPosition, $OMSubject, $OMDate, $OMContent, $OMSignature, $currentDate, $UUID);
+        $stmt = $conn->prepare("INSERT INTO officememorandomdocuments (org_Code, file_Size, file_path, TaskID, isFromTask, OM_No, OM_To, OM_To_Position, OM_From, OM_From_Position, OM_Sub, OM_Date, OM_Body, OM_Signature, DateCreated, UUID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sissssssssssssss", $OMORG, $filesize, $filepaths, $taskID, $isFromTask, $OMNo, $OMTO, $OMTOPosition, $OMFROM, $OMFROMPosition, $OMSubject, $OMDate, $OMContent, $OMSignature, $currentDate, $UUID);
         $stmt->execute();
         $stmt->close();
     }
 
-    response(['status' => 'success', 'message' => 'Successfully Created']);
-} catch (\Throwable $th) {
+    response(['status' => 'success', 'message' => 'Successfully Created', 'filepaths' => $filepaths]);
+} catch (Exception $th) {
     response(['status' => 'error', 'message' => $th->getMessage()]);
 }

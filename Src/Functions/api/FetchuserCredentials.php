@@ -1,8 +1,5 @@
 <?php
-
 date_default_timezone_set('Asia/Manila');
-
-// this function is used to fetch the user credentials and save it to the session
 function fetchUserCredentials($conn, $studentNumber, $device)
 {
     $stmt = $conn->prepare("SELECT * FROM usercredentials WHERE student_Number = ?");
@@ -17,8 +14,6 @@ function fetchUserCredentials($conn, $studentNumber, $device)
     $time = date('H:i:s');
 
     session_regenerate_id();
-
-
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
@@ -110,8 +105,7 @@ function fetchUserCredentials($conn, $studentNumber, $device)
             $_SESSION['LastName'] = $row['Last_Name'];
             $_SESSION['PrimaryEmail'] = $row['primary_email'];
             $_SESSION['student_Number'] = $row['student_Number'];
-            //$_SESSION['Password'] = password_hash($row['password'], PASSWORD_DEFAULT); // temporary fix for the password hashing
-            $_SESSION['Password'] = $row['password']; // note to self: remove this line when the password hashing is done
+            $_SESSION['Password'] = $row['password'];
             $_SESSION['isLogged'] = $row['isLogin'];
             $_SESSION['sessionID'] = $row['sessionID'];
             $_SESSION['Created_On'] = $row['created_at'];

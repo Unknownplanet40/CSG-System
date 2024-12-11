@@ -50,6 +50,18 @@ if (isset($_SESSION['last_activity'])) {
 }
 
 $_SESSION['last_activity'] = time();
+
+function orgList($conn)
+{
+    $stmt = $conn->prepare("SELECT * FROM sysorganizations");
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $stmt->close();
+    while ($row = $result->fetch_assoc()) {
+        echo '<option value="' . $row['org_code'] . '" data-org="' . $row['org_short_name'] . '">' . $row['org_name'] . '</option>';
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -114,6 +126,7 @@ $_SESSION['last_activity'] = time();
                         <div class="row text-center mt-3">
                             <div class="col fw-bolder text-light text-uppercase">Role</div>
                             <div class="col fw-bolder text-light text-uppercase">Position</div>
+                            <div class="col fw-bolder text-light text-uppercase">Send To</div>
                         </div>
                         <ol class="list-group list-group-numbered list-group-flush bg-transparent mb-3">
                             <?php for ($i = 0; $i < 10; $i++) { ?>
@@ -122,7 +135,7 @@ $_SESSION['last_activity'] = time();
                                 id="MultipleAccounts_<?php echo $i; ?>">
                                 <div class="row w-100 ms-2">
                                     <div class="col">
-                                        <select class="form-select form-select-sm rounded-1"
+                                        <select class="form-select form-select-sm rounded-0"
                                             id="Role_Select_<?php echo $i; ?>">
                                             <option selected hidden disabled value="null">Select Role</option>
                                             <option value="1">Administrator</option>
@@ -141,14 +154,18 @@ $_SESSION['last_activity'] = time();
                                             <option value="4">Secretary</option>
                                         </select>
                                     </div>
+                                    <div class="col">
+                                        <input type="text" class="form-control form-control-sm rounded-0"
+                                            id="CvsuEmail_<?php echo $i; ?>" placeholder="Email Address" required>
+                                    </div>
                                 </div>
                             </li>
                             <?php } ?>
                         </ol>
                         <small class="text-white">Temporary Email and Password will be generated automatically.</small>
-                        <div class="d-flex justify-content-center my-3">
-                            <button type="button" class="btn btn-success rounded-0" id="CreateMultiple_Btn">Create
-                                Accounts</button>
+                        <div class="d-flex justify-content-center my-3 gap-2">
+                            <button type="button" class="btn btn-danger rounded-0" id="ResetMultiple_Btn">Reset</button>
+                            <button type="button" class="btn btn-success rounded-0" id="CreateMultiple_Btn">Create Accounts</button>
                             <a class="btn btn-secondary rounded-0 ms-2 d-none" id="DL_zip_Btn" download
                                 data-bs-toggle="tooltip" data-bs-placement="top"
                                 title="Zip file will be deleted after closing the modal">Download Zip</a>
@@ -205,15 +222,7 @@ $_SESSION['last_activity'] = time();
                                 <div class="col-md-4">
                                     <label for="inputOrg" class="form-label">Organization</label>
                                     <select class="form-select form-select-sm rounded-1" id="inputOrg" required>
-                                        <?php
-                                            $stmt = $conn->prepare("SELECT * FROM sysorganizations");
-$stmt->execute();
-$result = $stmt->get_result();
-$stmt->close();
-while ($row = $result->fetch_assoc()) {
-    echo '<option value="' . $row['org_code'] . '" data-org="' . $row['org_short_name'] . '">' . $row['org_name'] . '</option>';
-}
-?>
+                                        <?php orgList($conn); ?>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
@@ -345,15 +354,7 @@ while ($row = $result->fetch_assoc()) {
                                 <div class="col-md-4 d-none">
                                     <label for="inputOrg_admin" class="form-label">Organization</label>
                                     <select class="form-select form-select-sm rounded-1" id="inputOrg_admin" required>
-                                        <?php
-$stmt = $conn->prepare("SELECT * FROM sysorganizations");
-$stmt->execute();
-$result = $stmt->get_result();
-$stmt->close();
-while ($row = $result->fetch_assoc()) {
-    echo '<option value="' . $row['org_code'] . '" data-org="' . $row['org_short_name'] . '">' . $row['org_name'] . '</option>';
-}
-?>
+                                        <?php orgList($conn); ?>
                                     </select>
                                 </div>
                                 <div class="col-md-4 d-none">
@@ -461,7 +462,7 @@ while ($row = $result->fetch_assoc()) {
                     </div>
                 </div>
                 <div class="container">
-                <?php include_once "./DSB.php"; ?>
+                    <?php include_once "./DSB.php"; ?>
                 </div>
             </div>
         </div>
@@ -480,7 +481,7 @@ while ($row = $result->fetch_assoc()) {
                             aria-selected="false">Officers <span class="d-none d-md-inline">Account</span></button>
                     </li>
                     <li class="nav-item <?php echo $_SESSION['role'] == 2 && ($_SESSION['org_position'] == 2 || $_SESSION['org_position'] == 3) ? 'd-none' : ''; ?>"
-                    role="presentation">
+                        role="presentation">
                         <button class="nav-link text-body" id="admin-tab" data-bs-toggle="tab"
                             data-bs-target="#admin-tab-pane" type="button" role="tab" aria-controls="admin-tab-pane"
                             aria-selected="false">Admins <span class="d-none d-md-inline">Account</span></button>
@@ -489,11 +490,18 @@ while ($row = $result->fetch_assoc()) {
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="NUP-tab-pane" role="tabpanel" tabindex="0">
                         <div class="row m-5 pt-5 g-4">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <div class="form-floating">
                                     <input type="text" class="form-control form-control-sm rounded-0" id="UUID_Input"
                                         placeholder="Unique User Identifier" readonly>
                                     <label for="UUID_Input">Unique User Identifier</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control form-control-sm rounded-0"
+                                        id="UUID_CvSU_Mail" placeholder="CvSU Email" required>
+                                    <label for="UUID_CvSU_Mail">CvSU Email</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -524,6 +532,7 @@ while ($row = $result->fetch_assoc()) {
                                     var role = $('#Role_Select').val();
                                     if (role == 1) {
                                         $('#Pos_Select').prop('disabled', true);
+                                        $('#Pos_Select').val('null');
                                     } else {
                                         $('#Pos_Select').prop('disabled', false);
                                     }

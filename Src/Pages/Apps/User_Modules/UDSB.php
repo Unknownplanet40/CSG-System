@@ -12,6 +12,7 @@ $ProjectProposal = "./ProjectProposal.php";
 $Feed = "../../Feed.php";
 $Preference = "../../Preference.php";
 $enableDocumentHeader = false;
+$createAccount = "./CreateAccount.php";
 
 if ($_SESSION['role'] == 1) {
     $enableDocumentHeader = true;
@@ -24,11 +25,9 @@ if ($_SESSION['role'] == 1) {
 
 ?>
 
-
 <div class="d-flex flex-column justify-content-between h-100">
     <div class="container text-center my-2">
-        <?php
-                    if ($_SESSION['ProfileImage'] == "Default-Profile.gif") {?>
+        <?php if ($_SESSION['ProfileImage'] == "Default-Profile.gif") {?>
         <img src="../../../../Assets/Images/Default-Profile.gif" class="rounded-circle img-fluid border border-3 mt-2"
             alt="Profile Picture" width="84" height="84">
         <?php } else {?>
@@ -70,6 +69,7 @@ if ($_SESSION['role'] == 1) {
             </small>
         </div>
     </div>
+
     <div class="container">
         <ul class="list-group">
             <li class="list-group-item lg my-2 <?php echo ($_SESSION['role'] == 1) ? '' : (($_SESSION['org_position'] == 1 || $_SESSION['org_position'] == 2 || $_SESSION['org_position'] == 3) ? '' : 'd-none'); ?>
@@ -80,7 +80,8 @@ if ($_SESSION['role'] == 1) {
                 </svg>
                 Dashboard
             </li>
-            <span class="hr-divider-start text-secondary <?php echo $isSubOrg['isSubOrg'] == 1 ? 'd-none' : ''; ?>"></span>
+            <span
+                class="hr-divider-start text-secondary <?php echo $isSubOrg['isSubOrg'] == 1 ? 'd-none' : ''; ?>"></span>
             <li class="list-group-item lg <?php echo $current_page == 'Dashboard.php' ? 'lg-active' : ''; ?>"
                 <?php echo $current_page != 'Dashboard.php' ? "onclick='window.location.href = \"$OfficerDashboard\"'" : ''; ?>>
                 <svg class="me-3" width="24" height="24">
@@ -95,11 +96,19 @@ if ($_SESSION['role'] == 1) {
                 </svg>
                 Document Header
             </li>
+            <li data-bs-toggle="modal" data-bs-target="#CreateUSERACCOUNT" <?php echo $current_page != 'CreateAccount.php' ? "onclick='window.location.href = \"$createAccount\"'" : ''; ?>
+                class="list-group-item lg my-2 <?php echo $current_page == 'CreateAccount.php' ? 'lg-active' : ''; ?> <?php echo $enableDocumentHeader ? '' : 'd-none'; ?> <?php echo ($_SESSION['role'] == 1) ? '' : (($_SESSION['org_position'] == 1 ) ? '' : 'd-none'); ?>">
+                <svg class="me-3" width="24" height="24">
+                    <use xlink:href="#ManageAct" />
+                </svg>
+                Create User
+            </li>
             <span class="hr-divider-start text-secondary d-none"></span>
             <div class="accordion accordion-flush" id="Modules_Accord">
                 <div class="accordion-item bg-transparent border-0">
-                    <li class="list-group-item lg <?php echo $current_page == 'ActivityProposal.php' || $current_page == 'ExcuseLetter.php' || $current_page == 'MinutesOfTheMeeting.php' || $current_page == 'OfficeMemorandum.php' || $current_page == 'ProjectProposal.php' ? 'collapsed' : ''; ?>" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                    <li class="list-group-item lg <?php echo $current_page == 'ActivityProposal.php' || $current_page == 'ExcuseLetter.php' || $current_page == 'MinutesOfTheMeeting.php' || $current_page == 'OfficeMemorandum.php' || $current_page == 'ProjectProposal.php' ? 'collapsed' : ''; ?>"
+                        type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne"
+                        aria-expanded="false" aria-controls="flush-collapseOne">
                         <svg class="me-3" width="24" height="24">
                             <use xlink:href="#Folder" />
                         </svg>

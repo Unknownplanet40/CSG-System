@@ -1,7 +1,5 @@
 <?php
-
 session_start();
-
 function response($data)
 {
     echo json_encode($data);
@@ -10,7 +8,7 @@ function response($data)
 
 require_once  "../../Database/Config.php";
 require_once './FetchuserCredentials.php';
-// prevent direct access to this file
+
 if (!file_exists('../env/HiddenKeys.php')) {
     if (!mkdir('../env', 0750, true)) {
         response(['status' => 'error', 'message' => 'Failed to create configuration directory']);
@@ -33,6 +31,7 @@ if (!file_exists('../env/HiddenKeys.php')) {
 } else {
     require_once '../env/HiddenKeys.php';
 }
+
 require_once '../../Debug/GenLog.php';
 $logPath = "../../Debug/Users/UUID.log";
 
@@ -58,10 +57,10 @@ try {
         response(['error' => 'Invalid request data']);
     }
 
-    $studentNumber = $data['studentnum']; // int
-    $password = $data['password']; // varchar
+    $studentNumber = $data['studentnum'];
+    $password = $data['password'];
     $device = $data['Device'];
-    $ipAddress = $data['ipAddress']; // varchar
+    $ipAddress = $data['ipAddress'];
     if (isset($data['stats']) && $data['stats'] == 'autologin') {
         $autoLogin = true;
     } else {
@@ -74,7 +73,6 @@ try {
     $result = $stmt->get_result();
     $stmt->close();
 
-    // Get the current date
     $CurrentDate = date('Y-m-d H:i:s');
 
     if ($result->num_rows > 0) {
@@ -82,11 +80,9 @@ try {
 
         $temp_UUID = $row['UUID'];
 
-        // Check if the account is locked
         if ($row['LoginStat'] === 'Locked') {
             $row['BanExpired'] = date('Y-m-d H:i:s', strtotime($row['BanExpired']));
 
-            // Check if the Lockout time has expired
             if ($CurrentDate > $row['BanExpired']) {
                 $stmt = $conn->prepare("UPDATE accounts SET LoginStat = 'Active', LoginAttempt = 0, BanExpired = NULL WHERE student_Number = ?");
                 $stmt->bind_param("i", $studentNumber);
@@ -104,8 +100,6 @@ try {
             }
         }
 
-        // if the account is not locked, proceed to login ------------------------------
-        // Check if the password is correct
         if (password_verify($password, $row['password'])) {
             $stmt = $conn->prepare("SELECT isLogin, access_date, ipAddress, UUID FROM accounts WHERE student_Number = ?");
             $stmt->bind_param("i", $studentNumber);
@@ -153,16 +147,13 @@ try {
             $stmt->execute();
             $stmt->close();
 
-            // update account status to online
             $stmt = $conn->prepare("UPDATE usercredentials SET isLogin = 1, sessionID = ? WHERE student_Number = ?");
             $stmt->bind_param("ss", $random, $studentNumber);
             $stmt->execute();
             $stmt->close();
             
-            // Fetch the account credentials to session
             $account = fetchUserCredentials($conn, $studentNumber, $device);
 
-            // Check if the account is fetched
             if ($account === null) {
                 response(['status' => 'error', 'message' => 'An error occurred while fetching your account']);
             } else {
@@ -204,7 +195,6 @@ try {
             $isLocked = false;
             $ReAttemptDate = "";
 
-            // Check if the account is locked
             if ($loginAttempt < 3) {
                 $loginAttempt++;
                 $stmt = $conn->prepare("UPDATE accounts SET LoginAttempt = ? WHERE student_Number = ?");
@@ -240,12 +230,11 @@ try {
                 $UUID = $row['UUID'];
                 $stmt->close();
 
-                // get reattempt year in $ReAttemptDate
-                $Year = date('Y', strtotime($ReAttemptDate)); // 2021
-                $Month = date('F', strtotime($ReAttemptDate)); // January
-                $Day = date('d', strtotime($ReAttemptDate)); // 01
-                $time = date('h:i', strtotime($ReAttemptDate)); // 12:00
-                $AMPM = date('A', strtotime($ReAttemptDate)); // AM
+                $Year = date('Y', strtotime($ReAttemptDate));
+                $Month = date('F', strtotime($ReAttemptDate));
+                $Day = date('d', strtotime($ReAttemptDate));
+                $time = date('h:i', strtotime($ReAttemptDate));
+                $AMPM = date('A', strtotime($ReAttemptDate));
 
                 $random = rand(100000, 999999);
                 $details = "User with student number " . $studentNumber . " has failed to login. Account is now temporarily locked.";
@@ -254,28 +243,24 @@ try {
                 try {
                     //Server settings
                     $mail = new PHPMailer(true);
-                    $mail->isSMTP(); // Send using SMTP
-                    $mail->Host = $SMTP_HOST; // Set the SMTP server to send through
-                    $mail->SMTPAuth = true; // Enable SMTP authentication
-                    $mail->Username = $SMTP_USER; // SMTP username
-                    $mail->Password = $SMTP_PASS; // SMTP password
-                    $mail->SMTPSecure = $SMTP_SECURE; // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` also accepted
-                    $mail->Port = $SMTP_PORT; // TCP port to connect to
+                    $mail->isSMTP();
+                    $mail->Host = $SMTP_HOST;
+                    $mail->SMTPAuth = true;
+                    $mail->Username = $SMTP_USER;
+                    $mail->Password = $SMTP_PASS;
+                    $mail->SMTPSecure = $SMTP_SECURE;
+                    $mail->Port = $SMTP_PORT;
 
-                    //Recipients
                     $mail->setFrom($SMTP_USER, 'CSG - System');
-                    $mail->addAddress($email, $fname); // Add a recipient
+                    $mail->addAddress($email, $fname);
 
-                    // Content
-                    $mail->isHTML(true); // Set email format to HTML
+                    $mail->isHTML(true);
                     $mail->Subject = 'Security Alert';
                     $mail->Body = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Security Alert</title><style>body{font-family:Segoe UI,Roboto,sans-serif;line-height:1.6;}.container{max-width:600px;margin:0 auto;padding:20px;}.header{color:white;padding:5px 0;text-align:center;border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:center;}.header h2{color:black;}.content{padding:10px 20px 20px 20px;margin-top:20px;}.footer{margin-top:20px;text-align:center;font-size:0.9em;color:#777;}table{width:100%;}td{padding:10px;}img{display:block;margin:0 auto;}h2{margin:0;color:#fff;}ul{list-style-type:none;padding:0;}li{margin-bottom:10px;}p{margin:0 0 10px;}</style></head><body><div class="container"><div class="header"><table><tr><td><img src="https://i.imgur.com/Xd06F5f.jpeg" alt="Company Logo" style="display:block;border-radius:50%;margin:0 auto" width="48"/></td><td><h2>Central Student Government</h2></td></tr></table></div><hr/><h3 style="text-align:start;text-transform:uppercase;color:#333;margin-bottom:-10px;">Security alert</h3><small style="color:#777;">' . date('F j, Y') . '</small><div class="content"><p>Dear <b>' . $fname . '</b>,</p><p>Please be informed that your account has been locked due to multiple failed login attempts. It will automatically unlock after</p><p style="text-align:center;margin-top:10px"><b>' . $Month . ' ' . $Day . ', ' . $Year . ' at ' . $time . ' ' . $AMPM . '</b>.</p><div style="text-align:end"><p>Thank you!</p><p><br/>Best regards,<br/>Central Student Government</p></div></div><div class="footer"><p>&copy; ' . date('Y') . ' Central Student Government. All rights reserved.</p></div><div><p style="text-align:center;color:#777;font-size:0.8em;margin-top:20px">This email was sent to <b>' . $email . '</b> because you are a member of the CvSU Organization. If you believe this email was sent by mistake, please ignore it.</p></div></div></body></html>';
                     $mail->AltBody = 'This is a system generated email. Please do not reply to this email.';
 
                     if ($mail->send()) {
                         $SMTPMessage = "Email sent successfully";
-            
-                        // Record the event to the system audit
                         $stmt = $conn->prepare("INSERT INTO systemaudit (userID, eventType, ip_address, details, status, SA_UID) VALUES (?, ?, ?, ?, 'Failed', ?)");
                         $stmt->bind_param("ssssi", $UUID, $loginmessage, $ipAddress, $details, $random);
                         $stmt->execute();

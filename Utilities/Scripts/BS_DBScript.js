@@ -78,11 +78,9 @@ $(document).ready(function () {
     ajax: {
       url: "../../../Functions/api/getAudits.php",
       dataSrc: "data",
-
       error: function (xhr, error, code) {
-        console.log(xhr);
-        console.log(error);
-        console.log(code);
+        $("#audit_table").DataTable().clear().draw();
+        console.error("Failed to fetch audit data:", error);
       },
     },
 
@@ -105,7 +103,7 @@ $(document).ready(function () {
       { data: "affected_user" },
       {
         data: null,
-        render: function (data, type, row) {
+        render: function () {
           return `<button class="btn btn-sm rounded-1 btn-success" id="viewAudit">View</button>`;
         },
       },

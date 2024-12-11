@@ -159,7 +159,7 @@ class PDF extends TCPDF
         $this->Cell(0, 5, 'Prepared by:', 0, 1);
         $this->setX(38.1);
         $this->setFont('helvetica', '', 11);
-        
+
         $stmt = $conn->prepare("SELECT * FROM userpositions WHERE org_code = ? AND org_position = 4 AND isTermComplete = 0 AND status = 'active' LIMIT 1");
         $stmt->bind_param("s", $_SESSION['org_Code']);
         $stmt->execute();
@@ -213,7 +213,10 @@ class PDF extends TCPDF
             $FileEnd = $FileNameEnd;
             $MM_DOCS_PATH = json_decode($MM_DOCS_PATH);
         }
-        $filepaths = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'DocumentsStorage' . DIRECTORY_SEPARATOR . (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']) . DIRECTORY_SEPARATOR . 'MinutesOfTheMeeting' . DIRECTORY_SEPARATOR . $FileEnd;
+
+        $filepaths = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'DocumentsStorage' . DIRECTORY_SEPARATOR .
+                     (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']) . DIRECTORY_SEPARATOR .
+                     'MinutesOfTheMeeting' . DIRECTORY_SEPARATOR . $FileEnd;
 
         $this->Ln(15);
         $this->setX(38.1);
@@ -221,14 +224,33 @@ class PDF extends TCPDF
         $this->Cell(0, 5, 'DOCUMENTATION', 0, 1, 'C');
 
         if (!empty($MM_DOCS_PATH)) {
-            foreach ($MM_DOCS_PATH as $key => $value) {
-                $this->ln(10);
-                $this->Image($filepaths . DIRECTORY_SEPARATOR . $value, 38.1, $this->GetY(), 156);
-                $this->Ln(10 + $this->getImageRBY() - $this->GetY());
+            $images = [];
+
+            // Collect image data with their heights
+            foreach ($MM_DOCS_PATH as $value) {
+                $imgPath = $filepaths . DIRECTORY_SEPARATOR . $value;
+                list($width, $height) = getimagesize($imgPath); // Get dimensions
+                $images[] = [
+                    'path' => $value,
+                    'height' => $height // Use height for sorting
+                ];
+            }
+
+            // Sort images by height (shortest first)
+            usort($images, function ($a, $b) {
+                return $a['height'] - $b['height'];
+            });
+
+            // Display images in sorted order
+            foreach ($images as $image) {
+                $this->ln(10); // Add spacing before image
+                $this->Image($filepaths . DIRECTORY_SEPARATOR . $image['path'], 38.1, $this->GetY(), 156); // Display image
+                $this->Ln(10 + $this->getImageRBY() - $this->GetY()); // Adjust position dynamically
             }
         }
-
     }
+
+
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -252,27 +274,26 @@ try {
     $OrgCode = $_POST['OrgCode'] ?? '';
     $Created_By = $_POST['Created_By'] ?? '';
     $taskID = $_POST['taskID'] ?? '';
-    $isFromTask = $_POST['isFromTask'] ?? '';
+    $isFromTask = $_POST['isFromTask'] ?? 0;
     $taskOrgCode = $_POST['taskOrgCode'] ?? '';
 
-    function filterAndRemove($input, $patterns) {
-        // Apply the patterns to remove matches
+    function filterAndRemove($input, $patterns)
+    {
         $filteredOutput = preg_replace($patterns, '', $input);
-    
-        // Clean up empty lines and excess whitespace
         $filteredOutput = preg_replace('/\n+/', "\n", trim($filteredOutput));
-    
+
         return $filteredOutput;
     }
 
-    function updateCssProperty($input, $search, $replace) {
+    function updateCssProperty($input, $search, $replace)
+    {
         return str_replace($search, $replace, $input);
     }
 
     $patterns = [
         '/background-color: var\(--bs-card-bg\); color: var\(--bs-body-color\);/',
-        '/background-color: var\(--bs-card-bg\);/',                                
-        '/color: rgb\(222, 226, 230\);/'                                           
+        '/background-color: var\(--bs-card-bg\);/',
+        '/color: rgb\(222, 226, 230\);/'
     ];
 
     $search = 'font-size: 14px;';
@@ -296,48 +317,59 @@ try {
 
     if (!empty($MM_DOCS)) {
         if (count($MM_DOCS['name']) > 0) {
+            $MM_DOCS_PATH = [];
+            if ($ID !== '' && $MM_DOCS !== '') {
+                $stmt = $conn->prepare("SELECT filedEnd AS FileNameEnd, DocsPath FROM minutemeetingdocuments WHERE ID = ? AND org_code = ?");
+                $stmt->bind_param("ss", $ID, $OrgCode);
+                $stmt->execute();
+                $result = $stmt->get_result()->fetch_assoc();
+                $stmt->close();
+
+                $oldFileNameEnd = $result['FileNameEnd'];
+                $oldDocsPath = json_decode($result['DocsPath'], true);
+
+                //delete folder
+                if (!empty($oldDocsPath)) {
+                    $storageDir = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'DocumentsStorage' . DIRECTORY_SEPARATOR .
+                          (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']) . DIRECTORY_SEPARATOR .
+                          'MinutesOfTheMeeting' . DIRECTORY_SEPARATOR . $oldFileNameEnd;
+                    if (is_dir($storageDir)) {
+                        $files = glob($storageDir . '/*');
+                        foreach ($files as $file) {
+                            if (is_file($file)) {
+                                unlink($file);
+                            }
+                        }
+                        rmdir($storageDir);
+                    }
+                }
+
+                $stmt = $conn->prepare("UPDATE minutemeetingdocuments SET DocsPath = null WHERE ID = ? AND org_code = ?");
+                $stmt->bind_param("ss", $ID, $OrgCode);
+                $stmt->execute();
+                $stmt->close();
+            }
+
+            $storageDir = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'DocumentsStorage' . DIRECTORY_SEPARATOR .
+            (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']) . DIRECTORY_SEPARATOR .
+            'MinutesOfTheMeeting' . DIRECTORY_SEPARATOR . $FileNameEnd;
+            if (!is_dir($storageDir)) {
+                mkdir($storageDir, 0777, true);
+            }
+
             for ($i = 0; $i < count($MM_DOCS['name']); $i++) {
-                $file = $MM_DOCS;
-                $fileName = $file['name'][$i];
-                $fileTmpName = $file['tmp_name'][$i];
-                $fileSize = $file['size'][$i];
-                $fileError = $file['error'][$i];
-                $fileType = $file['type'][$i];
+                $fileName = $MM_DOCS['name'][$i];
+                $fileTmpName = $MM_DOCS['tmp_name'][$i];
+                $fileSize = $MM_DOCS['size'][$i];
+                $fileError = $MM_DOCS['error'][$i];
 
-                $fileExt = explode('.', $fileName);
-                $fileActualExt = strtolower(end($fileExt));
+                $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                $allowed = ['png', 'jpg', 'jpeg'];
 
-                $allowed = array('png', 'jpg', 'jpeg');
-
-                if (in_array($fileActualExt, $allowed)) {
+                if (in_array($fileExt, $allowed)) {
                     if ($fileError === 0) {
-                        if ($fileSize < 10000000) {
-                            $storageDir = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'DocumentsStorage' . DIRECTORY_SEPARATOR . (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']) . DIRECTORY_SEPARATOR . 'MinutesOfTheMeeting' . DIRECTORY_SEPARATOR . $FileNameEnd;
-                            if (!is_dir($storageDir)) {
-                                mkdir($storageDir, 0777, true);
-                            }
-                            if ($ID !== '' && $MM_DOCS !== '') {
-                                $stmt = $conn->prepare("SELECT filedEnd AS FileNameEnd, DocsPath FROM minutemeetingdocuments WHERE ID = ? AND org_code = ?");
-                                $stmt->bind_param("ss", $ID, $OrgCode);
-                                $stmt->execute();
-                                $result = $stmt->get_result()->fetch_assoc();
-                                $stmt->close();
-                                $FileNameEnd = $result['FileNameEnd'];
-                                $MM_DOCS_PATH = json_decode($result['DocsPath']);
-
-                                if (!empty($MM_DOCS_PATH)) {
-                                    foreach ($MM_DOCS_PATH as $key => $value) {
-                                        $filepaths = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'DocumentsStorage' . DIRECTORY_SEPARATOR . (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']) . DIRECTORY_SEPARATOR . 'MinutesOfTheMeeting' . DIRECTORY_SEPARATOR . $FileNameEnd . DIRECTORY_SEPARATOR . $value;
-                                        if (file_exists($filepaths)) {
-                                            if (!unlink($filepaths)) {
-                                                response(['status' => 'error', 'message' => 'File to be replaced is currently in use!']);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            $fileNameNew = $FileNameEnd . '_img_' . $i . '.' . $fileActualExt;
+                        if ($fileSize < 10000000) { // 10MB
+                            $fileNameNew = $FileNameEnd . '_img_' . $i . '.' . $fileExt;
                             $fileDestination = $storageDir . DIRECTORY_SEPARATOR . $fileNameNew;
                             move_uploaded_file($fileTmpName, $fileDestination);
                             $MM_DOCS_PATH[] = $fileNameNew;
@@ -348,11 +380,18 @@ try {
                         response(['status' => 'error', 'message' => 'There was an error uploading your file!']);
                     }
                 } else {
-                    response(['status' => 'error', 'message' => '.'. $fileActualExt . ' file type is not allowed!']);
+                    response(['status' => 'error', 'message' => '.' . $fileExt . ' file type is not allowed!']);
                 }
             }
+
+            $stmt = $conn->prepare("UPDATE minutemeetingdocuments SET DocsPath = ? WHERE ID = ? AND org_code = ?");
+            $jsonDocsPath = json_encode($MM_DOCS_PATH);
+            $stmt->bind_param("sss", $jsonDocsPath, $ID, $OrgCode);
+            $stmt->execute();
+            $stmt->close();
         }
     }
+
 
     $MM_DOCS_PATH = json_encode($MM_DOCS_PATH);
 
@@ -366,7 +405,7 @@ try {
     $pdf->AddPage();
     $pdf->CustomHeader($conn, $OrgCode);
     $pdf->Content($conn, $MM_DATE, $MM_TIMESTARTED, $MM_LOC, $MM_PRESIDER, $MM_ATTENDEES, $MM_ABSENTEES, $MM_AGENDA, $MM_COMMENCEMENT, $MM_TIMEADJOURNED, $MM_SIGNATURE);
-    
+
     if (!empty($MM_DOCS) || $ID !== '') {
         $pdf->addPage();
         $pdf->CustomHeader($conn, $OrgCode);
@@ -383,7 +422,21 @@ try {
 
     $OrgCode = (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']);
 
+
     if ($ID !== '') {
+
+        // delete old file
+        $stmt = $conn->prepare("SELECT file_path FROM minutemeetingdocuments WHERE ID = ? AND org_code = ?");
+        $stmt->bind_param("ss", $ID, $OrgCode);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        $oldFilePath = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . $result['file_path'];
+        if (file_exists($oldFilePath)) {
+            unlink($oldFilePath);
+        }
+
         if (!empty($MM_DOCS)) {
             $stmt = $conn->prepare("UPDATE minutemeetingdocuments SET file_Size = ?, filedEnd = ?, file_path = ?, MMdate = ?, MMTimeStart = ?, MMLocation = ?, MMPresider = ?, MMAttendees = ?, MMAbsentees = ?, MMAgenda = ?, MMCommencement = ?, MMTimeend = ?, DocsPath = ?, MMsignature = ?, DateCreated = ? WHERE ID = ? AND org_code = ?");
             $stmt->bind_param("issssssssssssssss", $fileSize, $FileNameEnd, $filepaths, $MM_DATE, $MM_TIMESTARTED, $MM_LOC, $MM_PRESIDER, $MM_ATTENDEES, $MM_ABSENTEES, $MM_AGENDA, $MM_COMMENCEMENT, $MM_TIMEADJOURNED, $MM_DOCS_PATH, $MM_SIGNATURE, $currentDateTime, $ID, $OrgCode);
@@ -402,15 +455,20 @@ try {
             $stmt->execute();
             $stmt->close();
         }
-    
+
         $UUID = $_SESSION['UUID'];
+        if ($isFromTask) {
+            $isFromTask = 1;
+        } else {
+            $isFromTask = 0;
+        }
         $stmt = $conn->prepare("INSERT INTO minutemeetingdocuments (UUID, org_code, filedEnd, file_Size, file_path, taskID, isFromTask, MMdate, MMTimeStart, MMLocation, MMPresider, MMAttendees, MMAbsentees, MMAgenda, MMCommencement, MMTimeend, DocsPath, MMsignature, DateCreated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("sisisssssssssssssss", $UUID, $OrgCode, $FileNameEnd, $fileSize, $filepaths, $taskID, 1, $MM_DATE, $MM_TIMESTARTED, $MM_LOC, $MM_PRESIDER, $MM_ATTENDEES, $MM_ABSENTEES, $MM_AGENDA, $MM_COMMENCEMENT, $MM_TIMEADJOURNED, $MM_DOCS_PATH, $MM_SIGNATURE, $currentDateTime);
+        $stmt->bind_param("sisisssssssssssssss", $UUID, $OrgCode, $FileNameEnd, $fileSize, $filepaths, $taskID, $isFromTask, $MM_DATE, $MM_TIMESTARTED, $MM_LOC, $MM_PRESIDER, $MM_ATTENDEES, $MM_ABSENTEES, $MM_AGENDA, $MM_COMMENCEMENT, $MM_TIMEADJOURNED, $MM_DOCS_PATH, $MM_SIGNATURE, $currentDateTime);
         $stmt->execute();
         $stmt->close();
 
         response(['status' => 'success', 'message' => 'Minutes of the Meeting successfully uploaded!', 'filepaths' => $filepaths]);
     }
 } catch (\Throwable $th) {
-    response(['status' => 'error', 'message' => $th->getMessage()]);
+    response(['status' => 'error', 'message' => $th->getMessage() . ' on line ' . $th->getLine()]);
 }

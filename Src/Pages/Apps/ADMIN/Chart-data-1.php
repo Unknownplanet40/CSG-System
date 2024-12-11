@@ -1,10 +1,10 @@
 <?php
 
 $stmt = $conn->prepare("
-                                    SELECT usercredentials.fullName, systemaudit.eventType, COUNT(*) as count 
-                                    FROM systemaudit 
-                                    JOIN usercredentials ON systemaudit.userID = usercredentials.UUID 
-                                    GROUP BY systemaudit.eventType");
+SELECT usercredentials.fullName, systemaudit.eventType, COUNT(*) as count
+FROM systemaudit 
+JOIN usercredentials ON systemaudit.userID = usercredentials.UUID 
+GROUP BY systemaudit.eventType");
 
 $stmt->execute();
 $result = $stmt->get_result();

@@ -34,13 +34,9 @@ $_SESSION['last_activity'] = time();
 
 if ($_SESSION['role'] == 1) {
     $stmt1 = $conn->prepare("SELECT SUM(file_Size), COUNT(*) FROM activityproposaldocuments");
-
     $stmt2 = $conn->prepare("SELECT SUM(file_Size), COUNT(*) FROM excuseletterdocuments");
-
     $stmt3 = $conn->prepare("SELECT SUM(file_Size), COUNT(*) FROM minutemeetingdocuments");
-
     $stmt4 = $conn->prepare("SELECT SUM(file_Size), COUNT(*) FROM officememorandomdocuments");
-
     $stmt5 = $conn->prepare("SELECT SUM(file_Size), COUNT(*) FROM projectproposaldocuments");
 
     $Latest = $conn->prepare("SELECT act_title, file_path, date_Created, file_Size, org_code FROM activityproposaldocuments ORDER BY date_Created LIMIT 1");
@@ -48,37 +44,50 @@ if ($_SESSION['role'] == 1) {
     $latestMeeting = $conn->prepare("SELECT file_path, DateCreated, file_Size, org_code FROM minutemeetingdocuments ORDER BY DateCreated LIMIT 1");
     $latestOffice = $conn->prepare("SELECT OM_Sub, file_path, DateCreated, file_Size, org_code FROM officememorandomdocuments ORDER BY DateCreated LIMIT 1");
     $latestProject = $conn->prepare("SELECT act_title, file_path, date_Created, file_Size, org_code FROM projectproposaldocuments ORDER BY date_Created LIMIT 1");
-} else {
+} else if ($_SESSION['role'] == 2 && $_SESSION['org_position'] != 4) {
     $stmt1 = $conn->prepare("SELECT SUM(file_Size), COUNT(*) FROM activityproposaldocuments WHERE org_code = ? GROUP BY org_code");
     $stmt1->bind_param("s", $_SESSION['org_Code']);
-
     $stmt2 = $conn->prepare("SELECT SUM(file_Size), COUNT(*) FROM excuseletterdocuments WHERE org_code = ? GROUP BY org_code");
     $stmt2->bind_param("s", $_SESSION['org_Code']);
-
     $stmt3 = $conn->prepare("SELECT SUM(file_Size), COUNT(*) FROM minutemeetingdocuments WHERE org_code = ? GROUP BY org_code");
     $stmt3->bind_param("s", $_SESSION['org_Code']);
-
     $stmt4 = $conn->prepare("SELECT SUM(file_Size), COUNT(*) FROM officememorandomdocuments WHERE org_code = ? GROUP BY org_code");
     $stmt4->bind_param("s", $_SESSION['org_Code']);
-
     $stmt5 = $conn->prepare("SELECT SUM(file_Size), COUNT(*) FROM projectproposaldocuments WHERE org_code = ? GROUP BY org_code");
     $stmt5->bind_param("s", $_SESSION['org_Code']);
-
     $Latest = $conn->prepare("SELECT act_title, file_path, date_Created, file_Size, org_code FROM activityproposaldocuments WHERE org_code = ? ORDER BY date_Created LIMIT 1");
     $Latest->bind_param("s", $_SESSION['org_Code']);
-
     $latestExcuse = $conn->prepare("SELECT Event, file_path, DateCreated, file_Size, org_code FROM excuseletterdocuments WHERE org_code = ? ORDER BY DateCreated LIMIT 1");
     $latestExcuse->bind_param("s", $_SESSION['org_Code']);
-
     $latestMeeting = $conn->prepare("SELECT file_path, DateCreated, file_Size, org_code FROM minutemeetingdocuments WHERE org_code = ? ORDER BY DateCreated LIMIT 1");
     $latestMeeting->bind_param("s", $_SESSION['org_Code']);
-
     $latestOffice = $conn->prepare("SELECT OM_Sub, file_path, DateCreated, file_Size, org_code FROM officememorandomdocuments WHERE org_code = ? ORDER BY DateCreated LIMIT 1");
     $latestOffice->bind_param("s", $_SESSION['org_Code']);
-
     $latestProject = $conn->prepare("SELECT act_title, file_path, date_Created, file_Size, org_code FROM projectproposaldocuments WHERE org_code = ? ORDER BY date_Created LIMIT 1");
     $latestProject->bind_param("s", $_SESSION['org_Code']);
+} else {
+    $stmt1 = $conn->prepare("SELECT SUM(file_Size), COUNT(*) FROM activityproposaldocuments WHERE UUID = ? GROUP BY UUID");
+    $stmt1->bind_param("s", $_SESSION['UUID']);
+    $stmt2 = $conn->prepare("SELECT SUM(file_Size), COUNT(*) FROM excuseletterdocuments WHERE UUID = ? GROUP BY UUID");
+    $stmt2->bind_param("s", $_SESSION['UUID']);
+    $stmt3 = $conn->prepare("SELECT SUM(file_Size), COUNT(*) FROM minutemeetingdocuments WHERE UUID = ? GROUP BY UUID");
+    $stmt3->bind_param("s", $_SESSION['UUID']);
+    $stmt4 = $conn->prepare("SELECT SUM(file_Size), COUNT(*) FROM officememorandomdocuments WHERE UUID = ? GROUP BY UUID");
+    $stmt4->bind_param("s", $_SESSION['UUID']);
+    $stmt5 = $conn->prepare("SELECT SUM(file_Size), COUNT(*) FROM projectproposaldocuments WHERE UUID = ? GROUP BY UUID");
+    $stmt5->bind_param("s", $_SESSION['UUID']);
+    $Latest = $conn->prepare("SELECT act_title, file_path, date_Created, file_Size, org_code FROM activityproposaldocuments WHERE UUID = ? ORDER BY date_Created LIMIT 1");
+    $Latest->bind_param("s", $_SESSION['UUID']);
+    $latestExcuse = $conn->prepare("SELECT Event, file_path, DateCreated, file_Size, org_code FROM excuseletterdocuments WHERE UUID = ? ORDER BY DateCreated LIMIT 1");
+    $latestExcuse->bind_param("s", $_SESSION['UUID']);
+    $latestMeeting = $conn->prepare("SELECT file_path, DateCreated, file_Size, org_code FROM minutemeetingdocuments WHERE UUID = ? ORDER BY DateCreated LIMIT 1");
+    $latestMeeting->bind_param("s", $_SESSION['UUID']);
+    $latestOffice = $conn->prepare("SELECT OM_Sub, file_path, DateCreated, file_Size, org_code FROM officememorandomdocuments WHERE UUID = ? ORDER BY DateCreated LIMIT 1");
+    $latestOffice->bind_param("s", $_SESSION['UUID']);
+    $latestProject = $conn->prepare("SELECT act_title, file_path, date_Created, file_Size, org_code FROM projectproposaldocuments WHERE UUID = ? ORDER BY date_Created LIMIT 1");
 }
+
+
 $stmt1->execute();
 $stmt1->bind_result($fileSize, $actFileCount);
 $stmt1->fetch();
@@ -233,12 +242,12 @@ $realDocPath = "../../../../" . $DocPath;
                                 <option value="" selected hidden>Select Organization</option>
                                 <?php
                                     $stmt = $conn->prepare("SELECT org_code, org_name, org_short_name FROM sysorganizations WHERE stat = 0");
-$stmt->execute();
-$stmt->bind_result($org_code, $org_name, $org_short_name);
-while ($stmt->fetch()) {
-    echo "<option value='$org_code'>$org_short_name - $org_name</option>";
-}
-$stmt->close();?>
+                                    $stmt->execute();
+                                    $stmt->bind_result($org_code, $org_name, $org_short_name);
+                                    while ($stmt->fetch()) {
+                                        echo "<option value='$org_code'>$org_short_name - $org_name</option>";
+                                    }
+                                    $stmt->close();?>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -342,78 +351,44 @@ $stmt->close();?>
             <div class="container mt-3">
                 <ul class="nav nav-tabs nav-fill " id="myTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button
-                            class="nav-link <?php echo ($_SESSION['role'] == 1 || ($_SESSION['role'] == 2 && $_SESSION['org_position'] != 4) ? "active" : ""); ?>
+                        <button class="nav-link <?php echo ($_SESSION['role'] == 1 || ($_SESSION['role'] == 2 && $_SESSION['org_position'] != 4) || ($_SESSION['role'] == 3 && $_SESSION['org_position'] != 4) ? "active" : ""); ?>
                             " id="submitted-tab" data-bs-toggle="tab" data-bs-target="#Submitted-tab-pane" type="button" role="tab"
                             aria-controls="Submitted-tab-pane" aria-selected="false">Submitted Documents</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button
-                            class="nav-link <?php echo ($_SESSION['role'] == 2 && $_SESSION['org_position'] == 4) || ($_SESSION['role'] == 3 && $_SESSION['org_position'] == 4) ? "active" : ""; ?>
-                            " id="Task-tab" data-bs-toggle="tab" data-bs-target="#Task-tab-pane" type="button" role="tab"
+                        <button class="nav-link <?php echo (isset($_SESSION['org_position']) && $_SESSION['org_position'] == 4 ? "active" : ""); ?>"
+                            id="Task-tab" data-bs-toggle="tab" data-bs-target="#Task-tab-pane" type="button" role="tab"
                             aria-controls="Task-tab-pane" aria-selected="false">Task</button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button
-                            class="nav-link position-relative <?php echo ($_SESSION['role'] == 3 ? "active" : ""); ?>"
+                            class="nav-link"
                             id="home-tab" data-bs-toggle="tab" data-bs-target="#APDoc-tab-pane" type="button" role="tab"
-                            aria-controls="APDoc-tab-pane" aria-selected="true">Activity Proposal
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success z-1 <?php echo $actFileCount == 0 ? "d-none" : ""; ?>">
-                                <?php echo $actFileCount; ?>
-                                <span class="visually-hidden">unread messages</span>
-                        </button>
+                            aria-controls="APDoc-tab-pane" aria-selected="true">Activity Proposal </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link position-relative" id="ELDoc-tab" data-bs-toggle="tab"
+                        <button class="nav-link" id="ELDoc-tab" data-bs-toggle="tab"
                             data-bs-target="#ELDoc-tab-pane" type="button" role="tab" aria-controls="ELDoc-tab-pane"
-                            aria-selected="false">Excuse
-                            Letter
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success z-1 <?php echo $excuseFileCount == 0 ? "d-none" : ""; ?>">
-                                <?php echo $excuseFileCount; ?>
-                                <span class="visually-hidden">unread messages</span>
-                            </span>
-                        </button>
+                            aria-selected="false">Excuse Letter</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link position-relative" id="MMDoc-tab" data-bs-toggle="tab"
+                        <button class="nav-link" id="MMDoc-tab" data-bs-toggle="tab"
                             data-bs-target="#MMDoc-tab-pane" type="button" role="tab" aria-controls="MMDoc-tab-pane"
-                            aria-selected="false">Meeting Minutes
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success z-1 <?php echo $meetingFileCount == 0 ? "d-none" : ""; ?>">
-                                <?php echo $meetingFileCount; ?>
-                                <span class="visually-hidden">unread messages</span>
-                            </span>
-                        </button>
+                            aria-selected="false">Meeting Minutes</button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link position-relative" id="OMDoc-tab" data-bs-toggle="tab"
                             data-bs-target="#OMDoc-tab-pane" type="button" role="tab" aria-controls="OMDoc-tab-pane"
-                            aria-selected="false">
-                            Office Memorandum
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success z-1 <?php echo $officeFileCount == 0 ? "d-none" : ""; ?>">
-                                <?php echo $officeFileCount; ?>
-                                <span class="visually-hidden">unread messages</span>
-                            </span>
-                        </button>
+                            aria-selected="false">Office Memorandum</button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link position-relative" id="PPDoc-tab" data-bs-toggle="tab"
                             data-bs-target="#PPDoc-tab-pane" type="button" role="tab" aria-controls="PPDoc-tab-pane"
-                            aria-selected="false">
-                            Project Proposal
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success z-1 <?php echo $projectFileCount == 0 ? "d-none" : ""; ?>">
-                                <?php echo $projectFileCount; ?>
-                                <span class="visually-hidden">unread messages</span>
-                            </span>
-                        </button>
+                            aria-selected="false">Project Proposal</button>
                     </li>
                 </ul>
                 <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade <?php echo ($_SESSION['role'] == 1 || ($_SESSION['role'] == 2 && $_SESSION['org_position'] != 4) ? "show active" : ""); ?>" id="Submitted-tab-pane" role="tabpanel" aria-labelledby="submitted-tab" tabindex="0">
+                    <div class="tab-pane fade <?php echo ($_SESSION['role'] == 1 || ($_SESSION['role'] == 2 && $_SESSION['org_position'] != 4) || ($_SESSION['role'] == 3 && $_SESSION['org_position'] != 4) ? "show active" : ""); ?>" id="Submitted-tab-pane" role="tabpanel" aria-labelledby="submitted-tab" tabindex="0">
                         <div class="card glass-default border-0">
                             <div class="card-body">
                                 <h5 class="card-title">Submitted Documents</h5>
@@ -435,13 +410,13 @@ $stmt->close();?>
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane fade <?php echo ($_SESSION['role'] == 2 && $_SESSION['org_position'] == 4) || ($_SESSION['role'] == 3 && $_SESSION['org_position'] == 4) ? "show active" : ""; ?>" id="Task-tab-pane" role="tabpanel" aria-labelledby="Task-tab" tabindex="0">
+                    <div class="tab-pane fade <?php echo (isset($_SESSION['org_position']) && $_SESSION['org_position'] == 4 ? "show active" : ""); ?>" id="Task-tab-pane" role="tabpanel" aria-labelledby="Task-tab" tabindex="0">
                         <div class="card glass-default border-0">
                             <div class="card-body">
                                 <div class="hstack gap-3">
                                     <h5 class="card-title">Task Documents</h5>
                                     <div
-                                        class="ms-auto <?php echo ($_SESSION['role'] == 1 || ($_SESSION['role'] == 2 && $_SESSION['org_position'] != 4)) || ($_SESSION['role'] == 3 && $_SESSION['org_position'] != 4) ? "" : "d-none"; ?>">
+                                        class="ms-auto <?php echo ($_SESSION['role'] == 3 ? "d-none" : ""); ?>">
                                         <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal"
                                             data-bs-target="#taskModal">Create Task</button>
                                     </div>
@@ -467,7 +442,7 @@ $stmt->close();?>
                             </table>
                         </div>
                     </div>
-                    <div class="tab-pane fade <?php echo ($_SESSION['role'] == 3 ? "show active" : ""); ?>" id="APDoc-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                    <div class="tab-pane fade" id="APDoc-tab-pane" role="tabpanel" aria-labelledby="APDoc-tab" tabindex="0">
                         <div class="card glass-default bg-opacity-10 border-0">
                             <div class="card-body">
                                 <h5 class="card-title">Activity Proposal Documents</h5>
@@ -678,12 +653,10 @@ $stmt->close();?>
                         }).fire({
                             title: 'Successfully Created Task',
                             icon: 'success'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                $('#TaskDocTable').DataTable().ajax.reload();
-                                $('#taskModal').modal('hide');
-                            }
                         });
+
+                        $("#taskModal").modal('hide');
+                        $("#TaskDocTable").DataTable().ajax.reload();
                     } else {
                         Swal.mixin({
                             toast: true,
