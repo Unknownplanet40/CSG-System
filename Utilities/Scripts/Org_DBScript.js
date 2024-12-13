@@ -8,6 +8,7 @@ $(document).ready(function () {
       topStart: {
         search: {
           placeholder: "Search...",
+          className: "form-control form-control-sm",
         },
       },
       topEnd: {
@@ -15,14 +16,30 @@ $(document).ready(function () {
       },
       bottomStart: function () {
         return $(
-          '<select id="utype" class="form-select"><option value="active">Active</option><option value="archived">Archived</option></select>'
+          '<select id="utype" class="form-select form-select-sm"><option value="active">Active</option><option value="archived">Archived</option></select>'
         );
       },
     },
     responsive: true,
     autoWidth: false,
     order: [[1, "desc"]],
-    ordering: false,
+    language: {
+      emptyTable: "No Organizations have been created.",
+      zeroRecords: "No matching Organizations found.",
+      info: "Showing _START_ to _END_ of _TOTAL_ Organizations",
+      infoEmpty: "Showing 0 to 0 of 0 Organizations",
+      infoFiltered: "(filtered from _MAX_ total Organizations)",
+      search: "_INPUT_",
+      searchPlaceholder: "Search Organizations",
+      lengthMenu: "Show _MENU_",
+      paginate: {
+        first: "First",
+        last: "Last",
+        next: "Next",
+        previous: "Previous",
+      },
+    },
+      
 
     ajax: {
       url: TableAPI,
@@ -40,15 +57,31 @@ $(document).ready(function () {
       { data: "org_code" },
       { data: "org_name" },
       { data: "org_short_name" },
-      { data: null, render: function (data) { return "<p style='cursor: pointer;' title='" + data.org_Desc + "'>" + (data.org_Desc ? data.org_Desc.substring(0, 35) + "..." : "") + "</p>"; } },
+      { data: "onlyForCourse" },
+      {
+        data: null,
+        render: function (data) {
+          return (
+            "<p style='cursor: pointer;' title='" +
+            data.org_Desc +
+            "'>" +
+            (data.org_Desc ? data.org_Desc.substring(0, 35) + "..." : "") +
+            "</p>"
+          );
+        },
+      },
       { data: "created_At" },
       {
         data: null,
         render: function (data, type, row) {
           if (data.stat === 1) {
-            return `<button id="Enable-Btn" class="btn btn-sm btn-success">Enable</button>`;
+            return `<button id="Enable-Btn" class="btn btn-sm btn-outline-success border-0 text-success bg-transparent" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-trigger="hover" title="Enable Organization"
+            ><i class="bi bi-toggle2-on fs-4"></i></button>`;
           } else if (data.stat === 0) {
-            return `<button id="Disable-Btn" class="btn btn-sm btn-danger">Disable</button>`;
+            return `<button id="Disable-Btn" class="btn btn-sm btn-outline-danger border-0 text-danger bg-transparent" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-trigger="hover" title="Disable Organization"
+            ><i class="bi bi-toggle2-off fs-4"></i></button>
+            <button id="Edit-Btn" class="btn btn-sm btn-outline-primary border-0 text-primary bg-transparent" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-trigger="hover" title="Edit Organization"
+            ><i class="bi bi-pen-fill"></i></button>`;
           } else {
             return `<p class="text-danger">Error</p>`;
           }
@@ -58,11 +91,11 @@ $(document).ready(function () {
 
     columnDefs: [
       {
-        targets: [0],
+        targets: [0, 1],
         visible: false,
       },
       {
-        targets: [6],
+        targets: [5, 6, -1],
         orderable: false,
       },
     ],
@@ -109,10 +142,38 @@ $(document).ready(function () {
               QueueNotification(["danger", "Error disabling organization."]);
             }
           },
-          error: function (xhr, error, code) {
+          error: function () {
             QueueNotification(["danger", "Server error. Please try again."]);
           },
         });
+      });
+
+      $("#OrgTable").on("click", "#Edit-Btn", function () {
+        var data = table.api().row($(this).parents("tr")).data();
+        $("#input_ID").val(data.ID);
+        $("#btn_editorg").removeClass("d-none");
+        $("#btn_addorg").addClass("d-none");
+
+        $("#input_orgname").val(data.org_name);
+        $("#input_orgshortname").val(data.org_short_name);
+        $("#input_orgdesc").val(data.org_Desc);
+        let courseDropdown = $("#input_Course");
+        if (data.onlyForCourse === "All Courses") {
+          courseDropdown.val("ALL");
+        } else {
+          let matchingOption = courseDropdown.find(
+            "option[data-shorthand='" + data.onlyForCourse + "']"
+          );
+
+          if (matchingOption.length > 0) {
+            courseDropdown.val(matchingOption.val());
+          } else {
+            courseDropdown.append(
+              new Option(data.onlyForCourse, data.onlyForCourse)
+            );
+            courseDropdown.val(data.onlyForCourse);
+          }
+        }
       });
 
       $("#utype").change(function () {
@@ -129,11 +190,15 @@ $(document).ready(function () {
         let code = Math.floor(Math.random() * 100000);
         let name = $("#input_orgname").val();
         let shortname = $("#input_orgshortname").val();
+        let forCourse = $("#input_Course").val();
         let desc = $("#input_orgdesc").val();
 
-
-
-        if (name === "" || shortname === "" || desc === "") {
+        if (
+          name === "" ||
+          shortname === "" ||
+          desc === "" ||
+          forCourse === ""
+        ) {
           QueueNotification(["danger", "Please fill out all fields."]);
           return;
         }
@@ -146,6 +211,7 @@ $(document).ready(function () {
             name: name,
             shortname: shortname,
             desc: desc,
+            forCourse: forCourse,
           },
           success: function (response) {
             if (response.status === "success") {
@@ -167,8 +233,68 @@ $(document).ready(function () {
       $("#btn_clear").click(function () {
         $("#input_orgname").val("");
         $("#input_orgshortname").val("");
+        $("#input_Course").val("");
         $("#input_orgdesc").val("");
       });
     },
+  });
+
+  $("#OrgTable").on("draw.dt", function () {
+    const tooltipTriggerList = document.querySelectorAll(
+      '[data-bs-toggle="tooltip"]'
+    );
+    const tooltipList = [...tooltipTriggerList].map(
+      (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl)
+    );
+    const popoverTriggerList = document.querySelectorAll(
+      '[data-bs-toggle="popover"]'
+    );
+    const popoverList = [...popoverTriggerList].map(
+      (popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl)
+    );
+  });
+  
+  $("#btn_editorg").click(function () {
+    var ID = $("#input_ID").val();
+    var name = $("#input_orgname").val();
+    var shortname = $("#input_orgshortname").val();
+    var forCourse = $("#input_Course").val();
+    var desc = $("#input_orgdesc").val();
+
+    if (name === "" || shortname === "" || desc === "" || forCourse === "") {
+      QueueNotification(["danger", "Please fill out all fields."]);
+      return;
+    }
+
+    $.ajax({
+      url: "../../../Functions/api/EditOrg.php",
+      type: "POST",
+      data: {
+        ID: ID,
+        name: name,
+        shortname: shortname,
+        desc: desc,
+        forCourse: forCourse,
+      },
+      success: function (response) {
+        if (response.status === "success") {
+          $("#btn_editorg").addClass("d-none");
+          $("#btn_addorg").removeClass("d-none");
+          $("#input_orgname").val("");
+          $("#input_orgshortname").val("");
+          $("#input_orgdesc").val("");
+          $("#input_Course").val("");
+          $("#input_ID").val("");
+          $("#OrgTable").DataTable().ajax.reload();
+          QueueNotification(["success", "Organization has been updated."]);
+        } else {
+          QueueNotification(["danger", "Error updating organization."]);
+        }
+      },
+      error: function (xhr, error, code) {
+        QueueNotification(["danger", "Server error. Please try again."]);
+      },
+    });
+
   });
 });

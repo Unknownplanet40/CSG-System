@@ -12,4 +12,5 @@ if ($_SERVER['HTTP_HOST'] != 'localhost' && $_SERVER['HTTP_HOST'] == 'dodgerblue
     $dbname = "csg_database";
 }
 
+
 $conn = mysqli_connect($servername, $username, $password, $dbname);

@@ -38,6 +38,7 @@ $_SESSION['last_activity'] = time();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../../../Utilities/Third-party/Bootstrap/css/bootstrap.css">
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.css'/>
     <link rel="stylesheet" href="../../../../Utilities/Third-party/Datatable/css/datatables.css">
     <link rel="stylesheet" href="../../../../Utilities/Stylesheets/BGaniStyle.css">
     <link rel="stylesheet" href="../../../../Utilities/Stylesheets/NavbarStyle.css">
@@ -126,7 +127,7 @@ $_SESSION['last_activity'] = time();
                     <div class="accordion accordion-flush" id="accordionFlushExample">
                         <div class="accordion-item bg-transparent">
                             <h2 class="accordion-header bg-transparent">
-                                <button class="accordion-button collapsed bg-transparent" type="button"
+                                <button class="accordion-button collapsed bg-transparent" type="button" id="flush-headingOne"
                                     data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false"
                                     aria-controls="flush-collapseOne">
                                     <svg class="me-2" width="24" height="24">
@@ -165,6 +166,8 @@ $_SESSION['last_activity'] = time();
                                             </div>
                                         </div>
                                         <div class="hstack gap-3">
+                                            <input type="hidden" id="CSID">
+                                            <button class="btn btn-sm rounded-0 btn-success w-25 ms-auto d-none" id="EditCS">Edit</button>
                                             <button class="btn btn-sm rounded-0 btn-success w-25 ms-auto" id="CreateCS">Create</button>
                                             <button class="btn btn-sm rounded-0 btn-secondary" id="ResetCS">Reset</button>
                                         </div>

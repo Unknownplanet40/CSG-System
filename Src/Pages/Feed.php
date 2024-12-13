@@ -233,27 +233,31 @@ echo '<script>var theme = "' . $_SESSION['theme'] . '";</script>';
                                     </div>
                                 </div>
                                 <div class="col-2 position-relative mb-3">
-                                    <span class="position-absolute top-50 start-50 translate-middle text-white rounded-1 p-3 shadow"
+                                    <span
+                                        class="position-absolute top-50 start-50 translate-middle text-white rounded-1 p-3 shadow"
                                         id="eventColorPreview"></span>
                                 </div>
                                 <div class="col-10">
                                     <div class="form-floating mb-3">
                                         <select class="form-select rounded-0" id="eventColor" required>
                                             <option value="" selected disabled>Select Event Color</option>
-                                            <option value="bs-primary">Blue</option>
-                                            <option value="bs-success">Green</option>
-                                            <option value="bs-danger">Red</option>
-                                            <option value="bs-warning">Yellow</option>
-                                            <option value="bs-info">Cyan</option>
-                                            <option value="bs-light">white</option>
-                                            <option value="bs-dark">Black</option>
+                                            <option value="bs-indigo">Indigo</option>
+                                            <option value="bs-purple">Purple</option>
+                                            <option value="bs-pink">Pink</option>
+                                            <option value="bs-red">Red</option>
+                                            <option value="bs-orange">Orange</option>
+                                            <option value="bs-yellow">Yellow</option>
+                                            <option value="bs-green">Green</option>
+                                            <option value="bs-teal">Teal</option>
                                         </select>
                                         <label for="eventColor">Event Color</label>
                                     </div>
                                     <script>
-                                        document.getElementById('eventColor').addEventListener('change', function () {
-                                            document.getElementById('eventColorPreview').removeAttribute('class');
-                                            document.getElementById('eventColorPreview').classList = "position-absolute top-50 start-50 translate-middle text-white rounded-1 p-3 shadow " + this.value;
+                                        document.getElementById('eventColor').addEventListener('change', function() {
+                                            document.getElementById('eventColorPreview').removeAttribute(
+                                                'style');
+                                            document.getElementById('eventColorPreview').addAttribute(
+                                                'style', 'background-color: var(--' + this.value + ')');
                                         });
                                     </script>
                                 </div>
@@ -275,7 +279,8 @@ echo '<script>var theme = "' . $_SESSION['theme'] . '";</script>';
                         </div>
                     </div>
                     <div class="modal-footer border-0 glass-default bg-opacity-25">
-                        <button type="button" class="btn btn-sm btn-outline-success rounded-0" id="addEvent">Add Event</button>
+                        <button type="button" class="btn btn-sm btn-outline-success rounded-0" id="addEvent">Add
+                            Event</button>
                     </div>
                 </div>
             </div>
@@ -285,19 +290,24 @@ echo '<script>var theme = "' . $_SESSION['theme'] . '";</script>';
             <div class="row row-cols-1 row-cols-xl-3 row-cols-lg-3 row-cols-md-2 g-0">
                 <div class="order-md-2 col-xl-7 col-lg-7 col-md-7">
                     <div class="accordion" id="accordionExample">
-                        <div class="accordion-item">
+                        <div class="accordion-item bg-transparent border-0">
                             <h2 class="accordion-header">
-                                <div class="hstack gap-3 accordion-button" type="button" data-bs-toggle="collapse" id="CalendarEvent"
-                                    data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                <div class="hstack gap-3 accordion-button" type="button" data-bs-toggle="collapse"
+                                    id="CalendarEvent" data-bs-target="#collapseOne" aria-expanded="true"
+                                    aria-controls="collapseOne">
                                     <span id="CurrentMonth"
                                         class="me-auto fs-3 fw-bold text-uppercase"><?php echo date('F Y'); ?></span>
-                                    <button class="btn btn-sm rounded-0 btn-outline-success <?= $_SESSION['role'] == 1 ? '' : ($_SESSION['role'] == 2 && $_SESSION['org_position'] == 1 ? '' : 'd-none'); ?>
-                                    " id="addEventBtn"
-                                        data-bs-toggle="modal" data-bs-target="#addEventModal">
+                                </div>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show bg-transparent border-0"
+                                data-bs-parent="#accordionExample">
+                                <div class="hstack gap-2 p-2 mx-3 bg-transparent">
+                                    <button class="btn btn-sm rounded-0 btn-outline-success d-none <?= $_SESSION['role'] == 1 ? '' : ($_SESSION['role'] == 2 && $_SESSION['org_position'] == 1 ? '' : 'd-none'); ?>
+                                    " id="addEventBtn" data-bs-toggle="modal" data-bs-target="#addEventModal">
                                         <i class="bi bi-plus"></i>
                                         <span class="d-none d-md-inline">Add Event</span>
                                     </button>
-                                    <button class="btn btn-sm rounded-0 btn-outline-success" id="todayBtn">
+                                    <button class="btn btn-sm rounded-0 btn-outline-success me-auto" id="todayBtn">
                                         <i class="bi bi-calendar2-check"></i>
                                         <span class="d-none d-md-inline">Today</span>
                                     </button>
@@ -310,10 +320,7 @@ echo '<script>var theme = "' . $_SESSION['theme'] . '";</script>';
                                         <i class="bi bi-arrow-right"></i>
                                     </button>
                                 </div>
-                            </h2>
-                            <div id="collapseOne" class="accordion-collapse collapse show"
-                                data-bs-parent="#accordionExample">
-                                <div class="accordion-body bg-transparent glass-default bg-opacity-25">
+                                <div class="accordion-body bg-transparent pt-0 border-0">
                                     <div id="calendar" style="height: 512px;" class="shadow"></div>
                                 </div>
                             </div>
@@ -415,6 +422,9 @@ if ($row['org_code'] != null) {
         <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
         <script>
             AOS.init();
+            setInterval(() => {
+                $(".no-ann-box").html($(".no-ann-box").html());
+            }, 10000);
         </script>
 </body>
 

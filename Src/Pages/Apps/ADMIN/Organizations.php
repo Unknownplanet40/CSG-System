@@ -28,6 +28,29 @@ if (isset($_SESSION['last_activity'])) {
 }
 
 $_SESSION['last_activity'] = time();
+
+function getCourses($conn)
+{
+    $stmt = $conn->prepare("SELECT * FROM sysacadtype");
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) { ?>
+<option value="ALL">All Courses</option>
+<?php
+        while ($row = $result->fetch_assoc()) {?>
+<option
+    value="<?php echo $row['course_code']; ?>" data-Shorthand="<?php echo $row['course_short_name']; ?>">
+    <?php echo $row['course_name']; ?>
+</option>
+<?php }
+        } else {?>
+<option value="ALL">All Courses</option>
+<option value="NULL" selected>No Courses Available</option>
+<?php }
+        $stmt->close();
+    $conn->close();
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -38,6 +61,7 @@ $_SESSION['last_activity'] = time();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../../../Utilities/Third-party/Bootstrap/css/bootstrap.css">
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.css'/>
     <link rel="stylesheet" href="../../../../Utilities/Third-party/Datatable/css/datatables.css">
     <link rel="stylesheet" href="../../../../Utilities/Stylesheets/BGaniStyle.css">
     <link rel="stylesheet" href="../../../../Utilities/Stylesheets/NavbarStyle.css">
@@ -130,20 +154,34 @@ $_SESSION['last_activity'] = time();
                                     placeholder="Organization Name" required>
                                 <label for="input_orgname">Organization Name</label>
                             </div>
-                            <div class="form-floating">
-                                <input type="text" class="form-control" id="input_orgshortname" placeholder="Short Name"
-                                    required>
-                                <label for="input_orgshortname">Short Name</label>
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="input_orgshortname"
+                                            placeholder="Short Name" required>
+                                        <label for="input_orgshortname">Short Name</label>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="input_Course" required>
+                                            <?php getCourses($conn); ?>
+                                        </select>
+                                        <label for="input_Course">Course</label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="form-floating">
-                                <textarea class="form-control" id="input_orgdesc" placeholder="Description" style="height: 132px;"
-                                    required></textarea>
+                                <textarea class="form-control" id="input_orgdesc" placeholder="Description"
+                                    style="height: 132px;" required></textarea>
                                 <label for="input_orgdesc">Description</label>
                             </div>
                         </div>
                         <div class="col-12 d-flex justify-content-end gap-3">
+                            <input type="hidden" id="input_ID" value="">
+                            <button class="btn btn-sm btn-success rounded-1 d-none" id="btn_editorg">Edit Organization</button>
                             <button class="btn btn-sm btn-success rounded-1" id="btn_addorg">Add Organization</button>
                             <button class="btn btn-sm btn-secondary rounded-1" id="btn_clear">Clear</button>
                         </div>
@@ -156,6 +194,7 @@ $_SESSION['last_activity'] = time();
                             <th scope="col" class="text-nowrap">Code</th>
                             <th scope="col" class="text-nowrap">Name</th>
                             <th scope="col" class="text-nowrap">Short Name</th>
+                            <th scope="col" class="text-nowrap">Course</th>
                             <th scope="col" class="text-nowrap">Description</th>
                             <th scope="col" class="text-nowrap">Created At</th>
                             <th scope="col" class="text-nowrap">Actions</th>

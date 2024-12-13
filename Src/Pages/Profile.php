@@ -83,8 +83,9 @@ $_SESSION['last_activity'] = time();
                                                                 width="42" height="42" class="rounded-circle">
                                                             <?php
                                                                 } else {?>
-                                                            <img src="../../Assets/Images/UserProfiles/<?php echo $_SESSION['ProfileImage']?>" id="change-profile"
-                                                                alt="" width="42" height="42" class="rounded-circle">
+                                                            <img src="../../Assets/Images/UserProfiles/<?php echo $_SESSION['ProfileImage']?>"
+                                                                id="change-profile" alt="" width="42" height="42"
+                                                                class="rounded-circle">
                                                             <?php }?>
                                                         </div>
                                                         <div class="p-2">
@@ -231,7 +232,7 @@ $_SESSION['last_activity'] = time();
                                     alt="<?php echo $_SESSION['FirstName'] . ' ' . $_SESSION['LastName']; ?> Profile Image">
                                 <?php } else { ?>
                                 <img src="../../Assets/Images/UserProfiles/<?php echo $_SESSION['ProfileImage']; ?>"
-                                    class="img-fluid border rounded-circle" width="192" height="192" 
+                                    class="img-fluid border rounded-circle" width="192" height="192"
                                     alt="<?php echo $_SESSION['FirstName'] . ' ' . $_SESSION['LastName']; ?> Profile Image">
                                 <?php } ?>
                             </div>
@@ -788,9 +789,10 @@ if ($row['org_code'] != null) {
                                 $('#profileImage').attr('src',
                                     '../../Assets/Images/UserProfiles/' + response
                                     .profileImage);
-                                $('#change-profile').val('').attr('src', '../../Assets/Images/UserProfiles/' +
-                                    response.profileImage); 
-                                    
+                                $('#change-profile').val('').attr('src',
+                                    '../../Assets/Images/UserProfiles/' +
+                                    response.profileImage);
+
                             }
                         });
                     } else {
@@ -901,6 +903,10 @@ if ($row['org_code'] != null) {
             quill.root.innerHTML = '';
             $('#post-details').val('');
         });
+
+        setInterval(() => {
+            $(".no-ann-box").html($(".no-ann-box").html());
+        }, 10000);
     </script>
 </body>
 

@@ -325,5 +325,8 @@ div:where(.alert-container) button:where(.swal2-styled).alert-button-confirm{
   padding: 17px 17px 0;
   width: 301px;
   backdrop-filter: blur(10px);
-  z-index: 9999;
+}
+
+.toastui-calendar-popup-container {
+  z-index: 1000;
 }

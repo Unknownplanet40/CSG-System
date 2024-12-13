@@ -29,7 +29,18 @@ try {
 
     $data = [];
     while ($row = $result->fetch_assoc()) {
-        $row['created_At'] = date('F d, Y h:i A', strtotime($row['created_At']));
+        if ($row['onlyForCourse'] === 'ALL') {
+            $row['onlyForCourse'] = 'All Courses';
+        } else {
+            $stmt = $conn->prepare("SELECT course_short_name FROM sysacadtype WHERE course_code = ?");
+            $stmt->bind_param('s', $row['onlyForCourse']);
+            $stmt->execute();
+            $result2 = $stmt->get_result();
+            $stmt->close();
+            $row['onlyForCourse'] = $result2->fetch_assoc()['course_short_name'];
+        }
+
+        $row['created_At'] = date('F d, Y', strtotime($row['created_At']));
         $data[] = $row;
     }
 

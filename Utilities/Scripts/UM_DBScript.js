@@ -513,9 +513,24 @@ $(document).ready(function () {
       type: "POST",
       url: "../../../Functions/api/postTempAccount.php",
       data: data,
+      beforeSend: function () {
+        $("#CreateAccount_Btn").prop("disabled", true);
+        Swal.mixin({
+          toast: true,
+          position: "top",
+          showConfirmButton: false,
+          didOpen: (toast) => {
+            Swal.showLoading();
+          },
+        }).fire({
+          title: "Creating Account...",
+        });
+      },
+
       success: function (response) {
+        Swal.close();
         if (response.stat === "success") {
-          QueueNotification(["info", "Account has been created.", 3000]);
+          QueueNotification(["info", "Account has been created.", 2000]);
 
           userTempMail = TempMail;
           userTempPass = TempPass;
@@ -542,9 +557,8 @@ $(document).ready(function () {
               });
             },
             success: function (response) {
+              Swal.close();
               if (response.stat === "success") {
-                QueueNotification(["success", response.message, 3000]);
-
                 $("#UUID_Input").val("");
                 $("#UUID_CvSU_Mail").val("");
                 $("#Role_Select").val("null");
@@ -552,8 +566,9 @@ $(document).ready(function () {
                 $("#TempMail_Input").val("");
                 $("#TempPass_Input").val("");
                 $("#print_Btn").removeClass("d-none");
+                $("#CreateAccount_Btn").prop("disabled", false);
+                QueueNotification(["success", response.message, 3000]);
               } else {
-                Swal.close();
                 QueueNotification(["error", response.message, 3000]);
               }
             },
@@ -570,7 +585,7 @@ $(document).ready(function () {
               "Temporary account has been expired.",
               3000,
             ]);
-          }, 300000);
+          }, 300000); // 5 minutes
         } else {
           QueueNotification(["error", response.message, 3000]);
         }

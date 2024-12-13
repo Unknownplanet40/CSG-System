@@ -29,7 +29,7 @@ try {
 
     $data = [];
     while ($row = $result->fetch_assoc()) {
-        $row['created_at'] = $row['created_at'] ? date('M d, Y h:i A', strtotime($row['created_at'])) : null;
+        $row['created_at'] = $row['created_at'] ? date('M d, Y', strtotime($row['created_at'])) : null;
         $row['year'] = $row['year'] == 1 ? '1st Year' : ($row['year'] == 2 ? '2nd Year' : ($row['year'] == 3 ? '3rd Year' : '4th Year'));
         $row['course_name'] = ucwords($row['course_name']);
         $data[] = $row;

@@ -31,12 +31,17 @@ $(document).ready(function () {
       time: function (schedule) {
         return `<span class="fw-bold text-capitalize text-body">${schedule.title}</span>`;
       },
-      popupDetailTitle: function () {
-        return "<span class='text-body fw-bold text-uppercase'>Event Details</span>";
+      allday: function (schedule) {
+        return `<span class="fw-bold text-capitalize text-dark">${schedule.raw && schedule.raw.eventType && schedule.raw.eventType.toLowerCase() === "birthday" ? "🎉 " : ""}${schedule.title}</span>`;
+      },
+
+      popupDetailTitle: function (schedule) {
+        return `<span class='text-body fw-bold text-uppercase'>${schedule.title}</span>`;
       },
 
       popupDetailDate: function (Schedule) {
-        return `<span class="fw-bold">Date: </span> <span>${
+        return `<span class="fw-bold"><i class="bi bi-calendar-event-fill"></i>&nbsp;&nbsp;</span>
+        <span>${
           Schedule.start
             ? new Date(Schedule.start).toLocaleString("en-US", {
                 month: "long",
@@ -48,10 +53,15 @@ $(document).ready(function () {
       },
 
       popupDetailBody: function (schedule) {
-        return `<div class="d-flex flex-column gap-2">
+        console.log(schedule);
+        return `<div class="d-flex flex-column">
+        <div class="d-flex gap-2 ${schedule.raw.eventType === "Birthday" ? "d-none" : ""}">
+          <div class="fw-bold">Event Ended:</div>
+          <div class="text-capitalize fw-bold">${schedule.raw.isEnded ? "<span class='text-danger'>Yes</span>" : "<span class='text-success'>No</span>"}</div>
+        </div>
         <div class="d-flex gap-2">
-          <div class="fw-bold">Title:</div>
-          <div>${schedule.title || ""}</div>
+          <div class="fw-bold">Type:</div>
+          <div class="text-capitalize">${schedule.raw.eventType}</div>
         </div>
       <div class="d-flex gap-2">
         <div class="fw-bold">Start:</div>
@@ -84,7 +94,7 @@ $(document).ready(function () {
         }</div>
       </div>
       <div class="d-flex gap-2">
-        <div class="fw-bold">Body:</div>
+        <div class="fw-bold">Desc:</div>
         <div>${schedule.body || ""}</div>
       </div>
       `;
@@ -97,13 +107,13 @@ $(document).ready(function () {
       isAlways6Weeks: false,
       startDayOfWeek: 0,
       dayNames: [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
+        "SUN",
+        "MON",
+        "TUE",
+        "WED",
+        'THU',
+        "FRI",
+        "SAT",
       ],
       narrowWeekend: true,
     },
@@ -180,9 +190,11 @@ $(document).ready(function () {
                 state: event.state,
                 attendees: [event.attendees[0]],
                 isReadOnly: event.isReadOnly,
+                isAllDay: event.isAllDay,
                 start: start,
                 end: end,
                 backgroundColor: `var(--${event.backgroundColor})`,
+                raw: event.raw,
               },
             ]);
           });
@@ -217,6 +229,11 @@ $(document).ready(function () {
   observer.observe(document.body, {
     childList: true,
     subtree: true,
+  });
+
+  // remove toastui-calendar-popup-container when window is resized
+  $(window).resize(function () {
+    $(".toastui-calendar-popup-container").remove();
   });
 
   $("#nextBtn").on("click", function () {

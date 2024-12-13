@@ -19,9 +19,25 @@ try {
     $name = $_POST['name'];
     $shortname = $_POST['shortname'];
     $desc = $_POST['desc'];
+    $forCourse = $_POST['forCourse'];
 
-    $stmt = $conn->prepare("INSERT INTO sysorganizations (org_code, org_name, org_short_name, org_Desc, stat) VALUES (?, ?, ?, ?, 0)");
-    $stmt->bind_param('isss', $code, $name, $shortname, $desc);
+    // check if org code already exists
+    $stmt = $conn->prepare("SELECT * FROM sysorganizations WHERE org_name LIKE ? OR org_short_name LIKE ?");
+    $name = "%$name%";
+    $shortname = "%$shortname%";
+    $stmt->bind_param('ss', $name, $shortname);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $stmt->close();
+
+    if ($result->num_rows > 0) {
+        response(['status' => 'error', 'message' => 'Organization already exists']);
+    }
+
+
+
+    $stmt = $conn->prepare("INSERT INTO sysorganizations (org_code, org_name, org_short_name, onlyForCourse, org_Desc, stat) VALUES (?, ?, ?, ?, ?, 0)");
+    $stmt->bind_param('issss', $code, $name, $shortname, $forCourse, $desc);
     $stmt->execute();
     $stmt->close();
 
