@@ -13,7 +13,6 @@ function response($data)
 }
 
 try {
-
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         response(['status' => 'error', 'message' => 'Invalid request method']);
     }

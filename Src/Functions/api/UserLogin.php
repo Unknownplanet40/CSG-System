@@ -31,9 +31,10 @@ if (!file_exists('../env/HiddenKeys.php')) {
 } else {
     require_once '../env/HiddenKeys.php';
 }
-
+date_default_timezone_set('Asia/Manila');
 require_once '../../Debug/GenLog.php';
-$logPath = "../../Debug/Users/UUID.log";
+$logname = date('Y-m');
+$logPath = "../../Debug/Users/" . $logname . ".log";
 
 require '../../../vendor/autoload.php';
 
@@ -41,7 +42,6 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 header('Content-Type: application/json');
-date_default_timezone_set('Asia/Manila');
 
 
 $temp_UUID = "";
@@ -53,11 +53,12 @@ try {
 
     $data = json_decode(file_get_contents('php://input'), true);
 
-    if (empty($data) || !isset($data['studentnum']) || !isset($data['password'])) {
-        response(['error' => 'Invalid request data']);
+    if (empty($data) || !isset($data['password'])) {
+        response(['status' => 'error', 'message' => 'Invalid request data']);
     }
 
-    $studentNumber = $data['studentnum'];
+    $studentNumber = $data['studentnum'] ?? '';
+    $email = $data['email'] ?? '';
     $password = $data['password'];
     $device = $data['Device'];
     $ipAddress = $data['ipAddress'];
@@ -65,6 +66,21 @@ try {
         $autoLogin = true;
     } else {
         $autoLogin = false;
+    }
+
+    if ($studentNumber === '' AND !empty($email)) {
+        $stmt = $conn->prepare("SELECT student_Number FROM usercredentials WHERE primary_email = ? ");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $stmt->close();
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $studentNumber = $row['student_Number'];
+        } else {
+            response(['status' => 'error', 'message' => 'No account found with the email']);
+        }
     }
 
     $stmt = $conn->prepare("SELECT student_Number, password, LoginStat, BanExpired, UUID FROM accounts WHERE student_Number = ?");
@@ -177,10 +193,23 @@ try {
                         break;
                 }
 
+                // get current decvice user is using
+                $device = $_SERVER['HTTP_USER_AGENT'];
+                $mobile = ['Android', 'iPhone', 'iPad', 'Mobile', 'Opera Mini', 'Windows Phone', 'BlackBerry', 'webOS', 'iPod'];
+                $isMobile = false;
+
+                foreach ($mobile as $m) {
+                    if (strpos($device, $m) !== false) {
+                        $isMobile = true;
+                        break;
+                    }
+                }
+
                 response([
                     'status' => 'success',
                     'message' => $loginmessage,
-                    'data' => $account
+                    'data' => $account,
+                    'isMobile' => $isMobile
                 ]);
             }
         } else {

@@ -173,132 +173,140 @@ $(document).ready(function () {
   });
 
   $("#Login-btn").click(function () {
-    //added this to prevent the form from submitting when requirements are not met
-
-    //before Secondary Validation
-    if ($("#Login-stdnum").val() == "" || $("#Login-password").val() == "") {
-      if ($("#Login-stdnum").val() == "") {
-        $("#Login-stdnum").focus();
-        $("#Login-stdnum").addClass("is-invalid");
-        $("#stdnumHelp").text("Please enter your student number.");
-
-        $("#Login-stdnum").addClass("shake");
-        setTimeout(function () {
-          $("#Login-stdnum").removeClass("shake");
-        }, 500);
-      } else {
-        $("#Login-stdnum").removeClass("is-invalid");
-        $("#stdnumHelp").text("");
-
+    if ($("#useStdnum").hasClass("d-none")) {
+      if ($("#Login-email").val() == "" || $("#Login-password").val() == "") {
+        if ($("#Login-email").val() == "") {
+          $("#Login-email").focus();
+          $("#Login-email").addClass("is-invalid");
+          $("#emailHelp").text("Please enter your email address.");
+          $("#Login-email").addClass("shake");
+          setTimeout(function () {
+            $("#Login-email").removeClass("shake");
+          }, 500);
+        } else {
+          $("#Login-email").removeClass("is-invalid");
+          $("#emailHelp").text("");
+          $("#Login-password").focus();
+          $("#Login-password").addClass("is-invalid");
+          $("#passwordHelp").text("Please enter your password.");
+          $("#Login-password").addClass("shake");
+          setTimeout(function () {
+            $("#Login-password").removeClass("shake");
+          }, 500);
+        }
+        return;
+      }
+      
+      if (!PasswordRegex.test($("#Login-password").val())) {
         $("#Login-password").focus();
         $("#Login-password").addClass("is-invalid");
-        $("#passwordHelp").text("Please enter your password.");
-
-        $("#Login-password").addClass("shake");
+        $("#passwordHelp").text("Your password format is not valid.");
         setTimeout(function () {
-          $("#Login-password").removeClass("shake");
-        }, 500);
+          $("#Login-password").removeClass("is-invalid");
+          $("#passwordHelp").text("");
+        }, 3000);
+        return;
       }
+
+      $("#Login-email").removeClass("is-invalid");
+      $("#emailHelp").text("");
+      $("#Login-password").removeClass("is-invalid");
+      $("#passwordHelp").text("");
 
       $("#Login-btn").attr("disabled", "disabled");
-
-      setTimeout(function () {
-        $("#Login-btn").removeAttr("disabled");
-      }, 1500);
-      return;
-    }
-
-    // for Student Number
-    if (!StudentNumRegex.test($("#Login-stdnum").val())) {
-      $("#Login-stdnum").focus();
-      $("#Login-stdnum").addClass("is-invalid");
-      $("#stdnumHelp").text("Your student number is not valid.");
-      // QueueNotification([icon, title, message, duration])
-      QueueNotification([
-        "info",
-        '"' + $("#Login-stdnum").val() + " is not a valid student number.",
-        3000,
-      ]);
-      return;
-    }
-
-    // for Password
-    if (!PasswordRegex.test($("#Login-password").val())) {
-      $("#Login-password").focus();
-      $("#Login-password").addClass("is-invalid");
-      $("#passwordHelp").text("Your password format is not valid.");
-
-      setTimeout(function () {
-        $("#Login-password").removeClass("is-invalid");
-        $("#passwordHelp").text("");
-      }, 3000);
-
-      QueueNotification([
-        "info",
-        '"' + $("#Login-password").val() + " is not a valid password.",
-        3000,
-      ]);
-      return;
-    }
-
-    // after validation
-    $("#Login-stdnum").removeClass("is-invalid");
-    $("#Login-password").removeClass("is-invalid");
-
-    $("#stdnumHelp").text("");
-    $("#passwordHelp").text("");
-
-    $("#Login-btn").attr("disabled", "disabled");
-    $("#Login-btn-label").addClass("d-none");
-    $("#Login-btn-loader").removeClass("d-none");
-
-    if (localStorage.getItem("activesession") != null) {
-      if (
-        sha256($("#Login-stdnum").val()) !== localStorage.getItem("currentUser")
-      ) {
-        Swal.fire({
-          title: "Session Already Active",
-          text: localStorage.getItem("activesession"),
-          icon: "info",
-          confirmButtonText: "Understood",
-          allowOutsideClick: false,
-          customClass: {
-            popup: "alert-popup-inform",
-            confirmButton: "alert-button-confirm",
-            container: "alert-container",
-            htmlContainer: "alert-html-container",
-            title: "alert-title",
-          },
-        });
-        setTimeout(function () {
-          $("#Login-btn").removeAttr("disabled");
-          $("#Login-btn-label").removeClass("d-none");
-          $("#Login-btn-loader").addClass("d-none");
-        }, 1000);
-      } else {
-        QueueNotification(["info", "Confirming your session...", 1200]);
-        setTimeout(function () {
-          window.location.href =
-            "../../Src/Functions/api/UserLogout.php?studentnum=" +
-            $("#Login-stdnum").val() +
-            "&password=" +
-            $("#Login-password").val();
-        }, 1500);
-      }
-    } else {
-      localStorage.removeItem("activesession");
-      localStorage.removeItem("currentUser");
-
+      $("#Login-btn-label").addClass("d-none");
+      $("#Login-btn-loader").removeClass("d-none");
+      
       var data = {
-        studentnum: $("#Login-stdnum").val(),
+        studentnum: null,
+        email: $("#Login-email").val(),
         password: $("#Login-password").val(),
         ipAddress: $ipAddress,
         Device: getDeviceName(),
       };
-
-      LoginProcess(data);
+  
+      LoginProcess(data); // Proceed with email login
+      return;
     }
+  
+    // Check if student number login is active
+    if ($("#useEmail").hasClass("d-none")) {
+      if ($("#Login-stdnum").val() == "" || $("#Login-password").val() == "") {
+        // Handle empty student number or password field
+        if ($("#Login-stdnum").val() == "") {
+          $("#Login-stdnum").focus();
+          $("#Login-stdnum").addClass("is-invalid");
+          $("#stdnumHelp").text("Please enter your student number.");
+          $("#Login-stdnum").addClass("shake");
+          setTimeout(function () {
+            $("#Login-stdnum").removeClass("shake");
+          }, 500);
+        } else {
+          $("#Login-stdnum").removeClass("is-invalid");
+          $("#stdnumHelp").text("");
+          $("#Login-password").focus();
+          $("#Login-password").addClass("is-invalid");
+          $("#passwordHelp").text("Please enter your password.");
+          $("#Login-password").addClass("shake");
+          setTimeout(function () {
+            $("#Login-password").removeClass("shake");
+          }, 500);
+        }
+        return;
+      }
+  
+      if (!StudentNumRegex.test($("#Login-stdnum").val())) {
+        $("#Login-stdnum").focus();
+        $("#Login-stdnum").addClass("is-invalid");
+        $("#stdnumHelp").text("Your student number is not valid.");
+        QueueNotification([
+          "info",
+          '"' + $("#Login-stdnum").val() + " is not a valid student number.",
+          3000,
+        ]);
+        return;
+      }
+  
+      if (!PasswordRegex.test($("#Login-password").val())) {
+        $("#Login-password").focus();
+        $("#Login-password").addClass("is-invalid");
+        $("#passwordHelp").text("Your password format is not valid.");
+        setTimeout(function () {
+          $("#Login-password").removeClass("is-invalid");
+          $("#passwordHelp").text("");
+        }, 3000);
+        return;
+      }
+
+      $("#Login-stdnum").removeClass("is-invalid");
+      $("#stdnumHelp").text("");
+      $("#Login-password").removeClass("is-invalid");
+      $("#passwordHelp").text("");
+
+      $("#Login-btn").attr("disabled", "disabled");
+      $("#Login-btn-label").addClass("d-none");
+      $("#Login-btn-loader").removeClass("d-none");
+
+      var data = {
+        studentnum: $("#Login-stdnum").val(),
+        email: null,
+        password: $("#Login-password").val(),
+        ipAddress: $ipAddress,
+        Device: getDeviceName(),
+      };
+  
+      LoginProcess(data);
+      return;
+    }
+  
+    QueueNotification([
+      "error",
+      "Both student number and email fields are hidden.",
+      3000,
+    ]);
+    console.error("Both student number and email fields are hidden.");
   });
+  
 
   // Register Form Validation
   $("#eyecon-input2").click(function () {

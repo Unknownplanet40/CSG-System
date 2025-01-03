@@ -18,7 +18,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 try {
-    $stmt = $conn->prepare("SELECT * FROM sysevents WHERE isDeleted = 0");
+
+    if (isset($_GET['archived'])) {
+        $stmt = $conn->prepare("SELECT * FROM sysevents WHERE isDeleted = 1");
+    }  else {
+        $stmt = $conn->prepare("SELECT * FROM sysevents WHERE isDeleted = 0");
+    }
+
     $stmt->execute();
     $result = $stmt->get_result();
     $BGColor = [
@@ -36,6 +42,7 @@ try {
     ];
 
     $events = [];
+    
     while ($row = $result->fetch_assoc()) {
         $Name = $conn->query("SELECT fullName FROM usercredentials WHERE UUID = '{$row['UUID']}'")->fetch_assoc()['fullName'];
         $row['Name'] = $Name;
@@ -82,11 +89,11 @@ try {
                 $row['isAllDay'] = false;
             }
         }
-
         $row['start'] = date('Y-m-d\TH:i:s', strtotime($row['start']));
         $row['end'] = date('Y-m-d\TH:i:s', strtotime($row['end']));
 
         if ($row['type'] == 'BDay') {
+
             $isActive = $conn->prepare("SELECT accountStat FROM usercredentials WHERE UUID = ?");
             $isActive->bind_param('s', $USERUUID);
             $isActive->execute();
@@ -96,35 +103,33 @@ try {
             $isActive->close();
 
             if ($accountStat == 'active') {
-                for ($i = date('Y', strtotime($row['start'])); $i <= 2030; $i++) {
-                    $events[] = [
-                        'id' => uniqid($row['ID'] . $i),
-                        'calendarId' => 'None',
-                        'title' => $row['title'],
-                        'category' => 'allday',
-                        'body' => $row['eventdesc'],
-                        'location' => false,
-                        'state' => false,
-                        'raw' => ['isEnded' => $row['isEnded'], 'eventType' => $row['EventType']],
-                        'attendees' => [$row['Name']],
-                        'isAllDay' => true,
-                        'isReadOnly' => true,
-                        'start' => date('Y-m-d\TH:i:s', strtotime($i . date('-m-d', strtotime($row['start'])))),
-                        'end' => date('Y-m-d\TH:i:s', strtotime($i . date('-m-d', strtotime($row['end'])))),
-                        'backgroundColor' => $row['BGColor'],
-                    ];
-                }
+                $events[] = [
+                    'id' => uniqid($row['ID']),
+                    'calendarId' => 'None',
+                    'title' => $row['title'],
+                    'category' => 'allday',
+                    'body' => $row['eventdesc'],
+                    'location' => false,
+                    'state' => false,
+                    'raw' => ['isEnded' => $row['isEnded'], 'eventType' => $row['EventType'], 'isDeleted' => $row['isDeleted']],
+                    'attendees' => [$row['Name']],
+                    'isAllDay' => true,
+                    'isReadOnly' => true,
+                    'start' => $row['start'],
+                    'end' => $row['end'],
+                    'backgroundColor' => $row['BGColor'],
+                ];
             }
         } else {
             $events[] = [
                 'id' => $row['ID'],
                 'calendarId' => 'None',
                 'title' => $row['title'],
-                'category' => $row['isAllDay'] ?? false ? 'allday' : 'time',
+                'category' => $row['isAllDay'] ? 'allday' : 'time',
                 'body' => $row['eventdesc'],
                 'location' => $row['location'],
                 'state' => false,
-                'raw' => ['isEnded' => $row['isEnded'], 'eventType' => $row['EventType']],
+                'raw' => ['isEnded' => $row['isEnded'], 'eventType' => $row['EventType'], 'isDeleted' => $row['isDeleted']],
                 'attendees' => [$row['Name']],
                 'isAllDay' => $row['isAllDay'] ?? false,
                 'isReadOnly' => true,
@@ -133,23 +138,6 @@ try {
                 'backgroundColor' => $row['BGColor'],
             ];
         }
-
-        /*         $events[] = [
-                    'id' => $row['ID'],
-                    'calendarId' => 'None',
-                    'title' => $row['title'],
-                    'category' => $row['isAllDay'] ? 'allday' : 'time',
-                    'body' => $row['eventdesc'],
-                    'location' => $row['location'],
-                    'state' => false,
-                    'raw' => ['isEnded' => $row['isEnded'], 'eventType' => $row['EventType']],
-                    'attendees' => [$row['Name']],
-                    'isAllDay' => $row['isAllDay'] ?? false,
-                    'isReadOnly' => true,
-                    'start' => $row['start'],
-                    'end' => $row['end'],
-                    'backgroundColor' => $row['BGColor'],
-                ]; */
     }
     $stmt->close();
 

@@ -12,6 +12,7 @@ let currentTheme = theme === "dark" ? "dark" : "light";
 
 $(document).ready(function () {
   const calendar = new tui.Calendar("#calendar", {
+    usageStatistics: false,
     defaultView: "month",
     isReadOnly: true,
     useDetailPopup: true,
@@ -32,7 +33,13 @@ $(document).ready(function () {
         return `<span class="fw-bold text-capitalize text-body">${schedule.title}</span>`;
       },
       allday: function (schedule) {
-        return `<span class="fw-bold text-capitalize text-dark">${schedule.raw && schedule.raw.eventType && schedule.raw.eventType.toLowerCase() === "birthday" ? "🎉 " : ""}${schedule.title}</span>`;
+        return `<span class="fw-bold text-capitalize text-dark">${
+          schedule.raw &&
+          schedule.raw.eventType &&
+          schedule.raw.eventType.toLowerCase() === "birthday"
+            ? "🎉 "
+            : ""
+        }${schedule.title}</span>`;
       },
 
       popupDetailTitle: function (schedule) {
@@ -55,9 +62,15 @@ $(document).ready(function () {
       popupDetailBody: function (schedule) {
         console.log(schedule);
         return `<div class="d-flex flex-column">
-        <div class="d-flex gap-2 ${schedule.raw.eventType === "Birthday" ? "d-none" : ""}">
+        <div class="d-flex gap-2 ${
+          schedule.raw.eventType === "Birthday" ? "d-none" : ""
+        }">
           <div class="fw-bold">Event Ended:</div>
-          <div class="text-capitalize fw-bold">${schedule.raw.isEnded ? "<span class='text-danger'>Yes</span>" : "<span class='text-success'>No</span>"}</div>
+          <div class="text-capitalize fw-bold">${
+            schedule.raw.isEnded
+              ? "<span class='text-danger'>Yes</span>"
+              : "<span class='text-success'>No</span>"
+          }</div>
         </div>
         <div class="d-flex gap-2">
           <div class="fw-bold">Type:</div>
@@ -106,15 +119,7 @@ $(document).ready(function () {
     month: {
       isAlways6Weeks: false,
       startDayOfWeek: 0,
-      dayNames: [
-        "SUN",
-        "MON",
-        "TUE",
-        "WED",
-        'THU',
-        "FRI",
-        "SAT",
-      ],
+      dayNames: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
       narrowWeekend: true,
     },
   });
@@ -178,6 +183,35 @@ $(document).ready(function () {
           data.data.forEach((event) => {
             let start = new Date(event.start);
             let end = new Date(event.end);
+
+            if (event.isAllDay) {
+              start.setHours(0, 0, 0, 0);
+              end.setHours(23, 59, 59, 999);
+            }
+
+            // under construction for birthday notification
+            /* if (event.raw.eventType === "Birthday") {
+              if (localStorage.getItem("receivedBirthdayNotification") === null) {
+                let today = new Date();
+                let birthday = new Date(event.start);
+                if (
+                  today.getDate() === birthday.getDate() &&
+                  today.getMonth() === birthday.getMonth()
+                ) {
+                  Swal.fire({
+                    title: "Happy Birthday!",
+                    text: `Today is ${event.title}`,
+                    icon: "info",
+                    confirmButtonText: "Got it",
+                  }).then(() => {
+                    localStorage.setItem("receivedBirthdayNotification", "true");
+                  });
+                }
+                localStorage.setItem("receivedBirthdayNotification", "true");
+              } else {
+                localStorage.removeItem("receivedBirthdayNotification");
+              }
+            } */
 
             calendar.createEvents([
               {

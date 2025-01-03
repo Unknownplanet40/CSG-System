@@ -34,6 +34,9 @@ if (isset($_GET['pending'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../Utilities/Third-party/Bootstrap/css/bootstrap.css">
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.css'
+        integrity='sha512-ywmPbuxGS4cJ7GxwCX+bCJweeext047ZYU2HP52WWKbpJnF4/Zzfr2Bo19J4CWPXZmleVusQ9d//RB5bq0RP7w=='
+        crossorigin='anonymous' />
     <link rel="stylesheet" href="../../Utilities/Third-party/Sweetalert2/css/sweetalert2.css">
     <link rel="stylesheet" href="../../Utilities/Stylesheets/CustomStyle.css">
     <link rel="stylesheet" href="../../Utilities/Stylesheets/MNavbarStyle.css">
@@ -181,12 +184,66 @@ if (isset($_GET['pending'])) {
                         </h5>
                         <div class="d-flex justify-content-center">
                             <div class="container">
-                                <div class="mb-3">
+                                <div class="mb-3" id="useStdnum">
                                     <label for="Login-stdnum" class="form-label fs-6">Student Number</label>
-                                    <input type="text" class="form-control rounded-0 mx-1" id="Login-stdnum"
-                                        maxlength="9" aria-describedby="stdnumHelp Login-btn">
-                                    <div id="stdnumHelp" class="invalid-feedback">For validation</div>
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control rounded-0 mx-1" id="Login-stdnum"
+                                            maxlength="9" aria-describedby="stdnumHelp Login-btn">
+                                        <span class="d-flex align-items-center rounded-0 ms-2" style="cursor: pointer;" id="stdnum-icon">
+                                        <i class="bi bi-envelope-fill" data-bs-toggle="tooltip" data-bs-placement="right" title="Use your CvSU Email Address"></i>
+                                        </span>
+                                        <div id="stdnumHelp" class="invalid-feedback">For validation</div>
+                                    </div>
                                 </div>
+                                <div class="mb-3 d-none" id="useEmail">
+                                    <label for="Login-email" class="form-label fs-6">CvSU Email Address</label>
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control rounded-0 mx-1" id="Login-email"
+                                            aria-describedby="emailHelp Login-btn">
+                                        <span class="d-flex align-items-center rounded-0 ms-2 " style="cursor: pointer;" id="email-icon">
+                                            <i class="bi bi-person-fill" data-bs-toggle="tooltip" data-bs-placement="right" title="Use your CvSU Student Number"></i>
+                                        </span>
+                                    </div>
+                                    <div id="emailHelp" class="invalid-feedback">For validation</div>
+                                </div>
+                                <script>
+
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+                                        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                                            return new bootstrap.Tooltip(tooltipTriggerEl)
+                                        })
+                                    });
+
+                                    $('#Login-stdnum').on('input', function() {
+                                        var input = $(this);
+                                        var isnum = /^\d+$/.test(input.val());
+                                        if (!isnum) {
+                                            input.val(input.val().replace(/[^\d]/g, ''));
+                                        }
+                                    });
+
+                                    function toggleInputFields(showStdnum) {
+                                        if (showStdnum) {
+                                            $('#useStdnum').removeClass('d-none');
+                                            $('#Login-stdnum').val('').removeClass('is-invalid');
+                                            $('#useEmail').addClass('d-none');
+                                        } else {
+                                            $('#useEmail').removeClass('d-none');
+                                            $('#Login-email').val('').removeClass('is-invalid');
+                                            $('#useStdnum').addClass('d-none');
+                                        }
+                                    }
+
+                                    $('#stdnum-icon').on('click', function() {
+                                        toggleInputFields(false);
+                                    });
+
+                                    $('#email-icon').on('click', function() {
+                                        toggleInputFields(true);
+                                    });
+
+                                </script>
                                 <div class="mb-5">
                                     <label for="Login-password" class="form-label fs-6">Password</label>
                                     <div class="eyeforaneye pe-5">

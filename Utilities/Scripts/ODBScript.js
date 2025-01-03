@@ -2296,6 +2296,16 @@ $(document).ready(function () {
         $("#SDOrgSelect_SDs").on("change", function () {
           table.draw();
         });
+
+        const refreshBtn = document.createElement("button");
+        refreshBtn.classList.add("btn", "btn-sm", "btn-outline-secondary");
+        refreshBtn.innerHTML =
+          'Refresh';
+        refreshBtn.onclick = function () {
+          table.ajax.reload();
+        };
+
+        SDContainer.append(refreshBtn);
       }
     },
   });

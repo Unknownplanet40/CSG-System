@@ -29,6 +29,58 @@ if (isset($_SESSION['last_activity'])) {
 }
 
 $_SESSION['last_activity'] = time();
+
+$stmt = $conn->prepare("SELECT * FROM sysvenue");
+$stmt->execute();
+$result = $stmt->get_result();
+$stmt->close();
+$venues = [];
+
+while ($row = $result->fetch_assoc()) {
+    $venues[] = $row['ven_Name'];
+}
+echo '<script>var availableVenues = ' . json_encode($venues) . ';</script>';
+
+$stmt = $conn->prepare("SELECT title FROM sysevents WHERE type = 'Event' AND isDeleted = 0 AND isEnded = 0");
+$stmt->execute();
+$result = $stmt->get_result();
+$stmt->close();
+$events = [];
+
+while ($row = $result->fetch_assoc()) {
+    $events[] = $row['title'];
+}
+echo '<script>var availableEvents = ' . json_encode($events) . ';</script>';
+
+// org members
+
+$stmt = $conn->prepare("SELECT * FROM usercredentials WHERE accountStat = 'active'");
+$stmt->execute();
+$result = $stmt->get_result();
+$members = [];
+
+while ($row = $result->fetch_assoc()) {
+    if ($row['UUID'] == $_SESSION['UUID']) {
+        continue;
+    }
+
+    if ($_SESSION['role'] != 1) {
+        $stmt = $conn->prepare("SELECT * FROM userpositions WHERE UUID = ? AND status = ? AND org_code = ?");
+        $stmt->bind_param("sss", $row['UUID'], 'active', $_SESSION['org_Code']);
+        $stmt->execute();
+        $pos = $stmt->get_result();
+
+        if ($pos->num_rows > 0) {
+            $members[] = $row['First_Name'] . " " . $row['Last_Name'];
+        }
+        $stmt->close();
+    } else {
+        $members[] = $row['First_Name'] . " " . $row['Last_Name'];
+    }
+}
+$stmt->close();
+echo '<script>var availableMembers = ' . json_encode($members) . ';</script>';
+
 ?>
 
 <!DOCTYPE html>
@@ -41,6 +93,9 @@ $_SESSION['last_activity'] = time();
     <link rel="stylesheet" href="../../../../Utilities/Third-party/Bootstrap/css/bootstrap.css">
     <link rel="stylesheet" href="../../../../Utilities/Third-party/Datatable/css/datatables.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="../../../../Utilities/Third-party/summernote/summernote-bs5.css">
     <link rel="stylesheet" href="../../../../Utilities/Stylesheets/BGaniStyle.css">
     <link rel="stylesheet" href="../../../../Utilities/Stylesheets/CustomStyle.css">
@@ -50,6 +105,9 @@ $_SESSION['last_activity'] = time();
     <script defer src="../../../../Utilities/Third-party/Datatable/js/datatables.js"></script>
     <script src="../../../../Utilities/Third-party/Sweetalert2/js/sweetalert2.all.min.js"></script>
     <script src="../../../../Utilities/Third-party/JQuery/js/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js">
+    </script>
     <script src="../../../../Utilities/Third-party/summernote/summernote-bs5.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script defer type="module" src="../../../../Utilities/Scripts/BS_DBScript.js"></script>
@@ -57,6 +115,26 @@ $_SESSION['last_activity'] = time();
 </head>
 <?php include_once "../../../../Assets/Icons/Icon_Assets.php"; ?>
 <?php $_SESSION['useBobbleBG'] == 1 ? include_once "../../../Components/BGanimation.php" : null;?>
+
+<!--modal-->
+<div class="modal fade" id="MM-DOCS-View-Modal" tabindex="-1" aria-labelledby="MM-DOCS-View-Modal-Label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content rounded-1">
+            <div class="modal-header">
+                <h5 class="modal-title" id="MM-DOCS-View-Modal-Label">Attachments</h5>
+                <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="mbody">
+                <div class="card">
+                    <div class="card-body">
+                        <img src="../../../../Assets/Images/Loader-v1.gif" alt="Loading" width="100" height="100">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <body>
     <div class="bg-dark bg-opacity-75 bg-blur z-3 position-fixed top-0 start-0 w-100 h-100 d-md-none">
@@ -87,29 +165,117 @@ $_SESSION['last_activity'] = time();
                                 <input type="hidden" id="taskID" value="">
                                 <input type="radio" id="isFromTask" hidden value="false">
                                 <input type="hidden" id="taskOrgCode" value="">
-
                                 <div class="row g-3">
                                     <div class="col-md-3">
                                         <div class="mb-3">
                                             <label for="MM-DATE" class="form-label">Date</label>
-                                            <input type="date" class="form-control rounded-0" id="MM-DATE"
-                                                value="<?php echo date('Y-m-d'); ?>"
-                                                min="<?php echo date('Y-m-d'); ?>">
+                                            <input type="text" class="form-control rounded-0" id="MM-DATE">
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="mb-3">
                                             <label for="MM-TIMESTARTED" class="form-label">Time Started</label>
-                                            <input type="time" class="form-control rounded-0" id="MM-TIMESTARTED"
-                                                value="<?php echo date('H:i'); ?>"
-                                                required>
+                                            <input type="text" class="form-control rounded-0" id="MM-TIMESTARTED">
                                         </div>
                                     </div>
+                                    <script>
+                                        let events = [];
+                                        $.ajax({
+                                            url: '../../../Functions/api/datepickerData.php',
+                                            type: 'GET',
+                                            success: function(data) {
+                                                if (data.status == 'success') {
+                                                    events = data.data;
+                                                    console.log(events);
+                                                } else {
+                                                    Swal.fire({
+                                                        icon: 'error',
+                                                        title: 'Error',
+                                                        text: 'We encountered an error while fetching Events',
+                                                    });
+                                                }
+                                            },
+                                            error: function() {
+                                                Swal.fire({
+                                                    icon: 'error',
+                                                    title: 'Error',
+                                                    text: 'An error occurred while fetching data',
+                                                });
+                                            },
+                                        });
+                                        $('#MM-DATE').datetimepicker({
+                                            format: 'F j, Y',
+                                            timepicker: false,
+                                            datepicker: true,
+                                            theme: <?php echo $_SESSION['theme'] == 'dark' ? "'dark'" : "'light'"; ?> ,
+                                            lang: 'en',
+                                            scrollMonth: false,
+                                            scrollTime: false,
+                                            closeOnDateSelect: true,
+                                            mask: true,
+                                            minDate: '<?php echo date('Y-m-d'); ?>',
+                                            className: 'rounded-1 border-0 shadow z-2',
+                                            onShow: function(ct) {
+                                                this.setOptions({
+                                                    minDate: $('#MM-DATE').val() == '' ? false : $(
+                                                        '#MM-DATE').val()
+                                                });
+                                            },
+                                            beforeShowDay: function(date) {
+                                                let disabled = false;
+                                                for (let i = 0; i < events.length; i++) {
+                                                    let start = new Date(events[i].start);
+                                                    let end = new Date(events[i].end);
+                                                    if (date.getTime() >= start.getTime() && date
+                                                        .getTime() <= end.getTime()) {
+                                                        disabled = true;
+                                                        break;
+                                                    }
+                                                }
+                                                return [!disabled, ''];
+                                            },
+                                        });
+
+                                        $('#MM-TIMESTARTED').datetimepicker({
+                                            format: 'H:i A',
+                                            timepicker: true,
+                                            datepicker: false,
+                                            theme: <?php echo $_SESSION['theme'] == 'dark' ? "'dark'" : "'light'"; ?> ,
+                                            lang: 'en',
+                                            scrollMonth: false,
+                                            scrollTime: false,
+                                            closeOnDateSelect: true,
+                                            mask: true,
+                                            className: 'rounded-1 border-0 shadow z-2'
+                                        });
+                                    </script>
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="MM-LOC" class="form-label">Location</label>
                                             <input type="text" class="form-control rounded-0" id="MM-LOC"
-                                                placeholder="e.g. Conference Room" required>
+                                                placeholder="e.g. Conference Room" required list="venues">
+                                            <script>
+                                                $(function() {
+                                                    $("#MM-LOC").autocomplete({
+                                                        source: availableVenues,
+                                                        minLength: 0,
+                                                        autoFocus: true,
+                                                        delay: 0
+                                                    });
+                                                    $("#MM-LOC").on("focus", function() {
+                                                        $(this).autocomplete("search", "");
+                                                    });
+                                                    $("#MM-LOC").autocomplete("instance")._renderMenu =
+                                                        function(ul, items) {
+                                                            var that = this;
+                                                            items.forEach(function(item) {
+                                                                that._renderItemData(ul, item);
+                                                            });
+                                                            $(ul).addClass(
+                                                                "ui-autocomplete-open");
+                                                        };
+                                                });
+                                            </script>
                                         </div>
                                     </div>
                                     <div
@@ -173,9 +339,21 @@ while ($row = $result->fetch_assoc()) {
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="MM-TIMEADJOURNED" class="form-label">Time Adjourned</label>
-                                            <input type="time" class="form-control rounded-0" id="MM-TIMEADJOURNED"
-                                                value="<?php echo date('H:i'); ?>"
-                                                required>
+                                            <input type="text" class="form-control rounded-0" id="MM-TIMEADJOURNED">
+                                            <script>
+                                                $('#MM-TIMEADJOURNED').datetimepicker({
+                                                    format: 'H:i A',
+                                                    timepicker: true,
+                                                    datepicker: false,
+                                                    theme: <?php echo $_SESSION['theme'] == 'dark' ? "'dark'" : "'light'"; ?> ,
+                                                    lang: 'en',
+                                                    scrollMonth: false,
+                                                    scrollTime: false,
+                                                    closeOnDateSelect: true,
+                                                    mask: true,
+                                                    className: 'rounded-1 border-0 shadow z-2'
+                                                });
+                                            </script>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -183,6 +361,34 @@ while ($row = $result->fetch_assoc()) {
                                             <label for="MM-DOCS" class="form-label">Documentations</label>
                                             <input type="file" class="form-control rounded-0 rounded-0" id="MM-DOCS"
                                                 accept=".png, .jpg, .jpeg" multiple required>
+                                            <a href="javascript:void(0)" class="text-decoration-none d-none" id="MM-DOCS-View"
+                                                data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
+                                                data-bs-trigger="hover" data-bs-title="Accepted file types: .png, .jpg, .jpeg"
+                                                style="font-size: 12px;">Click here to view attachments</a>
+                                            <script>
+                                                $('#MM-DOCS-View').click(function() {
+                                                    $('#MM-DOCS-View-Modal').modal('show');
+                                                });
+                                                $('#MM-DOCS').on('change', function() {
+                                                    $('#MM-DOCS-View').removeClass('d-none');
+                                                    var $container = $('#mbody');
+                                                    $container.empty();
+                                                    var files = $(this)[0].files;
+                                                    for (var i = 0; i < files.length; i++) {
+                                                        var reader = new FileReader();
+                                                        reader.onload = function(e) {
+                                                            $container.append(
+                                                                `<div class="card mb-3">
+                                                                <div class="card-body">
+                                                                <img src="${e.target.result}" class="img-fluid" alt="Attachment">
+                                                                </div>
+                                                                </div>`
+                                                            );
+                                                        }
+                                                        reader.readAsDataURL(files[i]);
+                                                    }
+                                                });
+                                            </script>
                                         </div>
                                     </div>
                                     <div class="col-md-12">
@@ -386,8 +592,18 @@ while ($row = $result->fetch_assoc()) {
                                         $('#MM-SIGNATURE').summernote('code', item
                                             .MMsignature);
                                         $('#MM-DOCS').val('');
+                                        $('#MM-Docs-View').removeClass('d-none');
+                                        var filepatch = item.file_path.replace('.pdf', '');
+                                        var container = $('#mbody');
+                                        container.empty();
+                                        container.append(
+                                            `<div class="card mb-3">
+                                            <div class="card-body">
+                                            <img src="../../../../${filepatch}" class="img-fluid" alt="Attachment">
+                                            </div>
+                                            </div>`
+                                        );
                                         $('#MM-SAVE').text('Update');
-
                                     });
                                 });
                             }
@@ -605,6 +821,9 @@ while ($row = $result->fetch_assoc()) {
                     '<?php echo date('H:i'); ?>'
                 );
                 $('#MM-DOCS').val('');
+                $('#MM-Docs-View').addClass('d-none');
+                var container = $('#mbody');
+                container.empty();
                 $('#MM-SIGNATURE').summernote('code', '');
                 $('#MM-SAVE').text('Save');
             });

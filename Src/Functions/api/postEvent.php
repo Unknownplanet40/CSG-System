@@ -29,6 +29,37 @@ try {
     $start = date('Y-m-d H:i:s', strtotime($start));
     $end = date('Y-m-d H:i:s', strtotime($end));
 
+
+    $Venue = '%' . $location . '%';
+    $stmt = $conn->prepare("SELECT * FROM sysvenue WHERE ven_Name LIKE ? LIMIT 1");
+    $stmt->bind_param("s", $Venue);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 0) {
+        $stmt = $conn->prepare("INSERT INTO sysvenue (ven_Name, created_by, isOccupied, startOccupied, endOccupied) VALUES (?,?,1,?,?)");
+        $stmt->bind_param("ssss", $location, $_SESSION['UUID'], $start, $end);
+        $stmt->execute();
+        $stmt->close();
+    } else {
+        $row = $result->fetch_assoc();
+        if ($row['isOccupied'] === 0) {
+            $stmt = $conn->prepare("UPDATE sysvenue SET isOccupied = 1, startOccupied = ?, endOccupied = ? WHERE ID = ?");
+            $stmt->bind_param("ssi", $start, $end, $row['ID']);
+            $stmt->execute();
+            $stmt->close();
+        } else {
+            if ($row['endOccupied'] < date('Y-m-d')) {
+                $stmt = $conn->prepare("UPDATE sysvenue SET isOccupied = 1, startOccupied = ?, endOccupied = ? WHERE ID = ?");
+                $stmt->bind_param("ssi", $start, $end, $row['ID']);
+                $stmt->execute();
+                $stmt->close();
+            } else {
+                response(['status' => 'error', 'message' => 'Venue is already occupied']);
+            } 
+        }
+    }
+    
     $stmt = $conn->prepare("INSERT INTO sysevents (UUID, title, eventdesc, location, color, start, end) VALUES (?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("sssssss", $UUID, $title, $description, $location, $color, $start, $end);
     $stmt->execute();

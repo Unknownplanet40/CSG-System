@@ -54,22 +54,22 @@ class PDF extends TCPDF
         if (!$isDocHeaderHidden) {
             $this->Image('../../../Assets/Images/pdf-Resource/' . $LeftLogo, 45, 20, 40);
             $this->Image('../../../Assets/Images/pdf-Resource/' . $RightLogo, 155, 20, 40);
-    
+
             $this->setX(38.1);
             $this->SetFont('helvetica', '', 10);
             $this->Cell(0, 5, $FirstLine, 0, 1, 'C');
-    
+
             $this->setX(38.1);
             $this->SetFont('helvetica', 'B', 12);
             $this->Cell(0, 6, $SecondLine, 0, 1, 'C');
             $this->SetFont('helvetica', 'B', 10);
-    
+
             $this->setX(38.1);
             $this->Cell(0, 5, $ThirdLine, 0, 1, 'C');
-    
+
             $this->setX(38.1);
             $this->Cell(0, 5, $FourthLine, 0, 1, 'C');
-    
+
             $this->SetFont('helvetica', 'B', 12);
             $this->setX(38.1);
             $this->Cell(0, 5, $FifthLine, 0, 1, 'C');
@@ -128,7 +128,7 @@ class PDF extends TCPDF
         </tr>
         <tr>
             <td width="160"><strong>DATE AND VENUE:</strong></td>
-            <td width="250">' . $data['ActivityDateVenue'] . '</td>
+            <td width="250">' . $data['ActivityDate'] . ' at ' . $data['ActivityVenue'] . '</td>
         </tr>
         <tr>
             <td width="160"><strong>PROJECT HEAD:</strong></td>
@@ -211,7 +211,8 @@ try {
     $ActivityHead = $_POST['ActivityHead'];
     $LetterBody = $_POST['LetterBody']; // html content
     $ActivityTitle = $_POST['ActivityTitle'];
-    $ActivityDateVenue = $_POST['ActivityDateVenue'];
+    $ActivityDate = $_POST['ActivityDate'];
+    $ActivityVenue = $_POST['ActivityVenue'];
     $ActivityObjective = $_POST['ActivityObjective']; // html content
     $ActivityTarget = $_POST['ActivityTarget'];
     $ActivityMechanics = $_POST['ActivityMechanics'];
@@ -230,9 +231,12 @@ try {
     $ActivityBudget = updateCssProperty($ActivityBudget, $search, $replace);
     $ActivitySignature = updateCssProperty($ActivitySignature, $search, $replace);
 
+    $ActivityDate = date('Y-m-d H:i:s', strtotime($ActivityDate));
+
     $data = [
         'ActivityTitle' => $ActivityTitle,
-        'ActivityDateVenue' => $ActivityDateVenue,
+        'ActivityDate' => $ActivityDate,
+        'ActivityVenue' => $ActivityVenue,
         'ActivityObjective' => $ActivityObjective,
         'ActivityTarget' => $ActivityTarget,
         'ActivityMechanics' => $ActivityMechanics,
@@ -276,7 +280,7 @@ try {
 
 
     $name = "Project_Proposal_" . date('Y-m-d_H-i-s') . "_" . (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']) . "_" . rand(1000, 9999) . ".pdf";
-    $file_path = "DocumentsStorage/" . (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']) . "/" . $name;
+    $file_path = "DocumentsStorage/" . DIRECTORY_SEPARATOR . (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']) . DIRECTORY_SEPARATOR . $name;
     $storageDir = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'DocumentsStorage' . DIRECTORY_SEPARATOR . (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']);
     if (!file_exists($storageDir)) {
         mkdir($storageDir, 0777, true);
@@ -290,8 +294,8 @@ try {
     $conn->begin_transaction();
 
     if ($ID !== '') {
-        $stmt = $conn->prepare("UPDATE projectproposaldocuments SET file_Size = ?, file_path = ?, admin_name = ?, dear_title = ?, LetterBody = ?, act_title = ?, act_date_ven = ?, act_head = ?, act_obj = ?, act_participate = ?, act_mech = ?, act_budget = ?, act_funds = ?, act_expectOut = ?, act_signature = ?, taskID = ?, isFromTask = ? WHERE ID = ?");
-        $stmt->bind_param("isssssssssssssssis", $fileSize, $file_path, $AdminName, $LetterTo, $LetterBody, $ActivityTitle, $ActivityDateVenue, $ActivityHead, $ActivityObjective, $ActivityTarget, $ActivityMechanics, $ActivityBudget, $ActivitySourceFunds, $ActivityOutcomes, $ActivitySignature, $TaskID, $IsFromTask, $ID);
+        $stmt = $conn->prepare("UPDATE projectproposaldocuments SET file_Size = ?, file_path = ?, admin_name = ?, dear_title = ?, LetterBody = ?, act_title = ?, act_date = ?, act_ven = ?, act_head = ?, act_obj = ?, act_participate = ?, act_mech = ?, act_budget = ?, act_funds = ?, act_expectOut = ?, act_signature = ?, taskID = ?, isFromTask = ? WHERE ID = ?");
+        $stmt->bind_param("issssssssssssssssis", $fileSize, $file_path, $AdminName, $LetterTo, $LetterBody, $ActivityTitle, $ActivityDate, $ActivityVenue, $ActivityHead, $ActivityObjective, $ActivityTarget, $ActivityMechanics, $ActivityBudget, $ActivitySourceFunds, $ActivityOutcomes, $ActivitySignature, $TaskID, $IsFromTask, $ID);
         $stmt->execute();
         $stmt->close();
     } else {
@@ -306,10 +310,58 @@ try {
         $UUID = $_SESSION['UUID'];
         $orgCode = (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']);
 
-        $stmt = $conn->prepare("INSERT INTO projectproposaldocuments (UUID, org_code, file_Size, file_path, admin_name, dear_title, LetterBody, act_title, act_date_ven, act_head, act_obj, act_participate, act_mech, act_budget, act_funds, act_expectOut, act_signature, taskID, isFromTask) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-        $stmt->bind_param("ssissssssssssssssis", $UUID, $orgCode, $fileSize, $file_path, $AdminName, $LetterTo, $LetterBody, $ActivityTitle, $ActivityDateVenue, $ActivityHead, $ActivityObjective, $ActivityTarget, $ActivityMechanics, $ActivityBudget, $ActivitySourceFunds, $ActivityOutcomes, $ActivitySignature, $TaskID, $IsFromTask);
+        $stmt = $conn->prepare("INSERT INTO projectproposaldocuments (UUID, org_code, file_Size, file_path, admin_name, dear_title, LetterBody, act_title, act_date, act_ven, act_head, act_obj, act_participate, act_mech, act_budget, act_funds, act_expectOut, act_signature, taskID, isFromTask) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+        $stmt->bind_param("ssisssssssssssssssis", $UUID, $orgCode, $fileSize, $file_path, $AdminName, $LetterTo, $LetterBody, $ActivityTitle, $ActivityDate, $ActivityVenue, $ActivityHead, $ActivityObjective, $ActivityTarget, $ActivityMechanics, $ActivityBudget, $ActivitySourceFunds, $ActivityOutcomes, $ActivitySignature, $TaskID, $IsFromTask);
         $stmt->execute();
         $stmt->close();
+
+        $Venue = '%' . $ActivityVenue . '%';
+        $stmt = $conn->prepare("SELECT * FROM sysvenue WHERE ven_Name LIKE ? LIMIT 1");
+        $stmt->bind_param("s", $Venue);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 0) {
+            $ActivityDate = date('Y-m-d H:i:s', strtotime($ActivityDate));
+            $stmt = $conn->prepare("INSERT INTO sysvenue (ven_Name, created_by, isOccupied, startOccupied, endOccupied) VALUES (?,?,1,?,?)");
+            $stmt->bind_param("ssss", $ActivityVenue, $_SESSION['UUID'], $ActivityDate, $ActivityDate);
+            $stmt->execute();
+            $stmt->close();
+        } else {
+            $row = $result->fetch_assoc();
+            if ($row['isOccupied'] === 0) {
+                $stmt = $conn->prepare("UPDATE sysvenue SET isOccupied = 1, startOccupied = ?, endOccupied = ? WHERE ID = ?");
+                $stmt->bind_param("ssi", $ActivityDate, $ActivityDate, $row['ID']);
+                $stmt->execute();
+                $stmt->close();
+            } else {
+                if ($row['endOccupied'] < date('Y-m-d')) {
+                    $stmt = $conn->prepare("UPDATE sysvenue SET isOccupied = 1, startOccupied = ?, endOccupied = ? WHERE ID = ?");
+                    $stmt->bind_param("ssi", $ActivityDate, $ActivityDate, $row['ID']);
+                    $stmt->execute();
+                    $stmt->close();
+                } else {
+                    response(['status' => 'error', 'message' => 'Venue is already occupied']);
+                }
+            }
+        }
+
+        $UUID = $_SESSION['UUID'];
+        $title = $ActivityTitle;
+        $eventdesc = "Project Proposal for " . $ActivityTitle;
+        $location = $ActivityVenue;
+        $color = 'bs-indigo';
+        $start = date('Y-m-d', strtotime($ActivityDate));
+        $end = date('Y-m-d', strtotime($ActivityDate));
+        $isEnded = 0;
+        $type = 'PP';
+        $isDeleted = 0;
+
+        $stmt = $conn->prepare("INSERT INTO sysevents (UUID, title, eventdesc, location, color, start, end, isEnded, type, isDeleted) VALUES (?,?,?,?,?,?,?,?,?,?)");
+        $stmt->bind_param("sssssssiss", $UUID, $title, $eventdesc, $location, $color, $start, $end, $isEnded, $type, $isDeleted);
+        $stmt->execute();
+        $stmt->close();
+
     }
 
     $stmt = $conn->prepare("INSERT INTO audit_apdoc (UUID, file_Size, file_name) VALUES (?,?,?)");

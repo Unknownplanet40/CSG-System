@@ -14,6 +14,30 @@ function response($data)
     exit;
 }
 
+function filterAndRemove($input, $patterns)
+{
+    $filteredOutput = $input;
+    foreach ($patterns as $pattern) {
+        $filteredOutput = preg_replace($pattern, '', $filteredOutput);
+    }
+    $filteredOutput = preg_replace('/\n+/', "\n", trim($filteredOutput));
+    return $filteredOutput;
+}
+
+function updateCssProperty($input, $search, $replace)
+{
+    return str_replace($search, $replace, $input);
+}
+
+$patterns = [
+    '/background-color: var\(--bs-card-bg\); color: var\(--bs-body-color\);/',
+    '/background-color: var\(--bs-card-bg\);/',
+    '/color: rgb\(222, 226, 230\);/'
+];
+
+$search = 'font-size: 14px;';
+$replace = 'font-size: 11px;';
+
 
 class PDF extends TCPDF
 {
@@ -146,8 +170,6 @@ class PDF extends TCPDF
 
             $orgName = $orgRow['org_name'];
 
-
-
             $this->Ln(8);
             $this->setX(38.1);
             $this->SetFont('helvetica', '', 11);
@@ -173,8 +195,6 @@ class PDF extends TCPDF
             $this->SetFont('helvetica', '', 11);
             $this->writeHTMLCell(156, 0, '', '', $reason, 0, 1, 0, true, 'J', true);
         }
-
-
 
         $this->Ln(8);
         $this->setX(38.1);
@@ -254,7 +274,17 @@ try {
     $Created_By = $_POST['Created_By'] ?? '';
     $taskID = $_POST['taskID'] ?? '';
     $isFromTask = $_POST['isFromTask'] ?? 0;
+    
+    $Honorifics = $_POST['HONORIFICS'] ?? '';
+    $LetterToFN = $_POST['FIRSTNAME'] ?? '';
+    $LetterToLN = $_POST['LASTNAME'] ?? '';
 
+    $reason = filterAndRemove($reason, $patterns);
+    $reason = updateCssProperty($reason, $search, $replace);
+
+    $Recommending = filterAndRemove($Recommending, $patterns);
+    $Recommending = updateCssProperty($Recommending, $search, $replace);
+    
     if (!$docType) {
         response(['status' => 'error', 'message' => 'Document type is required']);
     }
@@ -302,9 +332,6 @@ try {
     $currentDate = date('Y-m-d H:i:s');
     $UUID = $_SESSION['UUID'];
 
-
-    // 	ID	UUID	org_code	file_Size	file_path	taskID	isFromTask	participants	dateStart	timeStart	dateEnd	timeEnd	Event	Reason	RecommSig	letterTo	Postition	Dear	excuseLetterType	DateCreated
-
     if ($docType === 'Constituents-ExcuseLetter') {
         $docType = 0;
     } else {
@@ -312,10 +339,16 @@ try {
     }
 
     if ($ID !== '') {
-        $stmt = $conn->prepare("UPDATE excuseletterdocuments SET file_Size = ?, file_path = ?, taskID = ?, isFromTask = ?, participants = ?, dateStart = ?, timeStart = ?, dateEnd = ?, timeEnd = ?, Event = ?, Reason = ?, RecommSig = ?, letterTo = ?, Postition = ?, Dear = ?, excuseLetterType = ?, DateCreated = ? WHERE ID = ?");
-        $stmt->bind_param("issssssssssssssssi", $fileSize, $file_path, $taskID, $isFromTask, $Participants, $DateStart, $StartTime, $DateEnd, $EndTime, $eventReason, $reason, $Recommending, $LetterTo, $position, $dear, $docType, $currentDate, $ID);
+        $stmt = $conn->prepare("UPDATE excuseletterdocuments SET file_Size = ?, file_path = ?, taskID = ?, isFromTask = ?, participants = ?, dateStart = ?, timeStart = ?, dateEnd = ?, timeEnd = ?, Event = ?, Reason = ?, RecommSig = ?, letterTo = ?, Postition = ?, Dear = ?, excuseLetterType = ?, DateCreated = ?, organizer = ? WHERE ID = ?");
+        $stmt->bind_param("isssssssssssssssssi", $fileSize, $file_path, $taskID, $isFromTask, $Participants, $DateStart, $StartTime, $DateEnd, $EndTime, $eventReason, $reason, $Recommending, $LetterTo, $position, $dear, $docType, $currentDate, $Organizer, $ID);
         $stmt->execute();
         $stmt->close();
+
+        $stmt = $conn->prepare("UPDATE excuseletterdocuments SET honor = ?, fname = ?, lname = ? WHERE ID = ?");
+        $stmt->bind_param("sssi", $Honorifics, $LetterToFN, $LetterToLN, $ID);
+        $stmt->execute();
+        $stmt->close();
+
     } else {
         if ($taskID !== '') {
             $stmt = $conn->prepare("UPDATE taskdocuments SET tastStat = 'Completed' WHERE taskID = ?");
@@ -328,10 +361,24 @@ try {
         $stmt->bind_param("ssissssssssssssssss", $UUID, $OrgCode, $fileSize, $file_path, $taskID, $isFromTask, $Participants, $DateStart, $StartTime, $DateEnd, $EndTime, $eventReason, $reason, $Recommending, $LetterTo, $position, $dear, $docType, $currentDate);
         $stmt->execute();
         $stmt->close();
+
+        $stmt = $conn->prepare("SELECT ID FROM excuseletterdocuments WHERE UUID = ? AND org_code = ? AND file_path = ?");
+        $stmt->bind_param("sss", $UUID, $OrgCode, $file_path);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $stmt->close();
+
+        $row = $result->fetch_assoc();
+        $ID = $row['ID'];
+
+        $stmt = $conn->prepare("UPDATE excuseletterdocuments SET honor = ?, fname = ?, lname = ?, organizer = ? WHERE ID = ?");
+        $stmt->bind_param("ssssi", $Honorifics, $LetterToFN, $LetterToLN, $Organizer, $ID);
+        $stmt->execute();
+        $stmt->close();
     }
 
     response(['status' => 'success', 'message' => ($successmessage ?? 'Excuse letter successfully created'), 'file_path' => $file_path]);
 
 } catch (\Throwable $th) {
-    response(['status' => 'error', 'message' => $th->getMessage()]);
+    response(['status' => 'error', 'message' => $th->getMessage() . ' at line ' . $th->getLine()]);
 }

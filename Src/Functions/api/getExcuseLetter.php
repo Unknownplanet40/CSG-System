@@ -21,9 +21,9 @@ try {
 
     if (isset($_GET['isSubmittedtoCSG'])) {
         if ($_SESSION['role'] == 1) {
-            $submitted = " WHERE isSubmittedtoCSG = 0";
+            $submitted = " WHERE isSubmittedtoCSG = 0 ORDER BY ID DESC";
         } else {
-            $submitted = " AND isSubmittedtoCSG = 0";
+            $submitted = " AND isSubmittedtoCSG = 0 ORDER BY ID DESC";
         }
     } else {
         $submitted = "";
@@ -61,7 +61,7 @@ try {
         $row2 = $result2->fetch_assoc();
         $row['Created_By'] = $row2['fullName'];
 
-        $row['excuseLetterType'] = $row['excuseLetterType'] == 0? 'Excuse Letter for Constituents' : 'Excuse Letter for Org Officers';
+        $row['excuseLetterType'] = $row['excuseLetterType'] == 0 ? 'Excuse Letter for Constituents' : 'Excuse Letter for Org Officers';
         
         $data[] = $row;
     }

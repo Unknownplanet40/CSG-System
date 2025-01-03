@@ -29,6 +29,32 @@ if (isset($_SESSION['last_activity'])) {
 }
 
 $_SESSION['last_activity'] = time();
+
+$stmt = $conn->prepare("SELECT * FROM sysvenue");
+$stmt->execute();
+$result = $stmt->get_result();
+$stmt->close();
+$venues = [];
+
+while ($row = $result->fetch_assoc()) {
+
+    $end = new DateTime($row['endOccupied']);
+    $now = new DateTime(date('Y-m-d H:i:s'));
+
+    if ($row['isOccupied'] == 1) {
+        if ($now >= $end) {
+            $stmt = $conn->prepare("UPDATE sysvenue SET isOccupied = 0 WHERE ID = ? AND isOccupied = 1");
+            $stmt->bind_param('i', $row['ID']);
+            $stmt->execute();
+            $stmt->close();
+        } else {
+            $venues[] = $row['ven_Name'];
+        }
+    } else {
+        $venues[] = $row['ven_Name'];
+    }
+}
+echo '<script>var availableVenues = ' . json_encode($venues) . ';</script>';
 ?>
 
 <!DOCTYPE html>
@@ -46,6 +72,9 @@ $_SESSION['last_activity'] = time();
     <!-- <link rel="stylesheet" href="../../../../Utilities/Third-party/Froalaeditor/css/froala_editor.pkgd.min.css"> -->
     <link rel="stylesheet" href="../../../../Utilities/Third-party/summernote/summernote-bs5.css">
     <!-- <link rel="stylesheet" href="../../../../Utilities/Third-party/Froalaeditor/css/themes/dark.css"> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
 
     <link rel="stylesheet" href="../../../../Utilities/Stylesheets/AB_DBStyle.css">
 
@@ -53,6 +82,9 @@ $_SESSION['last_activity'] = time();
     <script defer src="../../../../Utilities/Third-party/Datatable/js/datatables.js"></script>
     <script src="../../../../Utilities/Third-party/Sweetalert2/js/sweetalert2.all.min.js"></script>
     <script src="../../../../Utilities/Third-party/JQuery/js/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js">
+    </script>
     <script src="../../../../Utilities/Third-party/summernote/summernote-bs5.js"></script>
     <script defer type="module" src="../../../../Utilities/Scripts/BS_DBScript.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
@@ -118,7 +150,7 @@ $_SESSION['last_activity'] = time();
                                                 placeholder="Type your letter here"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-12">
                                         <div class="mb-3">
                                             <label for="ActivityTitle" class="form-label">Project Title</label>
                                             <input type="text" class="form-control rounded-0" id="ActivityTitle">
@@ -126,9 +158,93 @@ $_SESSION['last_activity'] = time();
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="ActivityDateVenue" class="form-label">Project Date and
-                                                Venue</label>
-                                            <input type="text" class="form-control rounded-0" id="ActivityDateVenue">
+                                            <label for="ActivityDate" class="form-label">Activity Date</label>
+                                            <input type="text" class="form-control rounded-0" id="ActivityDate"
+                                                placeholder="Select Date">
+                                            <script>
+                                                $(function() {
+                                                    let events = [];
+                                                    $.ajax({
+                                                        url: '../../../Functions/api/datepickerData.php',
+                                                        type: 'GET',
+                                                        success: function(data) {
+                                                            if (data.status == 'success') {
+                                                                events = data.data;
+                                                                console.log(events);
+                                                            } else {
+                                                                Swal.fire({
+                                                                    icon: 'error',
+                                                                    title: 'Error',
+                                                                    text: 'An error occurred while fetching data 1',
+                                                                });
+                                                            }
+                                                        },
+                                                        error: function() {
+                                                            Swal.fire({
+                                                                icon: 'error',
+                                                                title: 'Error',
+                                                                text: 'An error occurred while fetching data 2',
+                                                            });
+                                                        },
+                                                    });
+                                                    $('#ActivityDate').datetimepicker({
+                                                        format: 'F j, Y',
+                                                        timepicker: false,
+                                                        datepicker: true,
+                                                        theme: <?php echo $_SESSION['theme'] == 'dark' ? "'dark'" : "'light'"; ?> ,
+                                                        lang: 'en',
+                                                        scrollMonth: false,
+                                                        scrollTime: false,
+                                                        closeOnDateSelect: true,
+                                                        mask: true,
+                                                        minDate: '<?php echo date('Y-m-d'); ?>',
+                                                        className: 'rounded-1 border-0 shadow z-2',
+                                                        onShow: function(ct) {
+                                                            this.setOptions({minDate: $('#ActivityDate').val() ? $('#ActivityDate').val() : false});
+                                                        },
+                                                        beforeShowDay: function(date) {
+                                                            let disabled = false;
+                                                            for (let i = 0; i < events.length; i++) {
+                                                                let start = new Date(events[i].start);
+                                                                let end = new Date(events[i].end);
+                                                                if (date.getTime() >= start.getTime() && date.getTime() <= end.getTime()) {
+                                                                    disabled = true;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            return [!disabled, ''];
+                                                        },
+                                                    });
+                                                });
+                                            </script>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="ActivityVenue" class="form-label">Activity Venue</label>
+                                            <input type="text" class="form-control rounded-0" id="ActivityVenue" placeholder="Select Venue">
+                                            <script>
+                                                $(function() {
+                                                    $("#ActivityVenue").autocomplete({
+                                                        source: availableVenues,
+                                                        minLength: 0,
+                                                        autoFocus: true,
+                                                        delay: 0
+                                                    });
+                                                    $("#ActivityVenue").on("focus click", function() {
+                                                        $(this).autocomplete("search", "");
+                                                    });
+                                                    $("#ActivityVenue").autocomplete("instance")._renderMenu =
+                                                        function(ul, items) {
+                                                            var that = this;
+                                                            items.forEach(function(item) {
+                                                                that._renderItemData(ul, item);
+                                                            });
+                                                            $(ul).addClass(
+                                                                "ui-autocomplete-open");
+                                                        };
+                                                });
+                                            </script>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -379,8 +495,11 @@ while ($row = $result->fetch_assoc()) {
                                                     doc.LetterBody);
                                                 $('#ActivityTitle').val(doc
                                                     .act_title);
-                                                $('#ActivityDateVenue').val(doc
-                                                    .act_date_ven);
+                                                $('#ActivityDate').val(new Date(doc.act_date).toLocaleDateString('en-US', {
+                                                    day: 'numeric', month: 'long', year: 'numeric'
+                                                }));
+                                                $('#ActivityVenue').val(doc
+                                                    .act_ven);
                                                 $('#ActivityHead').val(doc
                                                     .act_head);
                                                 $('#ActivityObjective').summernote(
@@ -421,8 +540,11 @@ while ($row = $result->fetch_assoc()) {
                                             doc.LetterBody);
                                         $('#ActivityTitle').val(doc
                                             .act_title);
-                                        $('#ActivityDateVenue').val(doc
-                                            .act_date_ven);
+                                        $('#ActivityDate').val(new Date(doc.act_date).toLocaleDateString('en-US', {
+                                            day: 'numeric', month: 'long', year: 'numeric'
+                                        }));
+                                        $('#ActivityVenue').val(doc
+                                            .act_ven);
                                         $('#ActivityHead').val(doc
                                             .act_head);
                                         $('#ActivityObjective').summernote(
@@ -600,7 +722,8 @@ while ($row = $result->fetch_assoc()) {
             $('#LetterTo').val('');
             $('#LetterBody').summernote('code', '');
             $('#ActivityTitle').val('');
-            $('#ActivityDateVenue').val('');
+            $('#ActivityDate').val('');
+            $('#ActivityVenue').val('');
             $('#ActivityObjective').summernote('code', '');
             $('#ActivityTarget').val('');
             $('#ActivityMechanics').val('');
@@ -627,7 +750,8 @@ while ($row = $result->fetch_assoc()) {
             var LetterTo = $('#LetterTo').val();
             var LetterBody = $('#LetterBody').summernote('code');
             var ActivityTitle = $('#ActivityTitle').val();
-            var ActivityDateVenue = $('#ActivityDateVenue').val();
+            var ActivityDate = $('#ActivityDate').val();
+            var ActivityVenue = $('#ActivityVenue').val();
             var ActivityObjective = $('#ActivityObjective').summernote('code');
             var ActivityTarget = $('#ActivityTarget').val();
             var ActivityMechanics = $('#ActivityMechanics').val();
@@ -638,7 +762,7 @@ while ($row = $result->fetch_assoc()) {
             var ActivitySignature = $('#ActivitySignature').summernote('code');
 
             if (AdminName == '' || LetterTo == '' || LetterBody == '' || ActivityTitle == '' ||
-                ActivityDateVenue == '' || ActivityObjective == '' || ActivityTarget == '' ||
+                ActivityDate == '' || ActivityVenue == '' || ActivityObjective == '' || ActivityTarget == '' ||
                 ActivityMechanics == '' || ActivityBudget == '' || ActivityHead == '' || ActivitySourceFunds ==
                 '' || ActivityOutcomes == '' || ActivitySignature == '') {
                 Swal.mixin({
@@ -710,7 +834,8 @@ while ($row = $result->fetch_assoc()) {
                 LetterBody: LetterBody,
                 ActivityHead: ActivityHead,
                 ActivityTitle: ActivityTitle,
-                ActivityDateVenue: ActivityDateVenue,
+                ActivityDate: ActivityDate,
+                ActivityVenue: ActivityVenue,
                 ActivityObjective: ActivityObjective,
                 ActivityTarget: ActivityTarget,
                 ActivityMechanics: ActivityMechanics,

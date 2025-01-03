@@ -120,7 +120,11 @@ export async function LoginProcess(data) {
       localStorage.removeItem("lockoutTime");
 
       if (resData.data.role == 1) {
-        redirectTo = "../../Src/Pages/Apps/ADMIN/Dashboard.php";
+        if (resData.isMobile == "true") {
+          redirectTo = "../../Src/Pages/Feed.php";
+        } else {
+          redirectTo = "../../Src/Pages/Apps/ADMIN/Dashboard.php";
+        }
       } else if (resData.data.role >= 2) {
         if (resData.data.accountStat == "pending") {
           QueueNotification([
@@ -150,7 +154,7 @@ export async function LoginProcess(data) {
       }
     }
   } catch (error) {
-    console.error(error.message); // log error message to console
+    console.error(error.message);
     $("#Login-btn").addClass("shake");
 
     setTimeout(function () {

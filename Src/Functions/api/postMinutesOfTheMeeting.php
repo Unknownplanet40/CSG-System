@@ -277,6 +277,8 @@ try {
     $isFromTask = $_POST['isFromTask'] ?? 0;
     $taskOrgCode = $_POST['taskOrgCode'] ?? '';
 
+    $MM_DATE = ddate('Y-m-d H:i:s', strtotime($MM_DATE));
+
     function filterAndRemove($input, $patterns)
     {
         $filteredOutput = preg_replace($patterns, '', $input);
@@ -422,10 +424,7 @@ try {
 
     $OrgCode = (!empty($OrgCode) ? $OrgCode : $_SESSION['org_Code']);
 
-
     if ($ID !== '') {
-
-        // delete old file
         $stmt = $conn->prepare("SELECT file_path FROM minutemeetingdocuments WHERE ID = ? AND org_code = ?");
         $stmt->bind_param("ss", $ID, $OrgCode);
         $stmt->execute();
@@ -464,6 +463,53 @@ try {
         }
         $stmt = $conn->prepare("INSERT INTO minutemeetingdocuments (UUID, org_code, filedEnd, file_Size, file_path, taskID, isFromTask, MMdate, MMTimeStart, MMLocation, MMPresider, MMAttendees, MMAbsentees, MMAgenda, MMCommencement, MMTimeend, DocsPath, MMsignature, DateCreated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("sisisssssssssssssss", $UUID, $OrgCode, $FileNameEnd, $fileSize, $filepaths, $taskID, $isFromTask, $MM_DATE, $MM_TIMESTARTED, $MM_LOC, $MM_PRESIDER, $MM_ATTENDEES, $MM_ABSENTEES, $MM_AGENDA, $MM_COMMENCEMENT, $MM_TIMEADJOURNED, $MM_DOCS_PATH, $MM_SIGNATURE, $currentDateTime);
+        $stmt->execute();
+        $stmt->close();
+
+        $Venue = '%' . $MM_LOC . '%';
+        $stmt = $conn->prepare("SELECT * FROM sysvenue WHERE ven_Name LIKE ? LIMIT 1");
+        $stmt->bind_param("s", $Venue);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 0) {
+            $ActivityDate = date('Y-m-d H:i:s', strtotime($MM_DATE));
+            $stmt = $conn->prepare("INSERT INTO sysvenue (ven_Name, created_by, isOccupied, startOccupied, endOccupied) VALUES (?,?,1,?,?)");
+            $stmt->bind_param("ssss", $ActivityVenue, $_SESSION['UUID'], $ActivityDate, $ActivityDate);
+            $stmt->execute();
+            $stmt->close();
+        } else {
+            $row = $result->fetch_assoc();
+            if ($row['isOccupied'] === 0) {
+                $stmt = $conn->prepare("UPDATE sysvenue SET isOccupied = 1, startOccupied = ?, endOccupied = ? WHERE ID = ?");
+                $stmt->bind_param("ssi", $ActivityDate, $ActivityDate, $row['ID']);
+                $stmt->execute();
+                $stmt->close();
+            } else {
+                if ($row['endOccupied'] < date('Y-m-d')) {
+                    $stmt = $conn->prepare("UPDATE sysvenue SET isOccupied = 1, startOccupied = ?, endOccupied = ? WHERE ID = ?");
+                    $stmt->bind_param("ssi", $ActivityDate, $ActivityDate, $row['ID']);
+                    $stmt->execute();
+                    $stmt->close();
+                } else {
+                    response(['status' => 'error', 'message' => 'Venue is already occupied']);
+                }
+            }
+        }
+
+        $UUID = $_SESSION['UUID'];
+        $title = 'Meeting: ' . date('F d, Y', strtotime($MM_DATE));
+        $eventdesc = "Meeting: " . date('F d, Y', strtotime($MM_DATE));
+        $location = $MM_LOC;
+        $color = 'bs-indigo';
+        $start = date('Y-m-d', strtotime($ActivityDate));
+        $end = date('Y-m-d', strtotime($ActivityDate));
+        $isEnded = 0;
+        $type = 'MM';
+        $isDeleted = 0;
+
+        $stmt = $conn->prepare("INSERT INTO sysevents (UUID, title, eventdesc, location, color, start, end, isEnded, type, isDeleted) VALUES (?,?,?,?,?,?,?,?,?,?)");
+        $stmt->bind_param("sssssssiss", $UUID, $title, $eventdesc, $location, $color, $start, $end, $isEnded, $type, $isDeleted);
         $stmt->execute();
         $stmt->close();
 

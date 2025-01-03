@@ -71,10 +71,10 @@ $_SESSION['last_activity'] = time();
         <div class="BS-Side d-none d-lg-block border-end glass-10 bg-opacity-50">
             <?php include_once "./UDSB.php"; ?>
         </div>
-        <div class="BS-Main mt-5">
-            <div class="container">
+        <div class="BS-Main d-flex justify-content-center align-items-center w-100" style="height: 100svh; width: 100vw;">
+            <div class="container p-3">
                 <div class="row m-5 pt-5 g-4">
-                    <div class="col-md-6">
+                    <div class="col-md-6 d-none">
                         <div class="form-floating">
                             <input type="text" class="form-control form-control-sm rounded-0" id="UUID_Input"
                                 placeholder="Unique User Identifier" readonly>

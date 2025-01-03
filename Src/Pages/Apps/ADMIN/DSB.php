@@ -57,7 +57,7 @@ $UserDashboard = "../User_Modules/Dashboard.php";
                                             </svg>
                                             Organizations
                                         </li>
-                                        <li class="list-group-item lg my-2 text-truncate <?php echo ($current_page == 'User-Management.php') ? 'lg-active' : ''; ?> "
+                                        <li class="list-group-item lg my-2 text-truncate <?php $_SESSION['role'] != 1 ? 'd-none' : ''; ?> <?php echo ($current_page == 'User-Management.php') ? 'lg-active' : ''; ?> "
                                             <?php echo ($current_page != 'User-Management.php') ? 'onclick="window.location.href = \'' . $UserManagement . '\'"' : ''; ?>
                                             title="User Management">
                                             <svg class="me-3" width="24" height="24">

@@ -326,28 +326,79 @@ $_SESSION['last_activity'] = time();
                         </div>
                     </div>
                     <div class="col-md-5">
-                        <div class="card bg-body bg-opacity-25 bg-blur-5 rounded-1">
-                            <div class="card-body">
-                                <h4 class="card- text-uppercase text-bold text-center">User Access Log</h4>
-                                <div class="overflow-auto" style="max-height: 65svh;">
-                                    <div class="list-group list-group-flush user-select-none" id="logList">
-                                        <div class="emptyfeed" id="EmptyFeed">
-                                            <div class="card border-0">
-                                                <div class="card-body text-center">
-                                                    <img src="../../../../Assets/Images/Loader-v1.gif" alt="Loading"
-                                                        width="50" height="50">
+                        <div>
+                            <ul class="nav nav-tabs nav-fill" id="myTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="log-tab" data-bs-toggle="tab"
+                                        data-bs-target="#userLog" type="button" role="tab" aria-controls="userLog"
+                                        aria-selected="true">User Access Log</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="old-tab" data-bs-toggle="tab" data-bs-target="#oldLog"
+                                        type="button" role="tab" aria-controls="oldLog" aria-selected="false">old
+                                        Log</button>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="userLog" role="tabpanel" aria-labelledby="log-tab">
+                                    <div class="card bg-body bg-opacity-25 bg-blur-5 rounded-1">
+                                        <div class="card-body">
+                                            <h4 class="card- text-uppercase text-bold text-center">User Access Log</h4>
+                                            <div class="overflow-auto" style="max-height: 65svh;">
+                                                <div class="list-group list-group-flush user-select-none" id="logList">
+                                                    <div class="emptyfeed" id="EmptyFeed">
+                                                        <div class="card border-0">
+                                                            <div class="card-body text-center">
+                                                                <img src="../../../../Assets/Images/Loader-v1.gif"
+                                                                    alt="Loading" width="50" height="50">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Puking ina mo -->
+                                                    <?php include_once "../../../Debug/Users/dispalyData.php"; ?>
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="oldLog" role="tabpanel" aria-labelledby="old-tab">
+                                    <div class="card bg-body bg-opacity-25 bg-blur-5 rounded-1" style="height: 71vh;">
+                                        <div class="card-body">
+                                            <ol class="list-group list-group-numbered">
+                                                <?php
+                                            $dir = scandir("../../../Debug/Users/");
+                                            $currentLog = date('Y-m') . '.log';
+                                            $counter = 0;
+rsort($dir);
+foreach ($dir as $file) {
+    if ($file != "." && $file != ".." && $file != "UUID.log" && pathinfo($file, PATHINFO_EXTENSION) == 'log') {
+        
+        $name = pathinfo($file, PATHINFO_FILENAME);
+        $date = date('F d, Y', strtotime($name));
 
-                                        <!-- Puking ina mo -->
-                                        <?php include_once "../../../Debug/Users/dispalyData.php"; ?>
+        if ($file == $currentLog) {
+            echo '<li class="list-group-item"><aclass="text-decoration-none text-muted" disabled>' . $date . '.log</a> <span class="badge bg-primary rounded-pill">';
+        } else {
+            echo '<li class="list-group-item"><a href="../../../Debug/Users/' . $file . '" class="text-decoration-none" download>' . $date . '.log</a></li>';
+        }
+        $counter++;
+    }
+}
+
+if ($counter == 0) {
+    echo '<li class="list-group-item">No logs found</li>';
+}
+
+?>
+                                            </ol>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-12 my-2">
+                    <div class="col-md-12 d-none">
                         <div class="card bg-body bg-opacity-25 bg-blur-5 rounded-1">
                             <div class="card-body">
                                 <h4 class="card-title">Audit Logs</h4>

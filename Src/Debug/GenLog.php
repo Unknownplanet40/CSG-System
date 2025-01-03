@@ -1,35 +1,42 @@
 <?php
 
-function writeLog($logPath, $Type, $UUID, $Action, $ipAddress, $Status)
+function writeLog($baseDir, $Type, $UUID, $Action, $ipAddress, $Status)
 {
+    $logPath = $baseDir;
     if (!file_exists($logPath)) {
         $file = fopen($logPath, "w");
-        fwrite($file, date('m/d/Y h:i:s A') . " - ------------------------------ File Created ------------------------------([INFO][DEBUG][ERROR][WARNING])\n");
-        fclose($file);
+        if ($file) {
+            fwrite($file, date('m/d/Y h:i:s A') . " - ------------------------------ File Created ------------------------------([INFO][DEBUG][ERROR][WARNING])\n");
+            fclose($file);
+        } else {
+            die("Error: Unable to create log file.");
+        }
     }
-    $file = fopen($logPath, "a");
 
-    if ($Action == "Login") {
-        $IPADDRESS = $ipAddress;
-    } else {
+    // Determine IP address
+    $IPADDRESS = $ipAddress;
+    if ($Action !== "Login" && $ipAddress === "::1") {
         $ipData = file_get_contents("https://api.ipify.org?format=json");
         $ipData = json_decode($ipData, true);
-        $IPADDRESS = $ipData['ip'];
-
-       /*  if (str_contains($ipAddress, "::1")) {
-            $ipData = file_get_contents("https://api.ipify.org?format=json");
-            $ipData = json_decode($ipData, true);
-            $IPADDRESS = $ipData['ip'];
-        } else {
-            if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-                $IPADDRESS = $_SERVER['HTTP_CLIENT_IP'];
-            } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-                $IPADDRESS = $_SERVER['HTTP_X_FORWARDED_FOR'];
-            } else {
-                $IPADDRESS = $_SERVER['REMOTE_ADDR'];
-            }
-        } */
+        $IPADDRESS = $ipData['ip'] ?? "Unknown";
     }
 
-    fwrite($file, date('m/d/Y h:i:s A') . " - [" . strtoupper($Type) . "] - User: " . $UUID . " - Action: " . $Action . " - IP: " . $IPADDRESS . " - Status: " . $Status . "\n");
+    // Write log entry
+    $file = fopen($logPath, "a");
+    if ($file) {
+        $logEntry = sprintf(
+            "%s - [%s] - User: %s - Action: %s - IP: %s - Status: %s\n",
+            date('m/d/Y h:i:s A'),
+            strtoupper($Type),
+            $UUID,
+            $Action,
+            $IPADDRESS,
+            $Status
+        );
+        fwrite($file, $logEntry);
+        fclose($file);
+    } else {
+        die("Error: Unable to write to log file.");
+    }
 }
+

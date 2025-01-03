@@ -29,6 +29,17 @@ if (isset($_SESSION['last_activity'])) {
 }
 
 $_SESSION['last_activity'] = time();
+
+$stmt = $conn->prepare("SELECT * FROM sysvenue");
+$stmt->execute();
+$result = $stmt->get_result();
+$stmt->close();
+$venues = [];
+
+while ($row = $result->fetch_assoc()) {
+    $venues[] = $row['ven_Name'];
+}
+echo '<script>var availableVenues = ' . json_encode($venues) . ';</script';
 ?>
 
 <!DOCTYPE html>
@@ -42,17 +53,19 @@ $_SESSION['last_activity'] = time();
     <link rel="stylesheet" href="../../../../Utilities/Third-party/Datatable/css/datatables.css">
     <link rel="stylesheet" href="../../../../Utilities/Stylesheets/BGaniStyle.css">
     <link rel="stylesheet" href="../../../../Utilities/Stylesheets/CustomStyle.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
-    <!-- <link rel="stylesheet" href="../../../../Utilities/Third-party/Froalaeditor/css/froala_editor.pkgd.min.css"> -->
     <link rel="stylesheet" href="../../../../Utilities/Third-party/summernote/summernote-bs5.css">
-    <!-- <link rel="stylesheet" href="../../../../Utilities/Third-party/Froalaeditor/css/themes/dark.css"> -->
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="../../../../Utilities/Stylesheets/AB_DBStyle.css">
 
     <script defer src="../../../../Utilities/Third-party/Bootstrap/js/bootstrap.bundle.js"></script>
     <script defer src="../../../../Utilities/Third-party/Datatable/js/datatables.js"></script>
     <script src="../../../../Utilities/Third-party/Sweetalert2/js/sweetalert2.all.min.js"></script>
     <script src="../../../../Utilities/Third-party/JQuery/js/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js">
+    </script>
     <script src="../../../../Utilities/Third-party/summernote/summernote-bs5.js"></script>
     <script defer type="module" src="../../../../Utilities/Scripts/BS_DBScript.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
@@ -118,7 +131,7 @@ $_SESSION['last_activity'] = time();
                                                 placeholder="Type your letter here"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-12">
                                         <div class="mb-3">
                                             <label for="ActivityTitle" class="form-label">Activity Title</label>
                                             <input type="text" class="form-control rounded-0" id="ActivityTitle">
@@ -126,9 +139,93 @@ $_SESSION['last_activity'] = time();
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="ActivityDateVenue" class="form-label">Activity Date and
-                                                Venue</label>
-                                            <input type="text" class="form-control rounded-0" id="ActivityDateVenue">
+                                            <label for="ActivityDate" class="form-label">Activity Date</label>
+                                            <input type="text" class="form-control rounded-0" id="ActivityDate"
+                                                placeholder="Select Date">
+                                            <script>
+                                                $(function() {
+                                                    let events = [];
+                                                    $.ajax({
+                                                        url: '../../../Functions/api/datepickerData.php',
+                                                        type: 'GET',
+                                                        success: function(data) {
+                                                            if (data.status == 'success') {
+                                                                events = data.data;
+                                                                console.log(events);
+                                                            } else {
+                                                                Swal.fire({
+                                                                    icon: 'error',
+                                                                    title: 'Error',
+                                                                    text: 'An error occurred while fetching data 1',
+                                                                });
+                                                            }
+                                                        },
+                                                        error: function() {
+                                                            Swal.fire({
+                                                                icon: 'error',
+                                                                title: 'Error',
+                                                                text: 'An error occurred while fetching data 2',
+                                                            });
+                                                        },
+                                                    });
+                                                    $('#ActivityDate').datetimepicker({
+                                                        format: 'F j, Y',
+                                                        timepicker: false,
+                                                        datepicker: true,
+                                                        theme: <?php echo $_SESSION['theme'] == 'dark' ? "'dark'" : "'light'"; ?> ,
+                                                        lang: 'en',
+                                                        scrollMonth: false,
+                                                        scrollTime: false,
+                                                        closeOnDateSelect: true,
+                                                        mask: true,
+                                                        minDate: '<?php echo date('Y-m-d'); ?>',
+                                                        className: 'rounded-1 border-0 shadow z-2',
+                                                        onShow: function(ct) {
+                                                            this.setOptions({minDate: $('#ActivityDate').val() ? $('#ActivityDate').val() : false});
+                                                        },
+                                                        beforeShowDay: function(date) {
+                                                            let disabled = false;
+                                                            for (let i = 0; i < events.length; i++) {
+                                                                let start = new Date(events[i].start);
+                                                                let end = new Date(events[i].end);
+                                                                if (date.getTime() >= start.getTime() && date.getTime() <= end.getTime()) {
+                                                                    disabled = true;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            return [!disabled, ''];
+                                                        },
+                                                    });
+                                                });
+                                            </script>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="ActivityVenue" class="form-label">Activity Venue</label>
+                                            <input type="text" class="form-control rounded-0" id="ActivityVenue" placeholder="Select Venue">
+                                            <script>
+                                                $(function() {
+                                                    $("#ActivityVenue").autocomplete({
+                                                        source: availableVenues,
+                                                        minLength: 0,
+                                                        autoFocus: true,
+                                                        delay: 0
+                                                    });
+                                                    $("#ActivityVenue").on("focus click", function() {
+                                                        $(this).autocomplete("search", "");
+                                                    });
+                                                    $("#ActivityVenue").autocomplete("instance")._renderMenu =
+                                                        function(ul, items) {
+                                                            var that = this;
+                                                            items.forEach(function(item) {
+                                                                that._renderItemData(ul, item);
+                                                            });
+                                                            $(ul).addClass(
+                                                                "ui-autocomplete-open");
+                                                        };
+                                                });
+                                            </script>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -142,16 +239,18 @@ $_SESSION['last_activity'] = time();
                                         <div class="mb-3">
                                             <label for="OrgCode_new" class="form-label">Organization</label>
                                             <select id="OrgCode_new" class="form-select rounded-0">
-                                                <option value="<?php echo isset($_SESSION['org_Code']) ? $_SESSION['org_Code'] : '0'; ?>" selected>Select Organization</option>
+                                                <option
+                                                    value="<?php echo isset($_SESSION['org_Code']) ? $_SESSION['org_Code'] : '0'; ?>"
+                                                    selected>Select Organization</option>
                                                 <?php
                                                     $stmt = $conn->prepare("SELECT * FROM sysorganizations WHERE stat = 0");
-                                                    $stmt->execute();
-                                                    $result = $stmt->get_result();
-                                                    $stmt->close();
+$stmt->execute();
+$result = $stmt->get_result();
+$stmt->close();
 
-                                                    while ($row = $result->fetch_assoc()) {
-                                                        echo '<option value="' . $row['org_code'] . '">' . $row['org_name'] . '</option>';
-                                                    }?>
+while ($row = $result->fetch_assoc()) {
+    echo '<option value="' . $row['org_code'] . '">' . $row['org_name'] . '</option>';
+}?>
                                             </select>
                                         </div>
                                     </div>
@@ -378,8 +477,10 @@ $_SESSION['last_activity'] = time();
                                                     doc.LetterBody);
                                                 $('#ActivityTitle').val(doc
                                                     .act_title);
-                                                $('#ActivityDateVenue').val(doc
-                                                    .act_date_ven);
+                                                $('#ActivityDate').val(doc
+                                                    .act_date);
+                                                $('#ActivityVenue').val(doc
+                                                .act_ven);
                                                 $('#ActivityHead').val(doc
                                                     .act_head);
                                                 $('#ActivityObjective').summernote(
@@ -420,8 +521,9 @@ $_SESSION['last_activity'] = time();
                                             doc.LetterBody);
                                         $('#ActivityTitle').val(doc
                                             .act_title);
-                                        $('#ActivityDateVenue').val(doc
-                                            .act_date_ven);
+                                        $('#ActivityDate').val(doc
+                                            .act_date);
+                                        $('#ActivityVenue').val(doc.act_ven);
                                         $('#ActivityHead').val(doc
                                             .act_head);
                                         $('#ActivityObjective').summernote(
@@ -449,7 +551,7 @@ $_SESSION['last_activity'] = time();
                                         } else {
                                             $('#TasksMessage').text(
                                                 'No tasks found. Click reload to load the last task.'
-                                                );
+                                            );
                                         }
 
                                         $('#TaskIDis').text('N/A');
@@ -599,7 +701,8 @@ $_SESSION['last_activity'] = time();
             $('#LetterTo').val('');
             $('#LetterBody').summernote('code', '');
             $('#ActivityTitle').val('');
-            $('#ActivityDateVenue').val('');
+            $('#ActivityDate').val('');
+            $('#ActivityVenue').val('');
             $('#ActivityObjective').summernote('code', '');
             $('#ActivityTarget').val('');
             $('#ActivityMechanics').val('');
@@ -626,7 +729,8 @@ $_SESSION['last_activity'] = time();
             var LetterTo = $('#LetterTo').val();
             var LetterBody = $('#LetterBody').summernote('code');
             var ActivityTitle = $('#ActivityTitle').val();
-            var ActivityDateVenue = $('#ActivityDateVenue').val();
+            var ActivityDate = $('#ActivityDate').val();
+            var ActivityVenue = $('#ActivityVenue').val();
             var ActivityObjective = $('#ActivityObjective').summernote('code');
             var ActivityTarget = $('#ActivityTarget').val();
             var ActivityMechanics = $('#ActivityMechanics').val();
@@ -637,7 +741,7 @@ $_SESSION['last_activity'] = time();
             var ActivitySignature = $('#ActivitySignature').summernote('code');
 
             if (AdminName == '' || LetterTo == '' || LetterBody == '' || ActivityTitle == '' ||
-                ActivityDateVenue == '' || ActivityObjective == '' || ActivityTarget == '' ||
+                ActivityDate == '' || ActivityObjective == '' || ActivityTarget == '' || ActivityVenue == '' ||
                 ActivityMechanics == '' || ActivityBudget == '' || ActivityHead == '' || ActivitySourceFunds ==
                 '' || ActivityOutcomes == '' || ActivitySignature == '') {
                 Swal.mixin({
@@ -653,50 +757,51 @@ $_SESSION['last_activity'] = time();
                 return;
             }
 
-                var patterns = [
-                        /background-color: var\(--bs-card-bg\); color: var\(--bs-body-color\);/g,
-                        /background-color: var\(--bs-card-bg\);/g,
-                        /color: rgb\(222, 226, 230\);/g
-                    ];
+            var patterns = [
+                /background-color: var\(--bs-card-bg\); color: var\(--bs-body-color\);/g,
+                /background-color: var\(--bs-card-bg\);/g,
+                /color: rgb\(222, 226, 230\);/g
+            ];
 
-                    var search = /font-size: 14px;/g;
-                    var replace = 'font-size: 11px;';
+            var search = /font-size: 14px;/g;
+            var replace = 'font-size: 11px;';
 
-                    function filterAndRemove(input, patterns) {
-                        var output = input;
-                        for (var i = 0; i < patterns.length; i++) {
-                            output = output.replace(patterns[i],
-                                ''); // Replace matched patterns with an empty string
-                        }
-                        return output;
-                    }
+            function filterAndRemove(input, patterns) {
+                var output = input;
+                for (var i = 0; i < patterns.length; i++) {
+                    output = output.replace(patterns[i],
+                        ''); // Replace matched patterns with an empty string
+                }
+                return output;
+            }
 
-                    function updateCssProperty(input, search, replace) {
-                        return input.replace(search, replace); // Replace font-size as needed
-                    }
-                    
-                    if (typeof LetterBody === 'string' && typeof ActivityObjective === 'string' && typeof ActivityBudget === 'string' && typeof ActivitySignature === 'string') {
-                        letterBody = filterAndRemove(LetterBody, patterns);
-                        activityObjective = filterAndRemove(ActivityObjective, patterns);
-                        activityBudget = filterAndRemove(ActivityBudget, patterns);
-                        activitySignature = filterAndRemove(ActivitySignature, patterns);
+            function updateCssProperty(input, search, replace) {
+                return input.replace(search, replace); // Replace font-size as needed
+            }
 
-                        letterBody = updateCssProperty(letterBody, search, replace);
-                        activityObjective = updateCssProperty(activityObjective, search, replace);
-                        activityBudget = updateCssProperty(activityBudget, search, replace);
-                        activitySignature = updateCssProperty(activitySignature, search, replace);
-                    } else {
-                        Swal.mixin({
-                            toast: true,
-                            position: 'top',
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true,
-                        }).fire({
-                            icon: 'error',
-                            title: 'Error in Processing the document'
-                        });
-                    }
+            if (typeof LetterBody === 'string' && typeof ActivityObjective === 'string' &&
+                typeof ActivityBudget === 'string' && typeof ActivitySignature === 'string') {
+                letterBody = filterAndRemove(LetterBody, patterns);
+                activityObjective = filterAndRemove(ActivityObjective, patterns);
+                activityBudget = filterAndRemove(ActivityBudget, patterns);
+                activitySignature = filterAndRemove(ActivitySignature, patterns);
+
+                letterBody = updateCssProperty(letterBody, search, replace);
+                activityObjective = updateCssProperty(activityObjective, search, replace);
+                activityBudget = updateCssProperty(activityBudget, search, replace);
+                activitySignature = updateCssProperty(activitySignature, search, replace);
+            } else {
+                Swal.mixin({
+                    toast: true,
+                    position: 'top',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                }).fire({
+                    icon: 'error',
+                    title: 'Error in Processing the document'
+                });
+            }
 
             var data = {
                 TaskID: TaskID,
@@ -709,7 +814,8 @@ $_SESSION['last_activity'] = time();
                 LetterBody: LetterBody,
                 ActivityHead: ActivityHead,
                 ActivityTitle: ActivityTitle,
-                ActivityDateVenue: ActivityDateVenue,
+                ActivityDate: ActivityDate,
+                ActivityVenue: ActivityVenue,
                 ActivityObjective: ActivityObjective,
                 ActivityTarget: ActivityTarget,
                 ActivityMechanics: ActivityMechanics,

@@ -13,6 +13,7 @@ $Feed = "../../Feed.php";
 $Preference = "../../Preference.php";
 $enableDocumentHeader = false;
 $createAccount = "./CreateAccount.php";
+$CalendarEvents = "./CalendarEvents.php";
 
 if ($_SESSION['role'] == 1) {
     $enableDocumentHeader = true;
@@ -102,6 +103,13 @@ if ($_SESSION['role'] == 1) {
                     <use xlink:href="#ManageAct" />
                 </svg>
                 Create User
+            </li>
+            <li class="list-group-item lg my-2 <?php echo $current_page == 'CalendarEvents.php' ? 'lg-active' : ''; ?> <?php echo $enableDocumentHeader ? '' : 'd-none'; ?>"
+                <?php echo $current_page != 'CalendarEvents.php' ? "onclick='window.location.href = \"$CalendarEvents\"'" : ''; ?>>
+                <svg class="me-3" width="24" height="24">
+                    <use xlink:href="#calEvents" />
+                </svg>
+                Calendar Events
             </li>
             <span class="hr-divider-start text-secondary d-none"></span>
             <div class="accordion accordion-flush" id="Modules_Accord">
